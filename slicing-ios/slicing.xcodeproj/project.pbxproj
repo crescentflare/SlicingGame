@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		043D7263239C285C00A79415 /* Pages in Resources */ = {isa = PBXBuildFile; fileRef = 043D7262239C285C00A79415 /* Pages */; };
 		04875384239BDACB002FC386 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875383239BDACB002FC386 /* AppDelegate.swift */; };
 		0487538D239BDACC002FC386 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0487538C239BDACC002FC386 /* Assets.xcassets */; };
 		04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0487538E239BDACC002FC386 /* LaunchScreen.storyboard */; };
@@ -14,6 +15,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		043D7262239C285C00A79415 /* Pages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pages; sourceTree = "<group>"; };
 		04875380239BDACB002FC386 /* Slicing game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Slicing game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04875383239BDACB002FC386 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0487538C239BDACC002FC386 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -36,6 +38,7 @@
 		04875377239BDACB002FC386 = {
 			isa = PBXGroup;
 			children = (
+				043D7262239C285C00A79415 /* Pages */,
 				04875382239BDACB002FC386 /* SlicingGame */,
 				04875381239BDACB002FC386 /* Products */,
 			);
@@ -151,6 +154,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				043D7263239C285C00A79415 /* Pages in Resources */,
 				04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */,
 				0487538D239BDACC002FC386 /* Assets.xcassets in Resources */,
 			);
