@@ -1,0 +1,16 @@
+PODS:
+  - JsonInflator (0.6.2)
+
+DEPENDENCIES:
+  - JsonInflator (~> 0.6.2)
+
+SPEC REPOS:
+  https://github.com/CocoaPods/Specs.git:
+    - JsonInflator
+
+SPEC CHECKSUMS:
+  JsonInflator: a1d36ccd1c38d5604bc64752b6eb3ec0a94512f1
+
+PODFILE CHECKSUM: e44d347fd03210eca9ab10f6ec70ca6b1f50c7a3
+
+COCOAPODS: 1.8.4
