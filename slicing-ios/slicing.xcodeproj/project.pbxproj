@@ -3,12 +3,13 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0335411C5F848BDBF791E97F /* Pods_SlicingGame.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */; };
 		043D7263239C285C00A79415 /* Pages in Resources */ = {isa = PBXBuildFile; fileRef = 043D7262239C285C00A79415 /* Pages */; };
+		043D726C239C2C0E00A79415 /* Inflators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043D726B239C2C0D00A79415 /* Inflators.swift */; };
 		04875384239BDACB002FC386 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875383239BDACB002FC386 /* AppDelegate.swift */; };
 		0487538D239BDACC002FC386 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0487538C239BDACC002FC386 /* Assets.xcassets */; };
 		04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0487538E239BDACC002FC386 /* LaunchScreen.storyboard */; };
@@ -17,6 +18,7 @@
 
 /* Begin PBXFileReference section */
 		043D7262239C285C00A79415 /* Pages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pages; sourceTree = "<group>"; };
+		043D726B239C2C0D00A79415 /* Inflators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inflators.swift; sourceTree = "<group>"; };
 		04875380239BDACB002FC386 /* Slicing game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Slicing game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04875383239BDACB002FC386 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0487538C239BDACC002FC386 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -40,6 +42,22 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		043D7269239C2C0D00A79415 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				043D726A239C2C0D00A79415 /* Inflator */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		043D726A239C2C0D00A79415 /* Inflator */ = {
+			isa = PBXGroup;
+			children = (
+				043D726B239C2C0D00A79415 /* Inflators.swift */,
+			);
+			path = Inflator;
+			sourceTree = "<group>";
+		};
 		04875377239BDACB002FC386 = {
 			isa = PBXGroup;
 			children = (
@@ -62,6 +80,7 @@
 		04875382239BDACB002FC386 /* SlicingGame */ = {
 			isa = PBXGroup;
 			children = (
+				043D7269239C2C0D00A79415 /* Infrastructure */,
 				04875397239BDBBB002FC386 /* Page */,
 				0487539B239BDED5002FC386 /* Resources */,
 				04875383239BDACB002FC386 /* AppDelegate.swift */,
@@ -117,7 +136,6 @@
 				D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */,
 				27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -237,6 +255,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */,
+				043D726C239C2C0E00A79415 /* Inflators.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
