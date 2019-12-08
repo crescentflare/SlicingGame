@@ -6,23 +6,48 @@
 import Foundation
 import Alamofire
 
+protocol PageLoaderDelegate: class {
+
+    func didUpdatePage(page: Page)
+    func didReceivePageLoadingEvent(event: PageLoaderEvent)
+
+}
+
+enum PageLoaderEvent {
+
+    case loadingStarted
+    case loadingFinished
+    case loadingFailed
+    case loadingMerged
+    case loadingCached
+    case receivedNewPageData
+    case changedPageData
+    case ignoredSamePageData
+
+}
+
 class PageLoader {
     
     // --
     // MARK: Statics
     // --
     
+    private static let cacheMinute: TimeInterval = 60
     private static let forceInternalSyncLoad = true
+    private static let cacheTimeout = cacheMinute * 5
 
     
     // --
     // MARK: Members
     // --
     
+    private weak var delegate: PageLoaderDelegate?
     private let location: String
     private let entry: String
     private let loadInternal: Bool
     private var loading = false
+    private var waiting = false
+    private var continuousLoad = false
 
 
     // --
@@ -51,7 +76,7 @@ class PageLoader {
                 completion(page, error)
             })
         } else {
-            loadOnline(completion: { page, error in
+            loadOnline(currentHash: "ignore", completion: { page, error in
                 if let page = page {
                     PageCache.shared.storeEntry(cacheKey: self.entry, page: page)
                 }
@@ -60,10 +85,13 @@ class PageLoader {
         }
     }
     
-    private func loadOnline(completion: @escaping (_ page: Page?, _ error: Error?) -> Void) {
+    private func loadOnline(currentHash: String, completion: @escaping (_ page: Page?, _ error: Error?) -> Void) {
         if !loadInternal {
+            let headers: HTTPHeaders = [
+                "X-Mock-Wait-Change-Hash": currentHash
+            ]
             loading = true
-            Alamofire.request(location).responseString { response in
+            Alamofire.request(location, headers: headers).responseString { response in
                 self.loading = false
                 if let string = response.value {
                     completion(Page(jsonString: string), nil)
@@ -115,6 +143,89 @@ class PageLoader {
             return String(file[index...])
         }
         return ""
+    }
+    
+    
+    // --
+    // MARK: Advanced loading with cache and hot reload integration
+    // --
+    
+    func startLoading(completion: PageLoaderDelegate, hotReload: Bool, ignoreCache: Bool = false) {
+        var cacheStable = false
+        delegate = completion
+        continuousLoad = hotReload
+        if !ignoreCache {
+            if let page = PageCache.shared.getEntry(cacheKey: entry) {
+                let expired = Date().timeIntervalSince1970 - page.creationTime >= PageLoader.cacheTimeout
+                cacheStable = loadInternal || (!hotReload && !expired)
+            }
+        }
+        if !cacheStable {
+            tryNextLoad()
+        } else {
+            delegate?.didReceivePageLoadingEvent(event: .loadingCached)
+        }
+    }
+
+    func stopLoading() {
+        delegate = nil
+    }
+
+    private func tryNextLoad() {
+        if !loading && !waiting && delegate != nil {
+            if loadInternal {
+                loadInternal(completion: { page, error in
+                    if let page = page {
+                        self.delegate?.didReceivePageLoadingEvent(event: .loadingFinished)
+                        if PageCache.shared.hasEntry(cacheKey: self.entry) {
+                            self.delegate?.didReceivePageLoadingEvent(event: .changedPageData)
+                        } else {
+                            self.delegate?.didReceivePageLoadingEvent(event: .receivedNewPageData)
+                        }
+                        PageCache.shared.storeEntry(cacheKey: self.entry, page: page)
+                        self.delegate?.didUpdatePage(page: page)
+                    } else {
+                        self.delegate?.didReceivePageLoadingEvent(event: .loadingFailed)
+                    }
+                })
+            } else {
+                let hash = PageCache.shared.getEntry(cacheKey: entry)?.hash ?? "unknown"
+                loadOnline(currentHash: continuousLoad ? hash : "ignored", completion: { page, error in
+                    var waitingTime: Double = 2
+                    if error != nil {
+                        self.delegate?.didReceivePageLoadingEvent(event: .loadingFailed)
+                    } else {
+                        self.delegate?.didReceivePageLoadingEvent(event: .loadingFinished)
+                        waitingTime = 0.1
+                    }
+                    if let page = page {
+                        if hash != page.hash {
+                            if PageCache.shared.hasEntry(cacheKey: self.entry) {
+                                self.delegate?.didReceivePageLoadingEvent(event: .changedPageData)
+                            } else {
+                                self.delegate?.didReceivePageLoadingEvent(event: .receivedNewPageData)
+                            }
+                            PageCache.shared.storeEntry(cacheKey: self.entry, page: page)
+                            self.delegate?.didUpdatePage(page: page)
+                        } else {
+                            self.delegate?.didReceivePageLoadingEvent(event: .ignoredSamePageData)
+                            PageCache.shared.getEntry(cacheKey: self.entry)?.updateCreationTime()
+                        }
+                    } else if error == nil {
+                        self.delegate?.didReceivePageLoadingEvent(event: .ignoredSamePageData)
+                    }
+                    if self.continuousLoad {
+                        self.waiting = true
+                        DispatchQueue.main.asyncAfter(deadline: .now() + waitingTime, execute: {
+                            self.waiting = false
+                            self.tryNextLoad()
+                        })
+                    }
+                })
+            }
+        } else {
+            delegate?.didReceivePageLoadingEvent(event: .loadingMerged)
+        }
     }
 
 }

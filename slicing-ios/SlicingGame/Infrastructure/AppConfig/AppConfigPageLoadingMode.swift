@@ -7,5 +7,6 @@ enum AppConfigPageLoadingMode: String, CaseIterable {
     
     case local = "local"
     case server = "server"
+    case hotReloadServer = "hotReloadServer"
     
 }
