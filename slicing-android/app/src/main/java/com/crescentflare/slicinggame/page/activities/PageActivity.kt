@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.page.storage.PageLoader
 
@@ -42,6 +43,12 @@ class PageActivity : AppCompatActivity() {
         val view = View(this)
         view.setBackgroundColor(Color.GREEN)
         setContentView(view)
+
+        // Add long click listener to open app config menu
+        view.setOnLongClickListener {
+            ManageAppConfigActivity.startWithResult(this, 0)
+            true
+        }
 
         // Load page
         val pageLoader = PageLoader(this, intent.getStringExtra(pageParam) ?: defaultPage)

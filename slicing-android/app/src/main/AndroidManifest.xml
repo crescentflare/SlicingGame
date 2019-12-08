@@ -21,6 +21,18 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity"
+            android:theme="@style/Theme.AppCompat.Light"/>
+
+        <activity
+            android:name="com.crescentflare.dynamicappconfig.activity.EditAppConfigActivity"
+            android:theme="@style/Theme.AppCompat.Light"/>
+
+        <activity
+            android:name="com.crescentflare.dynamicappconfig.activity.AppConfigStringChoiceActivity"
+            android:theme="@style/Theme.AppCompat.Light"/>
+
     </application>
 
 </manifest>

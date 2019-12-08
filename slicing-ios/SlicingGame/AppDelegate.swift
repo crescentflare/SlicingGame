@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import DynamicAppConfig
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,15 +21,31 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // --
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        // Enable app config utility for non-release builds
+        #if !RELEASE
+            AppConfigStorage.shared.activate(manager: CustomAppConfigManager.sharedManager)
+            AppConfigStorage.shared.addDataObserver(self, selector: #selector(updateConfigurationValues), name: AppConfigStorage.configurationChanged)
+            updateConfigurationValues()
+        #endif
+
         // Configure framework
         registerViewlets()
         
         // Launch view controller
-        window = UIWindow(frame: UIScreen.main.bounds)
+        window = CustomWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = .black
         window?.rootViewController = PageViewController(pageJson: "game.json")
         window?.makeKeyAndVisible()
         return true
+    }
+
+    
+    // --
+    // MARK: App config integration
+    // --
+    
+    @objc func updateConfigurationValues() {
+        // No implementation needed (for now)
     }
 
     
@@ -45,4 +62,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
     }
     
+}
+
+fileprivate class CustomWindow: UIWindow {
+
+    override func sendEvent(_ event: UIEvent) {
+        super.sendEvent(event)
+        if AppConfigStorage.shared.isActivated() && event.subtype == .motionShake {
+            AppConfigManageViewController.launch()
+        }
+    }
+
 }
