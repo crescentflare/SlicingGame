@@ -1,0 +1,6 @@
+{
+  "category": "Hosting",
+  "method": "GET",
+  "responseCode": 200,
+  "generates": "fileList"
+}
