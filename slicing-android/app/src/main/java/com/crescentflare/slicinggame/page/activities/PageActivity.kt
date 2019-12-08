@@ -13,11 +13,12 @@ import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigMan
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
 import com.crescentflare.slicinggame.page.storage.PageLoader
+import com.crescentflare.slicinggame.page.storage.PageLoaderListener
 
 /**
  * Activity: a generic activity for loading pages
  */
-class PageActivity : AppCompatActivity() {
+class PageActivity : AppCompatActivity(), PageLoaderListener {
 
     // --
     // Statics: new instance
@@ -107,6 +108,7 @@ class PageActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         isResumed = false
+        stopPageLoad()
     }
 
 
@@ -117,7 +119,6 @@ class PageActivity : AppCompatActivity() {
     private fun checkPageLoad() {
         // Refresh page loader instance when the loading mode has changed (which will also drop the cache entry)
         var dropCache = false
-        var needsLoad = false
         if (!pageJson.contains("://")) {
             val currentPageLoadingServer = pageLoadingServer
             if (CustomAppConfigManager.currentConfig().devServerUrl.isNotEmpty() && CustomAppConfigManager.currentConfig().pageLoadingMode != AppConfigPageLoadingMode.Local) {
@@ -126,7 +127,6 @@ class PageActivity : AppCompatActivity() {
                     pageLoadingServer = "http://$pageLoadingServer"
                 }
                 pageLoadingServer = "$pageLoadingServer/pages/"
-                needsLoad = true
             } else {
                 pageLoadingServer = ""
             }
@@ -134,31 +134,28 @@ class PageActivity : AppCompatActivity() {
             if (dropCache) {
                 PageCache.removeEntry(pageJson)
             }
-        } else {
-            needsLoad = true
         }
         if (pageLoader == null || dropCache) {
             pageLoader = PageLoader(this, pageJson, pageLoadingServer)
-            needsLoad = true
         }
 
-        // Load page if needed
-        if (needsLoad) {
-            pageLoader?.load { page, _ ->
-                page?.let {
-                    if (page.hash != currentPageHash) {
-                        ViewletUtil.assertInflateOn(activityView, page.layout)
-                    }
-                }?:run {
-                    activityView.setBackgroundColor(Color.RED)
-                }
-            }
-        }
+        // Start the page loader (which may load if needed)
+        pageLoader?.startLoading(this, CustomAppConfigManager.currentConfig().pageLoadingMode == AppConfigPageLoadingMode.HotReloadServer)
     }
 
-    private fun onPageUpdated(page: Page) {
+    private fun stopPageLoad() {
+        pageLoader?.stopLoading()
+    }
+
+    override fun onPageUpdated(page: Page) {
         ViewletUtil.assertInflateOn(activityView, page.layout)
         currentPageHash = page.hash
+    }
+
+    override fun onPageLoadingEvent(event: PageLoader.Event) {
+        if (event == PageLoader.Event.LoadingFailed) {
+            activityView.setBackgroundColor(Color.RED)
+        }
     }
 
 }
