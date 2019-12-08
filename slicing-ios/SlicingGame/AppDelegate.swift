@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Launch view controller
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.backgroundColor = .black
-        window?.rootViewController = PageViewController()
+        window?.rootViewController = PageViewController(pageJson: "game.json")
         window?.makeKeyAndVisible()
         return true
     }
