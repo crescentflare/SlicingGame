@@ -46,6 +46,9 @@ dependencies {
     // App framework
     implementation 'com.crescentflare.jsoninflator:JsonInflatorLib:0.6.2'
 
+    // Other libraries
+    implementation 'com.google.code.gson:gson:2.8.5'
+
     // Testing framework
     implementation 'junit:junit:4.12'
 }

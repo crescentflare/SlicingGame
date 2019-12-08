@@ -15,6 +15,9 @@
 		0487538D239BDACC002FC386 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0487538C239BDACC002FC386 /* Assets.xcassets */; };
 		04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0487538E239BDACC002FC386 /* LaunchScreen.storyboard */; };
 		0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875399239BDC0D002FC386 /* PageViewController.swift */; };
+		0487D2EC239C518500515520 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0487D2EB239C518400515520 /* Page.swift */; };
+		0487D2F0239C519600515520 /* String+SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0487D2EE239C519600515520 /* String+SHA256.swift */; };
+		0487D2F1239C519600515520 /* Data+SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0487D2EF239C519600515520 /* Data+SHA256.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +30,9 @@
 		0487538F239BDACC002FC386 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		04875391239BDACC002FC386 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		04875399239BDC0D002FC386 /* PageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
+		0487D2EB239C518400515520 /* Page.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
+		0487D2EE239C519600515520 /* String+SHA256.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+SHA256.swift"; sourceTree = "<group>"; };
+		0487D2EF239C519600515520 /* Data+SHA256.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+SHA256.swift"; sourceTree = "<group>"; };
 		27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.release.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.release.xcconfig"; sourceTree = "<group>"; };
 		502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlicingGame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.debug.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.debug.xcconfig"; sourceTree = "<group>"; };
@@ -47,6 +53,7 @@
 		043D7269239C2C0D00A79415 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				0487D2ED239C519600515520 /* CoreExtensions */,
 				043D726A239C2C0D00A79415 /* Inflator */,
 			);
 			path = Infrastructure;
@@ -111,6 +118,7 @@
 		04875397239BDBBB002FC386 /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				0487D2EA239C518400515520 /* Storage */,
 				04875398239BDBC5002FC386 /* ViewControllers */,
 			);
 			path = Page;
@@ -139,6 +147,23 @@
 				0487538E239BDACC002FC386 /* LaunchScreen.storyboard */,
 			);
 			path = Localization;
+			sourceTree = "<group>";
+		};
+		0487D2EA239C518400515520 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				0487D2EB239C518400515520 /* Page.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		0487D2ED239C519600515520 /* CoreExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				0487D2EE239C519600515520 /* String+SHA256.swift */,
+				0487D2EF239C519600515520 /* Data+SHA256.swift */,
+			);
+			path = CoreExtensions;
 			sourceTree = "<group>";
 		};
 		529EC35F47AE04B3AC9A0B49 /* Frameworks */ = {
@@ -274,9 +299,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */,
+				0487D2F1239C519600515520 /* Data+SHA256.swift in Sources */,
 				043D726C239C2C0E00A79415 /* Inflators.swift in Sources */,
 				043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */,
+				0487D2F0239C519600515520 /* String+SHA256.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
+				0487D2EC239C518500515520 /* Page.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
