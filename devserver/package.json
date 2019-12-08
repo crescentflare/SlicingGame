@@ -1,0 +1,11 @@
+{
+    "name": "app_dev_server",
+    "version": "1.0.0",
+    "description": "Serves the JSON pages during development",
+    "author": "Johan Bos <johan@crescentflare.com>",
+    "main": "server.js",
+    "dependencies": {
+        "smart-mock-server": "1.2.0"
+    },
+    "private": true
+}
