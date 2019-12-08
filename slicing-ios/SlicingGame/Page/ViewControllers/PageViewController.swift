@@ -113,7 +113,11 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     }
     
     func didUpdatePage(page: Page) {
-        ViewletUtil.assertInflateOn(view: self.view, attributes: page.layout)
+        if Inflators.viewlet.findInflatableNameInAttributes(page.layout ?? [:]) == "view" {
+            ViewletUtil.assertInflateOn(view: self.view, attributes: page.layout)
+        } else {
+            view.backgroundColor = .red
+        }
         currentPageHash = page.hash
     }
     

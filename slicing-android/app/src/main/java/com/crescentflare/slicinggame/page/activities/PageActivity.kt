@@ -10,6 +10,7 @@ import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
+import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
 import com.crescentflare.slicinggame.page.storage.PageLoader
@@ -148,7 +149,11 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     }
 
     override fun onPageUpdated(page: Page) {
-        ViewletUtil.assertInflateOn(activityView, page.layout)
+        if (Inflators.viewlet.findInflatableNameInAttributes(page.layout) == "view") {
+            ViewletUtil.assertInflateOn(activityView, page.layout)
+        } else {
+            activityView.setBackgroundColor(Color.RED)
+        }
         currentPageHash = page.hash
     }
 
