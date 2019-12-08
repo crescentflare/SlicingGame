@@ -8,6 +8,11 @@ platform :ios, '9.3'
 
 # Public Pods
 def app_pods
+  # Network pods
+  pod 'Alamofire', '~> 4.9.1'
+
+  # App framework pods
+  pod 'DynamicAppConfig', '~> 1.3.4'
   pod 'JsonInflator', '~> 0.6.2'
 end
 
