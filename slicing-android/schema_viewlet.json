@@ -9,7 +9,8 @@
       "type": "string",
       "enum": [
         "view",
-        "frameContainer"
+        "frameContainer",
+        "linearContainer"
       ]
     },
     "refId": {
@@ -39,6 +40,10 @@
     "maxHeight": {
       "description": "The maximum height of the view",
       "$ref": "#/definitions/dimension"
+    },
+    "weight": {
+      "description": "The weight of the view, used to evenly place items in the remaining space of a linear container",
+      "type": "number"
     },
     "padding": {
       "description": "A list of padding values in the order of left, top, right and bottom",
@@ -139,6 +144,35 @@
       },
       "then": {
         "properties": {
+          "items": {
+            "description": "A list of viewlets in a container component",
+            "type": "array",
+            "items": {
+              "$ref": "#"
+            },
+            "default": []
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "linearContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "orientation": {
+            "description": "The layout direction of the items in the container",
+            "type": "string",
+            "enum": [
+              "horizontal",
+              "vertical"
+            ]
+          },
           "items": {
             "description": "A list of viewlets in a container component",
             "type": "array",
