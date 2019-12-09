@@ -24,6 +24,7 @@
 		04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB576239D8AA4006CFC0D /* CustomAppConfigModel.swift */; };
 		04ECB57A239D8AA4006CFC0D /* CustomAppConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB577239D8AA4006CFC0D /* CustomAppConfigManager.swift */; };
 		04F2AA6C239EB36E00126CD1 /* FrameContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */; };
+		04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -45,6 +46,7 @@
 		04ECB576239D8AA4006CFC0D /* CustomAppConfigModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAppConfigModel.swift; sourceTree = "<group>"; };
 		04ECB577239D8AA4006CFC0D /* CustomAppConfigManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAppConfigManager.swift; sourceTree = "<group>"; };
 		04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FrameContainerView.swift; sourceTree = "<group>"; };
+		04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearContainerView.swift; sourceTree = "<group>"; };
 		27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.release.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.release.xcconfig"; sourceTree = "<group>"; };
 		502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlicingGame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.debug.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.debug.xcconfig"; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 			isa = PBXGroup;
 			children = (
 				04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */,
+				04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */,
 			);
 			path = Containers;
 			sourceTree = "<group>";
@@ -335,6 +338,7 @@
 				0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */,
 				0487D2F1239C519600515520 /* Data+SHA256.swift in Sources */,
 				043D726C239C2C0E00A79415 /* Inflators.swift in Sources */,
+				04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */,
 				043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */,
 				04ECB57A239D8AA4006CFC0D /* CustomAppConfigManager.swift in Sources */,
 				04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */,

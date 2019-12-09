@@ -201,11 +201,12 @@ object ViewletUtil {
             else -> mapUtil.optionalDimension(attributes, "height", ViewGroup.LayoutParams.WRAP_CONTENT)
         }
 
-        // Size limits
+        // Size limits and weight
         layoutParams.minWidth = mapUtil.optionalDimension(attributes, "minWidth", 0)
         layoutParams.maxWidth = mapUtil.optionalDimension(attributes, "maxWidth", 0xFFFFFF)
         layoutParams.minHeight = mapUtil.optionalDimension(attributes, "minHeight", 0)
         layoutParams.maxHeight = mapUtil.optionalDimension(attributes, "maxHeight", 0xFFFFFF)
+        layoutParams.weight = mapUtil.optionalFloat(attributes, "weight", 0f)
 
         // Gravity
         layoutParams.horizontalGravity = optionalHorizontalGravity(mapUtil, attributes, 0.0f)

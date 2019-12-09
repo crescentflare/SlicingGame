@@ -3,6 +3,7 @@ package com.crescentflare.slicinggame
 import android.app.Application
 import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
+import com.crescentflare.slicinggame.components.containers.LinearContainerView
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
@@ -51,6 +52,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Containers
         Inflators.viewlet.register("frameContainer", FrameContainerView.viewlet)
+        Inflators.viewlet.register("linearContainer", LinearContainerView.viewlet)
 
         // Simple viewlets
         Inflators.viewlet.register("view", ViewletUtil.basicViewViewlet)

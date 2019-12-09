@@ -159,13 +159,14 @@ class ViewletUtil {
                 layoutProperties.height = convUtil.asDimension(value: attributes["height"]) ?? UniLayoutProperties.fitContent
             }
 
-            // Size limit and hiding behavior
+            // Size limit, weight and hiding behavior
             let visibility = convUtil.asString(value: attributes["visibility"]) ?? ""
             layoutProperties.hiddenTakesSpace = visibility == "invisible"
             layoutProperties.minWidth = convUtil.asDimension(value: attributes["minWidth"]) ?? 0
             layoutProperties.maxWidth = convUtil.asDimension(value: attributes["maxWidth"]) ?? 0xFFFFFF
             layoutProperties.minHeight = convUtil.asDimension(value: attributes["minHeight"]) ?? 0
             layoutProperties.maxHeight = convUtil.asDimension(value: attributes["maxHeight"]) ?? 0xFFFFFF
+            layoutProperties.weight = CGFloat(convUtil.asFloat(value: attributes["weight"]) ?? 0)
 
             // Gravity
             layoutProperties.horizontalGravity = getHorizontalGravity(convUtil: convUtil, attributes: attributes) ?? 0
