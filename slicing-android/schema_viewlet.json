@@ -8,6 +8,7 @@
       "description": "The viewlet type, a view component",
       "type": "string",
       "enum": [
+        "text",
         "view",
         "frameContainer",
         "linearContainer"
@@ -138,6 +139,61 @@
       "if": {
         "properties": {
           "viewlet": {
+            "const": "text"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "localizedText": {
+            "description": "The localized string key of the text",
+            "type": "string"
+          },
+          "text": {
+            "description": "The text",
+            "type": "string"
+          },
+          "textColor": {
+            "description": "The color of the text",
+            "$ref": "#/definitions/color"
+          },
+          "textSize": {
+            "description": "The size of the text",
+            "$ref": "#/definitions/dimension"
+          },
+          "font": {
+            "description": "The font of the text",
+            "type": "string",
+            "enum": [
+              "normal",
+              "italics",
+              "bold",
+              "boldItalics"
+            ],
+            "default": "normal"
+          },
+          "maxLines": {
+            "description": "The maximum amount of lines of the text, 0 = no limitation",
+            "type": "integer",
+            "default": 0
+          },
+          "textAlignment": {
+            "description": "The horizontal alignment of the text within its frame",
+            "type": "string",
+            "enum": [
+              "left",
+              "right",
+              "center"
+            ],
+            "default": "left"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
             "const": "frameContainer"
           }
         }
@@ -196,6 +252,10 @@
           ]
         },
         {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
+        {
           "type": "number"
         },
         {
@@ -207,6 +267,10 @@
     "dimension": {
       "oneOf": [
         {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
+        {
           "type": "number"
         },
         {
@@ -217,6 +281,10 @@
     },
     "color": {
       "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
         {
           "type": "string",
           "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
