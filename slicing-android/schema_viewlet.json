@@ -12,7 +12,8 @@
         "view",
         "frameContainer",
         "linearContainer",
-        "pageContainer"
+        "pageContainer",
+        "gameTitleBar"
       ]
     },
     "refId": {
@@ -266,6 +267,31 @@
           "backgroundItem": {
             "description": "A background view that's behind the content items and ignores the safe area",
             "$ref": "#"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "gameTitleBar"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "localizedTitle": {
+            "description": "The localized string key of the title",
+            "type": "string"
+          },
+          "title": {
+            "description": "The bar title",
+            "type": "string"
+          },
+          "showDivider": {
+            "description": "Set visibility of the divider between the bar and the rest of the content",
+            "type": "boolean"
           }
         }
       }

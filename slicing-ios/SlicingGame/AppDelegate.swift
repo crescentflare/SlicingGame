@@ -70,6 +70,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.register(name: "frameContainer", inflatable: FrameContainerView.viewlet())
         Inflators.viewlet.register(name: "linearContainer", inflatable: LinearContainerView.viewlet())
         Inflators.viewlet.register(name: "pageContainer", inflatable: PageContainerView.viewlet())
+        
+        // Navigation bars
+        Inflators.viewlet.register(name: "gameTitleBar", inflatable: GameTitleBarView.viewlet())
     }
     
 }

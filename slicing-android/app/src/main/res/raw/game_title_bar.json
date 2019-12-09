@@ -1,0 +1,38 @@
+{
+  "viewlet": "linearContainer",
+  "items": [
+    {
+      "refId": "statusUnderlay",
+      "viewlet": "view",
+      "width": "stretchToParent",
+      "height": 25,
+      "backgroundColor": "#fff"
+    },
+    {
+      "refId": "content",
+      "viewlet": "frameContainer",
+      "width": "stretchToParent",
+      "height": 48,
+      "backgroundColor": "#fff",
+      "items": [
+        {
+          "refId": "title",
+          "viewlet": "text",
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "gravity": "centerVertical",
+          "maxLines": 1,
+          "textSize": "$titleText"
+        }
+      ]
+    },
+    {
+      "refId": "divider",
+      "viewlet": "view",
+      "width": "stretchToParent",
+      "height": 2,
+      "backgroundColor": "#4000",
+      "visibility": "hidden"
+    }
+  ]
+}

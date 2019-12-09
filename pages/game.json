@@ -2,6 +2,13 @@
   "dataSets": {
     "layout": {
       "viewlet": "pageContainer",
+      "titleBar": {
+        "viewlet": "gameTitleBar",
+        "width": "stretchToParent",
+        "backgroundColor": "#0fff",
+        "localizedTitle": "GLOBAL_APP_NAME",
+        "showDivider": true
+      },
       "backgroundItem": {
         "viewlet": "view",
         "width": "stretchToParent",
