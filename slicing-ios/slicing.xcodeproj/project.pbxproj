@@ -31,6 +31,7 @@
 		04F2AA79239EDAE000126CD1 /* AppDimensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA77239EDAE000126CD1 /* AppDimensions.swift */; };
 		04F2AA7A239EDAE000126CD1 /* UIColor+AppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA78239EDAE000126CD1 /* UIColor+AppColors.swift */; };
 		04F2AA7C239EDD1F00126CD1 /* AppFonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA7B239EDD1F00126CD1 /* AppFonts.swift */; };
+		04F2AA7F239EDDE400126CD1 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA7E239EDDE400126CD1 /* TextView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -59,6 +60,7 @@
 		04F2AA77239EDAE000126CD1 /* AppDimensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDimensions.swift; sourceTree = "<group>"; };
 		04F2AA78239EDAE000126CD1 /* UIColor+AppColors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIColor+AppColors.swift"; sourceTree = "<group>"; };
 		04F2AA7B239EDD1F00126CD1 /* AppFonts.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppFonts.swift; sourceTree = "<group>"; };
+		04F2AA7E239EDDE400126CD1 /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.release.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.release.xcconfig"; sourceTree = "<group>"; };
 		502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlicingGame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.debug.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.debug.xcconfig"; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 		043D726D239C2D2300A79415 /* Components */ = {
 			isa = PBXGroup;
 			children = (
+				04F2AA7D239EDDE400126CD1 /* BasicViews */,
 				04F2AA6A239EB36D00126CD1 /* Containers */,
 				04F2AA76239EDAE000126CD1 /* Styling */,
 				043D726E239C2D2300A79415 /* Utility */,
@@ -227,6 +230,14 @@
 				04F2AA78239EDAE000126CD1 /* UIColor+AppColors.swift */,
 			);
 			path = Styling;
+			sourceTree = "<group>";
+		};
+		04F2AA7D239EDDE400126CD1 /* BasicViews */ = {
+			isa = PBXGroup;
+			children = (
+				04F2AA7E239EDDE400126CD1 /* TextView.swift */,
+			);
+			path = BasicViews;
 			sourceTree = "<group>";
 		};
 		529EC35F47AE04B3AC9A0B49 /* Frameworks */ = {
@@ -371,6 +382,7 @@
 				043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */,
 				04ECB57A239D8AA4006CFC0D /* CustomAppConfigManager.swift in Sources */,
 				04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */,
+				04F2AA7F239EDDE400126CD1 /* TextView.swift in Sources */,
 				04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */,
 				0487D2F0239C519600515520 /* String+SHA256.swift in Sources */,
 				04F2AA70239ED8FF00126CD1 /* String+Localization.swift in Sources */,
