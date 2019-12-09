@@ -85,6 +85,7 @@ class ViewletUtil {
                 if !result.isRecycled(index: index) {
                     container.insertSubview(view, at: index)
                 }
+                applyLayoutAttributes(convUtil: convUtil, view: view, attributes: result.getAttributes(index: index))
 
                 // Bind reference
                 if let refId = convUtil.asString(value: result.getAttributes(index: index)["refId"]) {
@@ -120,4 +121,130 @@ class ViewletUtil {
         }
     }
     
+    
+    // --
+    // MARK: Shared layout properties handling
+    // --
+    
+    class func applyLayoutAttributes(convUtil: InflatorConvUtil, view: UIView?, attributes: [String: Any]) {
+        if let layoutProperties = (view as? UniLayoutView)?.layoutProperties {
+            // Margin
+            let marginArray = convUtil.asDimensionArray(value: attributes["margin"])
+            var defaultMargin: [CGFloat] = [ 0, 0, 0, 0 ]
+            if marginArray.count == 4 {
+                defaultMargin = marginArray
+            }
+            layoutProperties.margin = UIEdgeInsets(
+                top: convUtil.asDimension(value: attributes["marginTop"]) ?? defaultMargin[1],
+                left: convUtil.asDimension(value: attributes["marginLeft"]) ?? defaultMargin[0],
+                bottom: convUtil.asDimension(value: attributes["marginBottom"]) ?? defaultMargin[3],
+                right: convUtil.asDimension(value: attributes["marginRight"]) ?? defaultMargin[2])
+            layoutProperties.spacingMargin = convUtil.asDimension(value: attributes["marginSpacing"]) ?? 0
+
+            // Forced size or stretching
+            let widthString = convUtil.asString(value: attributes["width"]) ?? ""
+            let heightString = convUtil.asString(value: attributes["height"]) ?? ""
+            if widthString == "stretchToParent" {
+                layoutProperties.width = UniLayoutProperties.stretchToParent
+            } else if widthString == "fitContent" {
+                layoutProperties.width = UniLayoutProperties.fitContent
+            } else {
+                layoutProperties.width = convUtil.asDimension(value: attributes["width"]) ?? UniLayoutProperties.fitContent
+            }
+            if heightString == "stretchToParent" {
+                layoutProperties.height = UniLayoutProperties.stretchToParent
+            } else if heightString == "fitContent" {
+                layoutProperties.height = UniLayoutProperties.fitContent
+            } else {
+                layoutProperties.height = convUtil.asDimension(value: attributes["height"]) ?? UniLayoutProperties.fitContent
+            }
+
+            // Size limit and hiding behavior
+            let visibility = convUtil.asString(value: attributes["visibility"]) ?? ""
+            layoutProperties.hiddenTakesSpace = visibility == "invisible"
+            layoutProperties.minWidth = convUtil.asDimension(value: attributes["minWidth"]) ?? 0
+            layoutProperties.maxWidth = convUtil.asDimension(value: attributes["maxWidth"]) ?? 0xFFFFFF
+            layoutProperties.minHeight = convUtil.asDimension(value: attributes["minHeight"]) ?? 0
+            layoutProperties.maxHeight = convUtil.asDimension(value: attributes["maxHeight"]) ?? 0xFFFFFF
+
+            // Gravity
+            layoutProperties.horizontalGravity = getHorizontalGravity(convUtil: convUtil, attributes: attributes) ?? 0
+            layoutProperties.verticalGravity = getVerticalGravity(convUtil: convUtil, attributes: attributes) ?? 0
+
+            // Mark layout as updated
+            if let view = view {
+                UniLayout.setNeedsLayout(view: view)
+            }
+        }
+    }
+
+
+    // --
+    // MARK: Gravity helpers
+    // --
+    
+    class func getHorizontalGravity(convUtil: InflatorConvUtil, attributes: [String: Any], key: String = "horizontalGravity", combinedKey: String = "gravity") -> CGFloat? {
+        // Extract horizontal gravity from shared horizontal/vertical string
+        if let gravityString = attributes[combinedKey] as? String {
+            if gravityString == "center" {
+                return 0.5
+            } else if gravityString == "centerHorizontal" {
+                return 0.5
+            } else if gravityString == "left" {
+                return 0
+            } else if gravityString == "right" {
+                return 1
+            }
+            return nil
+        }
+
+        // Check horizontal gravity being specified separately
+        if let horizontalGravityString = attributes[key] as? String {
+            if horizontalGravityString == "center" {
+                return 0.5
+            } else if horizontalGravityString == "left" {
+                return 0
+            } else if horizontalGravityString == "right" {
+                return 1
+            }
+            return nil
+        }
+        if let horizontalGravity = convUtil.asFloat(value: attributes[key]) {
+            return CGFloat(horizontalGravity)
+        }
+        return nil
+    }
+
+    class func getVerticalGravity(convUtil: InflatorConvUtil, attributes: [String: Any], key: String = "verticalGravity", combinedKey: String = "gravity") -> CGFloat? {
+        // Extract horizontal gravity from shared horizontal/vertical string
+        if let gravityString = attributes[combinedKey] as? String {
+            if gravityString == "center" {
+                return 0.5
+            } else if gravityString == "centerVertical" {
+                return 0.5
+            } else if gravityString == "bottom" {
+                return 1
+            } else if gravityString == "top" {
+                return 0
+            }
+            return nil
+        }
+
+        // Check horizontal gravity being specified separately
+        if let verticalGravityString = attributes[key] as? String {
+            if verticalGravityString == "center" {
+                return 0.5
+            } else if verticalGravityString == "top" {
+                return 0
+            } else if verticalGravityString == "bottom" {
+                return 1
+            }
+            return nil
+        }
+        if let verticalGravity = convUtil.asFloat(value: attributes[key]) {
+            return CGFloat(verticalGravity)
+        }
+        return nil
+    }
+
 }
