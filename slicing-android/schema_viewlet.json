@@ -251,6 +251,10 @@
       },
       "then": {
         "properties": {
+          "titleBar": {
+            "description": "The title bar view at the top of the screen",
+            "$ref": "#"
+          },
           "contentItems": {
             "description": "A list of viewlets within the safe area",
             "type": "array",

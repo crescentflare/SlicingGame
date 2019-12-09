@@ -52,6 +52,12 @@ class PageContainerView: UIView, UniLayoutView {
 
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let pageContainer = object as? PageContainerView {
+                // Create or update title bar
+                let titleBarResult = ViewletUtil.createSubviewItem(convUtil: convUtil, currentItem: pageContainer.titleBarView, parent: pageContainer, attributes: attributes, subviewItem: attributes["titleBar"], binder: binder)
+                if !titleBarResult.isRecycled(index: 0) {
+                    pageContainer.titleBarView = titleBarResult.items.first as? UIView
+                }
+                
                 // Create or update background item
                 let backgroundItemResult = ViewletUtil.createSubviewItem(convUtil: convUtil, currentItem: pageContainer.backgroundItemView, parent: pageContainer, attributes: attributes, subviewItem: attributes["backgroundItem"], binder: binder)
                 if !backgroundItemResult.isRecycled(index: 0) {
@@ -102,6 +108,15 @@ class PageContainerView: UIView, UniLayoutView {
     // --
     // MARK: Manage views
     // --
+
+    var titleBarView: UIView? {
+        didSet {
+            oldValue?.removeFromSuperview()
+            if let titleBarView = titleBarView {
+                addSubview(titleBarView)
+            }
+        }
+    }
     
     var backgroundItemView: UIView? {
         didSet {
@@ -143,8 +158,16 @@ class PageContainerView: UIView, UniLayoutView {
     }
 
     override func layoutSubviews() {
+        // Position title bar
+        let statusInset = statusBarHeight()
+        var topInset = statusInset
+        if let titleBarView = titleBarView {
+            let resultSize = UniLayout.measure(view: titleBarView, sizeSpec: CGSize(width: bounds.width, height: bounds.height), parentWidthSpec: .exactSize, parentHeightSpec: .exactSize, forceViewWidthSpec: .exactSize, forceViewHeightSpec: .unspecified)
+            UniLayout.setFrame(view: titleBarView, frame: CGRect(x: 0, y: 0, width: resultSize.width, height: resultSize.height))
+            topInset = max(topInset, resultSize.height)
+        }
+        
         // Position background view
-        let topInset = statusBarHeight()
         if let backgroundItemView = backgroundItemView {
             // Determine size
             var limitWidth = bounds.width

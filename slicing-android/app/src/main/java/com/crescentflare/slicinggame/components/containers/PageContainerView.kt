@@ -33,6 +33,12 @@ class PageContainerView: ViewGroup {
 
             override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
                 if (obj is PageContainerView) {
+                    // Set title bar
+                    val titleBarResult = ViewletUtil.createChildViewItem(mapUtil, obj.titleBarView, obj, attributes, attributes["titleBar"], binder)
+                    if (!titleBarResult.isRecycled(0)) {
+                        obj.titleBarView = titleBarResult.items.firstOrNull() as? View
+                    }
+
                     // Set background item
                     val backgroundItemResult = ViewletUtil.createChildViewItem(mapUtil, obj.backgroundItemView, obj, attributes, attributes["backgroundItem"], binder)
                     if (!backgroundItemResult.isRecycled(0)) {
@@ -112,6 +118,17 @@ class PageContainerView: ViewGroup {
     // Manage views
     // --
 
+    var titleBarView: View? = null
+        set(titleBarView) {
+            if (field != null) {
+                removeView(field)
+            }
+            field = titleBarView
+            if (field != null) {
+                addView(field)
+            }
+        }
+
     var backgroundItemView: View? = null
         set(backgroundView) {
             if (field != null) {
@@ -169,6 +186,13 @@ class PageContainerView: ViewGroup {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
+            val titleBarHeight = titleBarView?.layoutParams?.height ?: ViewGroup.LayoutParams.WRAP_CONTENT
+            if (titleBarHeight >= 0) {
+                titleBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(titleBarHeight, MeasureSpec.EXACTLY))
+            } else {
+                titleBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
+            }
+            titleBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(titleBarView?.measuredHeight ?: 0, MeasureSpec.EXACTLY))
             contentContainer.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
             backgroundItemView?.let {
                 var limitWidth = width
@@ -188,6 +212,7 @@ class PageContainerView: ViewGroup {
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        titleBarView?.layout(0, -transparentStatusBarHeight, right - left, (titleBarView?.measuredHeight ?: 0) - transparentStatusBarHeight)
         contentContainer.layout(0, 0, right - left, bottom - top)
         backgroundItemView?.let {
             var x = 0
