@@ -8,8 +8,37 @@
       "description": "The viewlet type, a view component",
       "type": "string",
       "enum": [
-        "view"
+        "view",
+        "frameContainer"
       ]
+    },
+    "refId": {
+      "description": "A unique identifier, used to refer to the viewlet from the source code",
+      "type": "string"
+    },
+    "width": {
+      "description": "The width of the view, determined by layout or with a fixed size",
+      "$ref": "#/definitions/layoutDimension"
+    },
+    "height": {
+      "description": "The height of the view, determined by layout or with a fixed size",
+      "$ref": "#/definitions/layoutDimension"
+    },
+    "minWidth": {
+      "description": "The minimum width of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "maxWidth": {
+      "description": "The maximum width of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "minHeight": {
+      "description": "The minimum height of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "maxHeight": {
+      "description": "The maximum height of the view",
+      "$ref": "#/definitions/dimension"
     },
     "padding": {
       "description": "A list of padding values in the order of left, top, right and bottom",
@@ -36,6 +65,47 @@
       "description": "The bottom padding inside the view",
       "$ref": "#/definitions/dimension"
     },
+    "margin": {
+      "description": "A list of margin values in the order of left, top, right and bottom",
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/definitions/dimension"
+      }
+    },
+    "marginLeft": {
+      "description": "The left margin of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "marginTop": {
+      "description": "The top margin of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "marginRight": {
+      "description": "The right margin of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "marginBottom": {
+      "description": "The bottom margin of the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "marginSpacing": {
+      "description": "The margin to the top or left of the view if it's not the first visible item in a linear container",
+      "$ref": "#/definitions/dimension"
+    },
+    "gravity": {
+      "description": "The gravity is the alignment to position a view within its container",
+      "$ref": "#/definitions/gravity"
+    },
+    "horizontalGravity": {
+      "description": "The gravity is the alignment to position a view within its container",
+      "$ref": "#/definitions/horizontalGravity"
+    },
+    "verticalGravity": {
+      "description": "The gravity is the alignment to position a view within its container",
+      "$ref": "#/definitions/verticalGravity"
+    },
     "visibility": {
       "description": "Determines the visibility of the view",
       "type": "string",
@@ -49,12 +119,57 @@
     "backgroundColor": {
       "description": "The color behind the content of the view",
       "$ref": "#/definitions/color"
+    },
+    "recycling": {
+      "description": "Recycle or replace sub items on refresh",
+      "type": "boolean"
     }
   },
   "required": [
     "viewlet"
   ],
+  "anyOf": [
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "frameContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "items": {
+            "description": "A list of viewlets in a container component",
+            "type": "array",
+            "items": {
+              "$ref": "#"
+            },
+            "default": []
+          }
+        }
+      }
+    }
+  ],
   "definitions": {
+    "layoutDimension": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "stretchToParent",
+            "fitContent"
+          ]
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "pattern": "^-?\\d*\\.?\\d+(dp|sp|px|wp|hp|vw|vh|maxp|minp|vmin|vmax)$"
+        }
+      ]
+    },
     "dimension": {
       "oneOf": [
         {
@@ -75,6 +190,48 @@
         {
           "type": "string",
           "pattern": "^([hH])\\d+\\s*(([sS])\\d+)?\\s*(([vV])\\d+)?\\s*(([lL])\\d+)?\\s*(([aA])\\d+)?\\s*$"
+        }
+      ]
+    },
+    "gravity": {
+      "type": "string",
+      "enum": [
+        "left",
+        "right",
+        "top",
+        "bottom",
+        "center",
+        "centerHorizontal",
+        "centerVertical"
+      ]
+    },
+    "horizontalGravity": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "left",
+            "center",
+            "right"
+          ]
+        },
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "verticalGravity": {
+      "oneOf": [
+        {
+          "type": "string",
+          "enum": [
+            "top",
+            "center",
+            "bottom"
+          ]
+        },
+        {
+          "type": "number"
         }
       ]
     }
