@@ -9,6 +9,11 @@
         "localizedTitle": "GLOBAL_APP_NAME",
         "showDivider": true
       },
+      "bottomBar": {
+        "viewlet": "simpleBottomBar",
+        "width": "stretchToParent",
+        "backgroundColor": "#ddd"
+      },
       "backgroundItem": {
         "viewlet": "view",
         "width": "stretchToParent",

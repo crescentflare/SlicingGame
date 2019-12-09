@@ -13,7 +13,8 @@
         "frameContainer",
         "linearContainer",
         "pageContainer",
-        "gameTitleBar"
+        "gameTitleBar",
+        "simpleBottomBar"
       ]
     },
     "refId": {
@@ -254,6 +255,10 @@
         "properties": {
           "titleBar": {
             "description": "The title bar view at the top of the screen",
+            "$ref": "#"
+          },
+          "bottomBar": {
+            "description": "Takes up the space of the bottom navigation bar on Android or the bottom safe area on iOS",
             "$ref": "#"
           },
           "contentItems": {
