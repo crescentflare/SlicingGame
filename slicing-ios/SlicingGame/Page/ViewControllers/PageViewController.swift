@@ -12,6 +12,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // MARK: Members
     // --
     
+    private let pageView = PageContainerView()
     private let pageJson: String
     private var pageLoader: PageLoader?
     private var pageLoadingServer = ""
@@ -38,8 +39,8 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // --
     
     override func loadView() {
-        view = PageContainerView()
-        view.backgroundColor = .white
+        pageView.backgroundColor = .white
+        view = pageView
     }
     
     override func viewDidLoad() {
@@ -75,6 +76,16 @@ class PageViewController: UIViewController, PageLoaderDelegate {
         super.viewWillDisappear(animated)
         isResumed = false
         stopPageLoad()
+    }
+    
+    
+    // --
+    // MARK: Handle status bar
+    // --
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let checkColor = pageView.titleBarView?.backgroundColor ?? pageView.backgroundColor
+        return checkColor?.intensity() ?? 0 < 0.25 ? .lightContent : .default
     }
     
     
@@ -132,13 +143,14 @@ class PageViewController: UIViewController, PageLoaderDelegate {
                 ]
             ]
         }
-        ViewletUtil.assertInflateOn(view: self.view, attributes: inflateLayout)
+        ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout)
         currentPageHash = page.hash
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     func didReceivePageLoadingEvent(event: PageLoaderEvent) {
         if event == .loadingFailed {
-            view.backgroundColor = .red
+            pageView.backgroundColor = .red
         }
     }
 

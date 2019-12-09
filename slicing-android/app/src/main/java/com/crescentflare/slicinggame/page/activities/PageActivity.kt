@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -16,6 +17,7 @@ import com.crescentflare.slicinggame.components.containers.PageContainerView
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
+import com.crescentflare.slicinggame.infrastructure.coreextensions.colorIntensity
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
@@ -84,8 +86,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
                 recursiveView = recursiveView.parent
             }
         }
-        updateStatusBarColor(0x00ffffff, false)
-        updateNavigationBarColor(0x00ffffff, false)
+        updateSystemBars()
 
         // Add long click listener to open app config menu
         activityView.setOnLongClickListener {
@@ -143,6 +144,13 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     // System bar color and transparency customization
     // --
 
+    private fun updateSystemBars() {
+        val checkStatusBarColor = viewBackgroundColor(activityView.titleBarView) ?: viewBackgroundColor(activityView) ?: 0
+        val lightStatusContent = checkStatusBarColor.colorIntensity() < 0.25f
+        updateStatusBarColor(checkStatusBarColor and 0xffffff, lightStatusContent)
+        updateNavigationBarColor(0x00ffffff, false)
+    }
+
     private fun updateStatusBarColor(color: Int, lightContent: Boolean) {
         if (statusBarColor == color) {
             return
@@ -183,6 +191,14 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
             }
         }
     }
+
+    private fun viewBackgroundColor(view: View?): Int? {
+        (view?.background as? ColorDrawable)?.let {
+            return it.color
+        }
+        return null
+    }
+
 
     // --
     // Page loader integration
@@ -238,6 +254,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
         }
         ViewletUtil.assertInflateOn(activityView, inflateLayout)
         currentPageHash = page.hash
+        updateSystemBars()
     }
 
     override fun onPageLoadingEvent(event: PageLoader.Event) {
