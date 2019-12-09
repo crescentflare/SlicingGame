@@ -65,6 +65,37 @@ class ViewletUtil {
     
     
     // --
+    // MARK: Subview creation
+    // --
+    
+    class func createSubviews(convUtil: InflatorConvUtil, container: UIView, parent: UIView?, attributes: [String: Any], subviewItems: Any?, binder: InflatorBinder?) {
+        // Inflate with optional recycling
+        let recycling = convUtil.asBool(value: attributes["recycling"]) ?? false
+        let result = Inflators.viewlet.inflateNestedItemList(currentItems: container.subviews, newItems: subviewItems, enableRecycling: recycling, parent: parent, binder: binder)
+
+        // First remove items that could not be recycled
+        for item in result.removedItems {
+            (item as? UIView)?.removeFromSuperview()
+        }
+
+        // Process items (non-recycled items are added)
+        for index in result.items.indices {
+            if let view = result.items[index] as? UIView {
+                // Set to container
+                if !result.isRecycled(index: index) {
+                    container.insertSubview(view, at: index)
+                }
+
+                // Bind reference
+                if let refId = convUtil.asString(value: result.getAttributes(index: index)["refId"]) {
+                    binder?.onBind(refId: refId, object: view)
+                }
+            }
+        }
+    }
+    
+    
+    // --
     // MARK: Shared generic view handling
     // --
     

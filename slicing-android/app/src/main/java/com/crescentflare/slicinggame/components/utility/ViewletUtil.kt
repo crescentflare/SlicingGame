@@ -93,6 +93,45 @@ object ViewletUtil {
 
 
     // --
+    // Child view creation
+    // --
+
+    fun createChildViews(mapUtil: InflatorMapUtil, container: ViewGroup, parent: ViewGroup, attributes: Map<String, Any>?, childViewItems: Any?, binder: InflatorBinder?) {
+        // Inflate with optional recycling
+        val currentItems = mutableListOf<Any>()
+        for (index in 0 until container.childCount) {
+            currentItems.add(container.getChildAt(index))
+        }
+        val recycling = mapUtil.optionalBoolean(attributes, "recycling", false)
+        val result = Inflators.viewlet.inflateNestedItemList(container.context, currentItems, childViewItems, recycling, parent, binder)
+
+        // First remove items that could not be recycled
+        for (removeView in result.removedItems) {
+            if (removeView is View) {
+                container.removeView(removeView)
+            }
+        }
+
+        // Process items (non-recycled items are added)
+        for (index in result.items.indices) {
+            val view = result.items[index]
+            if (view is View) {
+                // Set to container
+                if (!result.isRecycled(index)) {
+                    container.addView(view, index)
+                }
+
+                // Bind reference
+                val refId = mapUtil.optionalString(result.getAttributes(index), "refId", null)
+                if (refId != null) {
+                    binder?.onBind(refId, view)
+                }
+            }
+        }
+    }
+
+
+    // --
     // Shared generic view handling
     // --
 
