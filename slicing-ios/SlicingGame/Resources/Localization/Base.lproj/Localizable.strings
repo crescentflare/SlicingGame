@@ -1,0 +1,7 @@
+//
+//  Localizable.strings
+//  Defines localizable strings for the game
+//
+
+// Global app strings
+"GLOBAL_APP_NAME" = "Slicing game";

@@ -25,6 +25,8 @@
 		04ECB57A239D8AA4006CFC0D /* CustomAppConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB577239D8AA4006CFC0D /* CustomAppConfigManager.swift */; };
 		04F2AA6C239EB36E00126CD1 /* FrameContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */; };
 		04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */; };
+		04F2AA70239ED8FF00126CD1 /* String+Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6F239ED8FF00126CD1 /* String+Localization.swift */; };
+		04F2AA73239ED92500126CD1 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 04F2AA71239ED92500126CD1 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +49,8 @@
 		04ECB577239D8AA4006CFC0D /* CustomAppConfigManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAppConfigManager.swift; sourceTree = "<group>"; };
 		04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FrameContainerView.swift; sourceTree = "<group>"; };
 		04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearContainerView.swift; sourceTree = "<group>"; };
+		04F2AA6F239ED8FF00126CD1 /* String+Localization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Localization.swift"; sourceTree = "<group>"; };
+		04F2AA72239ED92500126CD1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.release.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.release.xcconfig"; sourceTree = "<group>"; };
 		502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlicingGame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.debug.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.debug.xcconfig"; sourceTree = "<group>"; };
@@ -161,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				0487538E239BDACC002FC386 /* LaunchScreen.storyboard */,
+				04F2AA71239ED92500126CD1 /* Localizable.strings */,
 			);
 			path = Localization;
 			sourceTree = "<group>";
@@ -179,6 +184,7 @@
 			isa = PBXGroup;
 			children = (
 				0487D2EF239C519600515520 /* Data+SHA256.swift */,
+				04F2AA6F239ED8FF00126CD1 /* String+Localization.swift */,
 				0487D2EE239C519600515520 /* String+SHA256.swift */,
 			);
 			path = CoreExtensions;
@@ -281,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				043D7263239C285C00A79415 /* Pages in Resources */,
+				04F2AA73239ED92500126CD1 /* Localizable.strings in Resources */,
 				04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */,
 				0487538D239BDACC002FC386 /* Assets.xcassets in Resources */,
 			);
@@ -344,6 +351,7 @@
 				04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */,
 				04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */,
 				0487D2F0239C519600515520 /* String+SHA256.swift in Sources */,
+				04F2AA70239ED8FF00126CD1 /* String+Localization.swift in Sources */,
 				04F2AA6C239EB36E00126CD1 /* FrameContainerView.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
 				0487D2EC239C518500515520 /* Page.swift in Sources */,
@@ -361,6 +369,14 @@
 				0487538F239BDACC002FC386 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		04F2AA71239ED92500126CD1 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				04F2AA72239ED92500126CD1 /* Base */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
