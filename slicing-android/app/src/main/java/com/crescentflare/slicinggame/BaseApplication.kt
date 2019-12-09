@@ -2,6 +2,8 @@ package com.crescentflare.slicinggame
 
 import android.app.Application
 import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
+import com.crescentflare.jsoninflator.utility.InflatorResourceColorLookup
+import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
@@ -49,6 +51,10 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
         // Enable platform specific attributes
         Inflators.viewlet.setMergeSubAttributes(listOf("android"))
         Inflators.viewlet.setExcludeAttributes(listOf("ios"))
+
+        // Lookups
+        Inflators.viewlet.setColorLookup(InflatorResourceColorLookup(this))
+        Inflators.viewlet.setDimensionLookup(InflatorResourceDimensionLookup(this))
 
         // Containers
         Inflators.viewlet.register("frameContainer", FrameContainerView.viewlet)

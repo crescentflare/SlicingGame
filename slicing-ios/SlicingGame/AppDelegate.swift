@@ -58,6 +58,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.setMergeSubAttributes(["ios"])
         Inflators.viewlet.setExcludeAttributes(["android"])
 
+        // Lookups
+        Inflators.viewlet.colorLookup = UIColor.AppColorLookup()
+        Inflators.viewlet.dimensionLookup = AppDimensions.AppDimensionLookup()
+
         // Containers
         Inflators.viewlet.register(name: "frameContainer", inflatable: FrameContainerView.viewlet())
         Inflators.viewlet.register(name: "linearContainer", inflatable: LinearContainerView.viewlet())
