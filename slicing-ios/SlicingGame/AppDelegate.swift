@@ -73,6 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Navigation bars
         Inflators.viewlet.register(name: "gameTitleBar", inflatable: GameTitleBarView.viewlet())
+        Inflators.viewlet.register(name: "simpleBottomBar", inflatable: SimpleBottomBarView.viewlet())
     }
     
 }

@@ -52,20 +52,26 @@ class PageContainerView: UIView, UniLayoutView {
 
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let pageContainer = object as? PageContainerView {
-                // Create or update title bar
+                // Create or update the title bar
                 let titleBarResult = ViewletUtil.createSubviewItem(convUtil: convUtil, currentItem: pageContainer.titleBarView, parent: pageContainer, attributes: attributes, subviewItem: attributes["titleBar"], binder: binder)
                 if !titleBarResult.isRecycled(index: 0) {
                     pageContainer.titleBarView = titleBarResult.items.first as? UIView
                 }
                 
-                // Create or update background item
+                // Create or update the bottom bar
+                let bottomBarResult = ViewletUtil.createSubviewItem(convUtil: convUtil, currentItem: pageContainer.bottomBarView, parent: pageContainer, attributes: attributes, subviewItem: attributes["bottomBar"], binder: binder)
+                if !bottomBarResult.isRecycled(index: 0) {
+                    pageContainer.bottomBarView = bottomBarResult.items.first as? UIView
+                }
+
+                // Create or update the background item
                 let backgroundItemResult = ViewletUtil.createSubviewItem(convUtil: convUtil, currentItem: pageContainer.backgroundItemView, parent: pageContainer, attributes: attributes, subviewItem: attributes["backgroundItem"], binder: binder)
                 if !backgroundItemResult.isRecycled(index: 0) {
                     pageContainer.backgroundItemView = backgroundItemResult.items.first as? UIView
                     pageContainer.backgroundItemView?.clipsToBounds = false
                 }
 
-                // Create or update content items
+                // Create or update the content items
                 ViewletUtil.createSubviews(convUtil: convUtil, container: pageContainer.contentContainer, parent: pageContainer, attributes: attributes, subviewItems: attributes["contentItems"], binder: binder)
                 for view in pageContainer.contentContainer.subviews {
                     view.clipsToBounds = false
@@ -114,6 +120,15 @@ class PageContainerView: UIView, UniLayoutView {
             oldValue?.removeFromSuperview()
             if let titleBarView = titleBarView {
                 addSubview(titleBarView)
+            }
+        }
+    }
+    
+    var bottomBarView: UIView? {
+        didSet {
+            oldValue?.removeFromSuperview()
+            if let bottomBarView = bottomBarView {
+                addSubview(bottomBarView)
             }
         }
     }
@@ -180,6 +195,12 @@ class PageContainerView: UIView, UniLayoutView {
             }
         }
         
+        // Position bottom bar
+        let bottomInset = bottomControlsHeight()
+        if let bottomBarView = bottomBarView {
+            UniLayout.setFrame(view: bottomBarView, frame: CGRect(x: 0, y: bounds.height - bottomInset, width: bounds.width, height: bottomInset))
+        }
+        
         // Position background view
         if let backgroundItemView = backgroundItemView {
             // Determine size
@@ -204,7 +225,6 @@ class PageContainerView: UIView, UniLayoutView {
         }
 
         // Position content container
-        let bottomInset = bottomControlsHeight()
         UniLayout.setFrame(view: contentContainer, frame: CGRect(x: 0, y: topInset, width: bounds.width, height: bounds.height - topInset - bottomInset))
     }
 

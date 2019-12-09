@@ -45,6 +45,12 @@ class PageContainerView: ViewGroup {
                         obj.titleBarView = titleBarResult.items.firstOrNull() as? View
                     }
 
+                    // Set bottom bar
+                    val bottomBarResult = ViewletUtil.createChildViewItem(mapUtil, obj.bottomBarView, obj, attributes, attributes["bottomBar"], binder)
+                    if (!bottomBarResult.isRecycled(0)) {
+                        obj.bottomBarView = bottomBarResult.items.firstOrNull() as? View
+                    }
+
                     // Set background item
                     val backgroundItemResult = ViewletUtil.createChildViewItem(mapUtil, obj.backgroundItemView, obj, attributes, attributes["backgroundItem"], binder)
                     if (!backgroundItemResult.isRecycled(0)) {
@@ -150,6 +156,17 @@ class PageContainerView: ViewGroup {
             }
         }
 
+    var bottomBarView: View? = null
+        set(bottomBarView) {
+            if (field != null) {
+                removeView(field)
+            }
+            field = bottomBarView
+            if (field != null) {
+                addView(field)
+            }
+        }
+
     var backgroundItemView: View? = null
         set(backgroundView) {
             if (field != null) {
@@ -240,6 +257,9 @@ class PageContainerView: ViewGroup {
             }
             debugMenuView?.measure(MeasureSpec.makeMeasureSpec(width - debugViewInset * 2, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(actionBarHeight, MeasureSpec.EXACTLY))
 
+            // Update and measure bottom bar
+            bottomBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(transparentBottomBarHeight, MeasureSpec.EXACTLY))
+
             // Measure content and background
             contentContainer.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height - topInset, MeasureSpec.EXACTLY))
             backgroundItemView?.let {
@@ -263,6 +283,7 @@ class PageContainerView: ViewGroup {
         val topInset = if (titleBarView is NavigationBarComponent) actionBarHeight else titleBarView?.measuredHeight ?: 0
         titleBarView?.layout(0, -transparentStatusBarHeight, right - left, (titleBarView?.measuredHeight ?: 0) - transparentStatusBarHeight)
         debugMenuView?.layout(debugViewInset, 0, right - left - debugViewInset, actionBarHeight)
+        bottomBarView?.layout(0, bottom, right - left, bottom + transparentBottomBarHeight)
         contentContainer.layout(0, topInset, right - left, bottom - top)
         backgroundItemView?.let {
             var x = 0

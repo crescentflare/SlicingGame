@@ -140,10 +140,13 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
 
     private fun updateSystemBars() {
         val titleBarColor = (activityView.titleBarView as? NavigationBarComponent)?.averageColor ?: viewBackgroundColor(activityView.titleBarView)
+        val bottomBarColor = (activityView.bottomBarView as? NavigationBarComponent)?.averageColor ?: viewBackgroundColor(activityView.bottomBarView)
         val checkStatusBarColor = titleBarColor ?: viewBackgroundColor(activityView) ?: 0
+        val checkBottomBarColor = bottomBarColor ?: viewBackgroundColor(activityView) ?: 0
         val lightStatusContent = checkStatusBarColor.colorIntensity() < 0.25
+        val lightBottomContent = checkBottomBarColor.colorIntensity() < 0.25
         updateStatusBarColor(checkStatusBarColor and 0xffffff, lightStatusContent)
-        updateNavigationBarColor(0x00ffffff, false)
+        updateNavigationBarColor(checkBottomBarColor, lightBottomContent)
     }
 
     private fun updateStatusBarColor(color: Int, lightContent: Boolean) {

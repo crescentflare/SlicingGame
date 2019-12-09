@@ -9,6 +9,7 @@ import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
 import com.crescentflare.slicinggame.components.containers.PageContainerView
 import com.crescentflare.slicinggame.components.navigationbars.GameTitleBarView
+import com.crescentflare.slicinggame.components.navigationbars.SimpleBottomBarView
 import com.crescentflare.slicinggame.components.styling.AppFonts
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
@@ -72,6 +73,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Navigation bars
         Inflators.viewlet.register("gameTitleBar", GameTitleBarView.viewlet)
+        Inflators.viewlet.register("simpleBottomBar", SimpleBottomBarView.viewlet)
     }
 
 }
