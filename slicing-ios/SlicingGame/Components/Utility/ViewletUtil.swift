@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import UniLayout
 import JsonInflator
 
 class ViewletUtil {
@@ -19,18 +20,18 @@ class ViewletUtil {
     private class viewletClass: JsonInflatable {
         
         func create() -> Any {
-            return UIView()
+            return UniView()
         }
         
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
-            if let view = object as? UIView {
+            if let view = object as? UniView {
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: view, attributes: attributes)
             }
             return true
         }
         
         func canRecycle(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any]) -> Bool {
-            return type(of: object) == UIView.self
+            return type(of: object) == UniView.self
         }
         
     }
@@ -68,7 +69,24 @@ class ViewletUtil {
     // --
     
     class func applyGenericViewAttributes(convUtil: InflatorConvUtil, view: UIView, attributes: [String: Any]) {
+        // Standard view properties
+        let visibility = convUtil.asString(value: attributes["visibility"]) ?? ""
+        view.isHidden = visibility == "hidden" || visibility == "invisible"
         view.backgroundColor = convUtil.asColor(value: attributes["backgroundColor"]) ?? UIColor.clear
+
+        // Padding
+        if var uniPaddedView = view as? UniLayoutPaddedView {
+            let paddingArray = convUtil.asDimensionArray(value: attributes["padding"])
+            var defaultPadding: [CGFloat] = [ 0, 0, 0, 0 ]
+            if paddingArray.count == 4 {
+                defaultPadding = paddingArray
+            }
+            uniPaddedView.padding = UIEdgeInsets(
+                top: convUtil.asDimension(value: attributes["paddingTop"]) ?? defaultPadding[1],
+                left: convUtil.asDimension(value: attributes["paddingLeft"]) ?? defaultPadding[0],
+                bottom: convUtil.asDimension(value: attributes["paddingBottom"]) ?? defaultPadding[3],
+                right: convUtil.asDimension(value: attributes["paddingRight"]) ?? defaultPadding[2])
+        }
     }
     
 }

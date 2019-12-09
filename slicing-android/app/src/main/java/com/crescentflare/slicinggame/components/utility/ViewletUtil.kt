@@ -10,6 +10,7 @@ import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.BuildConfig
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
+import com.crescentflare.unilayout.views.UniView
 import org.junit.Assert
 
 /**
@@ -24,18 +25,18 @@ object ViewletUtil {
     val basicViewViewlet: JsonInflatable = object : JsonInflatable {
 
         override fun create(context: Context): Any {
-            return View(context)
+            return UniView(context)
         }
 
         override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
-            if (obj is View) {
+            if (obj is UniView) {
                 applyGenericViewAttributes(mapUtil, obj, attributes)
             }
             return true
         }
 
         override fun canRecycle(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>): Boolean {
-            return obj::class == View::class
+            return obj::class == UniView::class
         }
 
     }
@@ -96,8 +97,27 @@ object ViewletUtil {
     // --
 
     fun applyGenericViewAttributes(mapUtil: InflatorMapUtil, view: View, attributes: Map<String, Any>) {
-        // Color
+        // Visibility and color
+        val visibility = mapUtil.optionalString(attributes, "visibility", "")
+        view.visibility = when(visibility) {
+            "hidden" -> View.GONE
+            "invisible" -> View.INVISIBLE
+            else -> View.VISIBLE
+        }
         view.setBackgroundColor(mapUtil.optionalColor(attributes, "backgroundColor", 0))
+
+        // Padding
+        var defaultPadding = listOf(0, 0, 0, 0)
+        val paddingArray = mapUtil.optionalDimensionList(attributes, "padding")
+        if (paddingArray.size == 4) {
+            defaultPadding = paddingArray
+        }
+        view.setPadding(
+            mapUtil.optionalDimension(attributes, "paddingLeft", defaultPadding[0]),
+            mapUtil.optionalDimension(attributes, "paddingTop", defaultPadding[1]),
+            mapUtil.optionalDimension(attributes, "paddingRight", defaultPadding[2]),
+            mapUtil.optionalDimension(attributes, "paddingBottom", defaultPadding[3])
+        )
 
         // Capture touch
         view.isClickable = mapUtil.optionalBoolean(attributes, "blockTouch", false)

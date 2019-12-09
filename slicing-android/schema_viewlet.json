@@ -11,6 +11,41 @@
         "view"
       ]
     },
+    "padding": {
+      "description": "A list of padding values in the order of left, top, right and bottom",
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/definitions/dimension"
+      }
+    },
+    "paddingLeft": {
+      "description": "The left padding inside the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "paddingTop": {
+      "description": "The top padding inside the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "paddingRight": {
+      "description": "The right padding inside the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "paddingBottom": {
+      "description": "The bottom padding inside the view",
+      "$ref": "#/definitions/dimension"
+    },
+    "visibility": {
+      "description": "Determines the visibility of the view",
+      "type": "string",
+      "enum": [
+        "visible",
+        "hidden",
+        "invisible"
+      ],
+      "default": "visible"
+    },
     "backgroundColor": {
       "description": "The color behind the content of the view",
       "$ref": "#/definitions/color"
@@ -20,6 +55,17 @@
     "viewlet"
   ],
   "definitions": {
+    "dimension": {
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "pattern": "^-?\\d*\\.?\\d+(dp|sp|px|wp|hp|vw|vh|maxp|minp|vmin|vmax)$"
+        }
+      ]
+    },
     "color": {
       "oneOf": [
         {

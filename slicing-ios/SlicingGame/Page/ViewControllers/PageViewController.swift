@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import UniLayout
 
 class PageViewController: UIViewController, PageLoaderDelegate {
 
@@ -37,7 +38,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // --
     
     override func loadView() {
-        view = UIView()
+        view = UniView()
         view.backgroundColor = .green
     }
     

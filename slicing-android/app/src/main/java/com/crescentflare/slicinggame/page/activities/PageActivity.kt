@@ -15,6 +15,7 @@ import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
 import com.crescentflare.slicinggame.page.storage.PageLoader
 import com.crescentflare.slicinggame.page.storage.PageLoaderListener
+import com.crescentflare.unilayout.views.UniView
 
 /**
  * Activity: a generic activity for loading pages
@@ -43,7 +44,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     // Members
     // --
 
-    private val activityView by lazy { View(this) }
+    private val activityView by lazy { UniView(this) }
     private var pageJson = ""
     private var pageLoader: PageLoader? = null
     private var pageLoadingServer = ""
