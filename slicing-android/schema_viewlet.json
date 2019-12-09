@@ -11,7 +11,8 @@
         "text",
         "view",
         "frameContainer",
-        "linearContainer"
+        "linearContainer",
+        "pageContainer"
       ]
     },
     "refId": {
@@ -236,6 +237,31 @@
               "$ref": "#"
             },
             "default": []
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "pageContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "contentItems": {
+            "description": "A list of viewlets within the safe area",
+            "type": "array",
+            "items": {
+              "$ref": "#"
+            },
+            "default": []
+          },
+          "backgroundItem": {
+            "description": "A background view that's behind the content items and ignores the safe area",
+            "$ref": "#"
           }
         }
       }
