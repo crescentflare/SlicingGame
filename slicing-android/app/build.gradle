@@ -49,6 +49,7 @@ dependencies {
 
     // App framework
     implementation 'com.crescentflare.dynamicappconfig:DynamicAppConfigLib:1.3.0'
+    implementation 'com.crescentflare.unilayout:UniLayoutLib:0.4.0'
     implementation 'com.crescentflare.jsoninflator:JsonInflatorLib:0.6.2'
 
     // Other libraries
