@@ -13,6 +13,7 @@ import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
+import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.unilayout.containers.UniFrameContainer
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 
@@ -38,6 +39,15 @@ open class LevelCanvasView : UniFrameContainer {
                     // Apply canvas size
                     obj.canvasWidth = mapUtil.optionalFloat(attributes, "canvasWidth", 1f)
                     obj.canvasHeight = mapUtil.optionalFloat(attributes, "canvasHeight", 1f)
+
+                    // Apply slices
+                    val sliceList = mapUtil.optionalFloatList(attributes, "slices")
+                    obj.resetSlices()
+                    for (index in sliceList.indices) {
+                        if (index % 4 == 0 && index + 3 < sliceList.size) {
+                            obj.slice(Vector(PointF(sliceList[index], sliceList[index + 1]), PointF(sliceList[index + 2], sliceList[index + 3])))
+                        }
+                    }
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
@@ -91,6 +101,23 @@ open class LevelCanvasView : UniFrameContainer {
     // Configurable values
     // --
 
+    fun slice(vector: Vector) {
+        clipPolygon.sliced(vector)?.let {
+            clipPolygon = it
+            updateClipPath()
+        }
+    }
+
+    fun resetSlices() {
+        clipPolygon = Polygon(mutableListOf(PointF(0f, 0f), PointF(canvasWidth, 0f), PointF(canvasWidth, canvasHeight), PointF(0f, canvasHeight)))
+        updateClipPath()
+    }
+
+
+    // --
+    // Configurable values
+    // --
+
     override fun setBackgroundColor(color: Int) {
         drawView.setBackgroundColor(color)
     }
@@ -122,6 +149,7 @@ open class LevelCanvasView : UniFrameContainer {
 
     private fun updateClipPath() {
         clipPath = clipPolygon.asPath(width.toFloat() / canvasWidth, height.toFloat() / canvasHeight)
+        invalidate()
     }
 
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {

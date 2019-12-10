@@ -35,6 +35,15 @@ class LevelCanvasView: UniView {
                 // Apply canvas size
                 levelCanvas.canvasWidth = convUtil.asFloat(value: attributes["canvasWidth"]) ?? 1
                 levelCanvas.canvasHeight = convUtil.asFloat(value: attributes["canvasHeight"]) ?? 1
+                
+                // Apply slices
+                let sliceArray = convUtil.asFloatArray(value: attributes["slices"])
+                levelCanvas.resetSlices()
+                for index in sliceArray.indices {
+                    if index % 4 == 0 && index + 3 < sliceArray.count {
+                        levelCanvas.slice(vector: Vector(start: CGPoint(x: CGFloat(sliceArray[index]), y: CGFloat(sliceArray[index + 1])), end: CGPoint(x: CGFloat(sliceArray[index + 2]), y: CGFloat(sliceArray[index + 3]))))
+                    }
+                }
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: levelCanvas, attributes: attributes)
@@ -69,6 +78,23 @@ class LevelCanvasView: UniView {
     }
     
     
+    // --
+    // MARK: Slicing
+    // --
+    
+    func slice(vector: Vector) {
+        if let sliced = clipPolygon.sliced(vector: vector) {
+            clipPolygon = sliced
+            updateMask()
+        }
+    }
+
+    func resetSlices() {
+        clipPolygon = Polygon(points: [ CGPoint(x: 0, y: 0), CGPoint(x: CGFloat(canvasWidth), y: 0), CGPoint(x: CGFloat(canvasWidth), y: CGFloat(canvasHeight)), CGPoint(x: 0, y: CGFloat(canvasHeight)) ])
+        updateMask()
+    }
+    
+
     // --
     // MARK: Configurable values
     // --
