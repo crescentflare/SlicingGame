@@ -1,6 +1,6 @@
 # Slicing game
 
-An open source project developing a mix of mobile app and game in a framework which stores the app structure in several JSON pages.
+An open source project developing a mix of mobile app and game in a framework which stores the app structure in several JSON pages. Want to know how the game is being built? Check the [wiki](https://github.com/crescentflare/SlicingGame/wiki).
 
 
 ## The JSON framework
