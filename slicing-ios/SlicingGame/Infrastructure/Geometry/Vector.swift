@@ -45,5 +45,26 @@ class Vector {
     func directionOf(point: CGPoint) -> CGFloat {
         return (point.y - end.y) * (end.x - start.x) - (end.y - start.y) * (point.x - end.x)
     }
+    
+    func intersect(withVector: Vector) -> CGPoint? {
+        // Intersection direction formula
+        let d = (end.x - start.x) * (withVector.end.y - withVector.start.y) - (end.y - start.y) * (withVector.end.x - withVector.start.x)
+        if d == 0 {
+            return nil
+        }
+        
+        // Distance formulas
+        let u = ((withVector.start.x - start.x) * (withVector.end.y - withVector.start.y) - (withVector.start.y - start.y) * (withVector.end.x - withVector.start.x)) / d
+        let v = ((withVector.start.x - start.x) * (end.y - start.y) - (withVector.start.y - start.y) * (end.x - start.x)) / d
+        if u < 0 || u > 1 {
+            return nil
+        }
+        if v < 0 || v > 1 {
+            return nil
+        }
+        
+        // Return the intersection result
+        return CGPoint(x: start.x + u * (end.x - start.x), y: start.y + u * (end.y - start.y))
+    }
 
 }
