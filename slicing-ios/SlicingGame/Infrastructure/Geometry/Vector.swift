@@ -33,4 +33,17 @@ class Vector {
         return Vector(start: end, end: start)
     }
 
+
+    // --
+    // MARK: Checks
+    // --
+    
+    func isValid() -> Bool {
+        return start.x != end.x || start.y != end.y
+    }
+    
+    func directionOf(point: CGPoint) -> CGFloat {
+        return (point.y - end.y) * (end.x - start.x) - (end.y - start.y) * (point.x - end.x)
+    }
+
 }
