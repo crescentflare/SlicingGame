@@ -13,6 +13,7 @@
         "frameContainer",
         "linearContainer",
         "pageContainer",
+        "levelCanvas",
         "gameTitleBar",
         "simpleBottomBar"
       ]
@@ -272,6 +273,27 @@
           "backgroundItem": {
             "description": "A background view that's behind the content items and ignores the safe area",
             "$ref": "#"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "levelCanvas"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "canvasWidth": {
+            "description": "The width in pixel independent canvas units",
+            "type": "number"
+          },
+          "canvasHeight": {
+            "description": "The height in pixel independent canvas units",
+            "type": "number"
           }
         }
       }
