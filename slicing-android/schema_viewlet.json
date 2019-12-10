@@ -294,6 +294,13 @@
           "canvasHeight": {
             "description": "The height in pixel independent canvas units",
             "type": "number"
+          },
+          "slices": {
+            "description": "A flattened list of slice vector coordinates",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
         }
       }
