@@ -54,6 +54,23 @@ class Polygon {
         }
         return result
     }
+    
+    func asBezierPath(scaleX: CGFloat = 1, scaleY: CGFloat = 1) -> UIBezierPath? {
+        if isValid() {
+            let path = UIBezierPath()
+            for index in points.indices {
+                let coordPoint = CGPoint(x: points[index].x * scaleX, y: points[index].y * scaleY)
+                if index == 0 {
+                    path.move(to: coordPoint)
+                } else {
+                    path.addLine(to: coordPoint)
+                }
+            }
+            path.close()
+            return path
+        }
+        return nil
+    }
 
     func sliced(vector: Vector) -> Polygon? {
         // Collect intersections for shape slice entry and exit
