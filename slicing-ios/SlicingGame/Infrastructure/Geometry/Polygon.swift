@@ -46,6 +46,61 @@ class Polygon {
     func reversed() -> Polygon {
         return Polygon(points: points.reversed())
     }
+    
+    func asVectorArray() -> [Vector] {
+        var result = [Vector]()
+        for index in points.indices {
+            result.append(Vector(start: points[index], end: points[(index + 1) % points.count]))
+        }
+        return result
+    }
+
+    func sliced(vector: Vector) -> Polygon? {
+        // Collect intersections for shape slice entry and exit
+        let allVectors = asVectorArray()
+        let enterVectors = allVectors.filter { $0.directionOf(point: vector.end) > 0 }
+        let exitVectors = allVectors.filter { $0.directionOf(point: vector.start) > 0 }
+        var enterIntersectVector: Vector?
+        var enterIntersection: CGPoint?
+        var exitIntersectVector: Vector?
+        var exitIntersection: CGPoint?
+        for checkVector in enterVectors {
+            if let intersection = checkVector.intersect(withVector: vector) {
+                enterIntersectVector = checkVector
+                enterIntersection = intersection
+                break
+            }
+        }
+        for checkVector in exitVectors {
+            if let intersection = checkVector.intersect(withVector: vector) {
+                exitIntersectVector = checkVector
+                exitIntersection = intersection
+                break
+            }
+        }
+        
+        // Apply slice
+        if let enterIntersectVector = enterIntersectVector, let exitIntersectVector = exitIntersectVector, let enterIntersection = enterIntersection, let exitIntersection = exitIntersection {
+            var slicedPoints = [enterIntersection, exitIntersection]
+            if var startIndex = allVectors.firstIndex(where: { $0 === exitIntersectVector }), var endIndex = allVectors.firstIndex(where: { $0 === enterIntersectVector }) {
+                startIndex += 1
+                if exitIntersection == exitIntersectVector.end {
+                    startIndex += 1
+                }
+                if enterIntersection == enterIntersectVector.start {
+                    endIndex = (endIndex + allVectors.count - 1) % allVectors.count
+                }
+                if endIndex < startIndex {
+                    endIndex += allVectors.count
+                }
+                for i in startIndex...endIndex {
+                    slicedPoints.append(points[i % points.count])
+                }
+                return Polygon(points: slicedPoints)
+            }
+        }
+        return nil
+    }
 
 
     // --
