@@ -3,6 +3,9 @@ package com.crescentflare.slicinggame.components.utility
 import android.content.Context
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 
 /**
@@ -100,6 +103,23 @@ class ImageSource {
             } else {
                 callback(null)
             }
+        } else if (type == Type.Online || type == Type.SecureOnline) {
+            Glide.with(context)
+                .`as`(Drawable::class.java)
+                .load(uri)
+                .into(object : CustomTarget<Drawable>() {
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        // No implementation
+                    }
+
+                    override fun onLoadFailed(errorDrawable: Drawable?) {
+                        callback(null)
+                    }
+
+                    override fun onResourceReady(resource: Drawable, transition: Transition<in Drawable>?) {
+                        callback(resource)
+                    }
+                })
         } else {
             callback(null)
         }
@@ -113,7 +133,9 @@ class ImageSource {
     enum class Type(val value: String) {
 
         Unknown("unknown"),
-        InternalImage("app");
+        InternalImage("app"),
+        Online("http"),
+        SecureOnline("https");
 
         companion object {
 

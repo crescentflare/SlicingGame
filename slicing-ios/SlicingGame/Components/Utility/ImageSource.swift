@@ -5,11 +5,14 @@
 
 import UIKit
 import UniLayout
+import AlamofireImage
 
 enum ImageSourceType: String {
     
     case unknown = "unknown"
     case appInternal = "app"
+    case online = "http"
+    case secureOnline = "https"
     
 }
 
@@ -83,10 +86,18 @@ class ImageSource {
     // MARK: Obtain image
     // --
 
-    func getImage(completion: (_ image: UIImage?) -> Void) {
+    func getImage(completion: @escaping (_ image: UIImage?) -> Void) {
         if type == .appInternal {
             let bundle = Bundle(for: ImageSource.self)
             completion(UIImage(named: name, in: bundle, compatibleWith: nil))
+        } else if type == .online || type == .secureOnline {
+            if let imageUrl = URL(string: uri) {
+                UIImageView.af_sharedImageDownloader.download(URLRequest(url: imageUrl), completion: { response in
+                    completion(response.result.value)
+                })
+            } else {
+                completion(nil)
+            }
         } else {
             completion(nil)
         }
