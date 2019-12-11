@@ -23,6 +23,7 @@ class ImageSource {
     // --
 
     var type = ImageSourceType.unknown
+    var parameters = [String: Any]()
     var name = ""
     
 
@@ -52,7 +53,24 @@ class ImageSource {
             checkString = String(checkString[schemeMarker.upperBound...])
         }
         
-        // Set name to the remaining string
+        // Extract parameters
+        if let parameterMarker = checkString.range(of: "?") {
+            // Get parameter string
+            let parameterString = String(checkString[parameterMarker.upperBound...])
+            checkString = String(checkString[..<parameterMarker.lowerBound])
+            
+            // Split into separate parameters and fill dictionary
+            let parameterItems = parameterString.split(separator: "&").map(String.init)
+            for parameterItem in parameterItems {
+                let parameterSet = parameterItem.split(separator: "=").map(String.init)
+                if parameterSet.count == 2 {
+                    let key = parameterSet[0].urlDecode()
+                    parameters[key] = parameterSet[1].urlDecode()
+                }
+            }
+        }
+        
+        // Finally set name to the remaining string
         name = checkString
     }
     
@@ -62,6 +80,7 @@ class ImageSource {
         if let name = convUtil.asString(value: dictionary["name"]) {
             self.name = name
         }
+        parameters = dictionary.filter { $0.key != "type" && $0.key != "name" }
     }
 
     
@@ -71,13 +90,21 @@ class ImageSource {
 
     var uri: String {
         get {
-            return "\(type.rawValue)://\(name)"
+            var uri = "\(type.rawValue)://\(name)"
+            if let parameterString = getParameterString() {
+                uri += "?" + parameterString
+            }
+            return uri
         }
     }
     
     var dictionary: [String: Any] {
         get {
-            return ["type": type.rawValue, "name": name]
+            var dictionary: [String: Any] = ["type": type.rawValue, "name": name]
+            for (key, value) in parameters {
+                dictionary[key] = value
+            }
+            return dictionary
         }
     }
     
@@ -103,4 +130,34 @@ class ImageSource {
         }
     }
     
+    
+    // --
+    // MARK: Helper
+    // --
+
+    private func getParameterString(ignoreParams: [String] = []) -> String? {
+        if parameters.count > 0 {
+            var parameterString = ""
+            for key in parameters.keys.sorted() {
+                var ignore = false
+                for ignoreParam in ignoreParams {
+                    if key == ignoreParam {
+                        ignore = true
+                        break
+                    }
+                }
+                if !ignore, let value = Inflators.viewlet.convUtil.asString(value: parameters[key]) {
+                    if parameterString.count > 0 {
+                        parameterString += "&"
+                    }
+                    parameterString += key.urlEncode() + "=" + value.urlEncode()
+                }
+            }
+            if !parameterString.isEmpty {
+                return parameterString
+            }
+        }
+        return nil
+    }
+
 }

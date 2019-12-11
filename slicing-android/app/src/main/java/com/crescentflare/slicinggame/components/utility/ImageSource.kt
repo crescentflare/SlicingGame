@@ -6,6 +6,8 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.crescentflare.slicinggame.infrastructure.coreextensions.urlDecode
+import com.crescentflare.slicinggame.infrastructure.coreextensions.urlEncode
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 
 /**
@@ -42,6 +44,7 @@ class ImageSource {
     // --
 
     var type = Type.Unknown
+    var parameters = mutableMapOf<String, Any>()
     var name = ""
 
 
@@ -58,7 +61,25 @@ class ImageSource {
             checkString = checkString.substring(schemeMarker + 3)
         }
 
-        // Set name to the remaining string
+        // Extract parameters
+        val parameterMarker = checkString.indexOf('?')
+        if (parameterMarker >= 0) {
+            // Get parameter string
+            val parameterString = checkString.substring(parameterMarker + 1)
+            checkString = checkString.substring(0, parameterMarker)
+
+            // Split into separate parameters and fill dictionary
+            val parameterItems = parameterString.split("&")
+            for (parameterItem in parameterItems) {
+                val parameterSet = parameterItem.split("=")
+                if (parameterSet.size == 2) {
+                    val key = parameterSet[0].urlDecode()
+                    parameters[key] = parameterSet[1].urlDecode()
+                }
+            }
+        }
+
+        // Finally set name to the remaining string
         name = checkString
     }
 
@@ -68,6 +89,7 @@ class ImageSource {
         mapUtil.optionalString(map, "name", null)?.let {
             name = it
         }
+        parameters = map.filter { it.key != "type" && it.key != "name" }.toMutableMap()
     }
 
     constructor(context: Context, resourceId: Int) {
@@ -82,12 +104,18 @@ class ImageSource {
 
     val uri: String
         get() {
-            return "${type.value}://$name"
+            var uri = "${type.value}://$name"
+            getParameterString()?.let {
+                uri += "?$it"
+            }
+            return uri
         }
 
     val map: Map<String, Any>
         get() {
-            return mapOf<String, Any>(Pair("type", type.value), Pair("name", name))
+            val map = mutableMapOf<String, Any>(Pair("type", type.value), Pair("name", name))
+            map.putAll(parameters)
+            return map
         }
 
 
@@ -123,6 +151,37 @@ class ImageSource {
         } else {
             callback(null)
         }
+    }
+
+
+    // --
+    // Helper
+    // --
+
+    private fun getParameterString(ignoreParams: List<String> = emptyList()): String? {
+        if (parameters.isNotEmpty()) {
+            var parameterString = ""
+            for (key in parameters.keys.sorted()) {
+                var ignore = false
+                for (ignoreParam in ignoreParams) {
+                    if (key == ignoreParam) {
+                        ignore = true
+                        break
+                    }
+                }
+                val stringValue = Inflators.viewlet.mapUtil.optionalString(parameters, key, null)
+                if (!ignore && stringValue != null) {
+                    if (parameterString.isNotEmpty()) {
+                        parameterString += "&"
+                    }
+                    parameterString += key.urlEncode() + "=" + stringValue.urlEncode()
+                }
+            }
+            if (parameterString.isNotEmpty()) {
+                return parameterString
+            }
+        }
+        return null
     }
 
 
