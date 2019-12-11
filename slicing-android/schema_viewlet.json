@@ -8,6 +8,7 @@
       "description": "The viewlet type, a view component",
       "type": "string",
       "enum": [
+        "image",
         "text",
         "view",
         "frameContainer",
@@ -139,6 +140,23 @@
     "viewlet"
   ],
   "anyOf": [
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "image"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "description": "The source to retrieve the image from",
+            "$ref": "#/definitions/imageSource"
+          }
+        }
+      }
+    },
     {
       "if": {
         "properties": {
@@ -424,6 +442,30 @@
         },
         {
           "type": "number"
+        }
+      ]
+    },
+    "imageSource": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^(app):\/\/.+$"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The type of image source to load",
+              "type": "string",
+              "enum": [
+                "app"
+              ]
+            },
+            "name": {
+              "description": "The filename of the image",
+              "type": "string"
+            }
+          }
         }
       ]
     }
