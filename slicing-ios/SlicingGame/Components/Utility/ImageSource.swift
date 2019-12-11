@@ -83,12 +83,13 @@ class ImageSource {
     // MARK: Obtain image
     // --
 
-    func getImage() -> UIImage? {
+    func getImage(completion: (_ image: UIImage?) -> Void) {
         if type == .appInternal {
             let bundle = Bundle(for: ImageSource.self)
-            return UIImage(named: name, in: bundle, compatibleWith: nil)
+            completion(UIImage(named: name, in: bundle, compatibleWith: nil))
+        } else {
+            completion(nil)
         }
-        return nil
     }
     
 }

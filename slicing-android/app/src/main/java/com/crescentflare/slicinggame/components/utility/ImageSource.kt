@@ -92,14 +92,17 @@ class ImageSource {
     // Obtain drawable
     // --
 
-    fun getDrawable(context: Context): Drawable? {
+    fun getDrawable(context: Context, callback: (drawable: Drawable?) -> Unit) {
         if (type == Type.InternalImage) {
             val resourceId = context.resources.getIdentifier(name, "drawable", context.packageName)
             if (resourceId > 0) {
-                return ContextCompat.getDrawable(context, resourceId)
+                return callback(ContextCompat.getDrawable(context, resourceId))
+            } else {
+                callback(null)
             }
+        } else {
+            callback(null)
         }
-        return null
     }
 
 

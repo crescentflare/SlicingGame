@@ -92,7 +92,15 @@ class ImageView: UniImageView {
     
     var source: ImageSource? {
         didSet {
-            image = source?.getImage()
+            if let source = source {
+                source.getImage(completion: { [weak self] image in
+                    if self?.source === source {
+                        self?.image = image
+                    }
+                })
+            } else {
+                image = nil
+            }
         }
     }
 

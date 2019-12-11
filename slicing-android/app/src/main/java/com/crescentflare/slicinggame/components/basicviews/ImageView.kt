@@ -80,7 +80,15 @@ open class ImageView : UniImageView {
     var source: ImageSource? = null
         set(source) {
             field = source
-            setImageDrawable(source?.getDrawable(context))
+            if (source != null) {
+                source.getDrawable(context) {
+                    if (field === source) {
+                        setImageDrawable(it)
+                    }
+                }
+            } else {
+                setImageDrawable(null)
+            }
         }
 
 
