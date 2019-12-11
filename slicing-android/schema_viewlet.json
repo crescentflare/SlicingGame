@@ -460,7 +460,7 @@
       "oneOf": [
         {
           "type": "string",
-          "pattern": "^(app):\/\/.+$"
+          "pattern": "^(app|http|https):\/\/.+$"
         },
         {
           "type": "object",
@@ -469,12 +469,26 @@
               "description": "The type of image source to load",
               "type": "string",
               "enum": [
-                "app"
+                "app",
+                "http",
+                "https"
               ]
             },
             "name": {
               "description": "The filename of the image",
               "type": "string"
+            },
+            "forceWidth": {
+              "description": "Online images only: scale the image to this width",
+              "$ref": "#/definitions/dimension"
+            },
+            "forceHeight": {
+              "description": "Online images only: scale the image to this height",
+              "$ref": "#/definitions/dimension"
+            },
+            "density": {
+              "description": "Online images only: the image has this density, scale up/down for devices with another density",
+              "type": "number"
             }
           }
         }
