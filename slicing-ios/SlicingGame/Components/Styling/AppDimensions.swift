@@ -16,6 +16,8 @@ class AppDimensions {
         
         func getDimension(refId: String) -> CGFloat? {
             let dimensionTable: [String: CGFloat] = [
+                "pagePadding": pagePadding,
+
                 "text": text,
                 "titleText": titleText,
                 
@@ -28,6 +30,13 @@ class AppDimensions {
     }
     
     
+    // --
+    // MARK: Margins
+    // --
+    
+    class var pagePadding: CGFloat { get { return 8 }}
+
+
     // --
     // MARK: Text
     // --

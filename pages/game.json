@@ -22,24 +22,18 @@
       },
       "contentItems": [
         {
-          "viewlet": "view",
+          "viewlet": "frameContainer",
           "width": "stretchToParent",
           "height": "stretchToParent",
-          "backgroundColor": "#ddd"
-        },
-        {
-          "viewlet": "frameContainer",
-          "width": "92vw",
-          "height": "92vw",
-          "gravity": "center",
+          "padding": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
+          "backgroundColor": "#ddd",
           "items": [
             {
-              "viewlet": "image",
-              "width": "stretchToParent",
-              "height": "stretchToParent",
-              "backgroundColor": "#fff",
-              "source": "app://background_level_starry_night",
-              "stretchType": "aspectCrop"
+              "viewlet": "levelCanvas",
+              "canvasWidth": 12,
+              "canvasHeight": 16,
+              "gravity": "center",
+              "backgroundColor": "#fff"
             }
           ]
         }
