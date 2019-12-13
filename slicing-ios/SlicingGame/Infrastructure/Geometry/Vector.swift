@@ -28,6 +28,14 @@ class Vector {
     // --
     // MARK: Return modified result
     // --
+    
+    func translated(translateX: CGFloat, translateY: CGFloat) -> Vector {
+        return Vector(start: CGPoint(x: start.x + translateX, y: start.y + translateY), end: CGPoint(x: end.x + translateX, y: end.y + translateY))
+    }
+    
+    func scaled(scaleX: CGFloat, scaleY: CGFloat) -> Vector {
+        return Vector(start: CGPoint(x: start.x * scaleX, y: start.y * scaleY), end: CGPoint(x: end.x * scaleX, y: end.y * scaleY))
+    }
 
     func reversed() -> Vector {
         return Vector(start: end, end: start)

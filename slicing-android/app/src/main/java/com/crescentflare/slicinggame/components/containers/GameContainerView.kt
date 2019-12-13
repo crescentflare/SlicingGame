@@ -1,11 +1,13 @@
 package com.crescentflare.slicinggame.components.containers
 
+import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
 import android.util.AttributeSet
+import android.view.MotionEvent
 import androidx.core.view.setMargins
 import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
@@ -67,6 +69,9 @@ open class GameContainerView : FrameContainerView {
     // --
 
     private var canvasView = LevelCanvasView(context)
+    private var dragStart: PointF? = null
+    private var dragEnd: PointF? = null
+    private var dragPointerId = 0
 
 
     // --
@@ -127,5 +132,66 @@ open class GameContainerView : FrameContainerView {
             field = levelHeight
             canvasView.canvasHeight = levelHeight
         }
+
+
+    // --
+    // Interaction
+    // --
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            when (event.action) {
+                MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
+                    if (dragStart == null && event.pointerCount > 0) {
+                        dragStart = PointF(event.getX(0), event.getY(0))
+                        dragEnd = dragStart
+                        dragPointerId = event.getPointerId(0)
+                    }
+                    return true
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    if (dragStart != null && dragEnd != null) {
+                        for (i in 0 until event.pointerCount) {
+                            if (event.getPointerId(i) == dragPointerId) {
+                                dragEnd = PointF(event.getX(i), event.getY(i))
+                                break
+                            }
+                        }
+                        return true
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
+                    if (dragStart != null && dragEnd != null) {
+                        for (i in 0 until event.pointerCount) {
+                            if (event.getPointerId(i) == dragPointerId) {
+                                // Update final end position
+                                dragEnd = PointF(event.getX(i), event.getY(i))
+
+                                // Make vector and slice
+                                val vectorStart = dragStart
+                                val vectorEnd = dragEnd
+                                if (vectorStart != null && vectorEnd != null && canvasView.width > 0 && canvasView.height > 0) {
+                                    val viewVector = Vector(vectorStart, vectorEnd)
+                                    val canvasVector = viewVector.translated(-canvasView.left.toFloat(), -canvasView.top.toFloat())
+                                    val sliceVector = canvasVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
+                                    if (sliceVector.isValid()) {
+                                        slice(sliceVector)
+                                    }
+                                }
+
+                                // Reset dragging state
+                                dragStart = null
+                                dragEnd = null
+                                break
+                            }
+                        }
+                        return true
+                    }
+                }
+            }
+        }
+        return super.onTouchEvent(event)
+    }
 
 }

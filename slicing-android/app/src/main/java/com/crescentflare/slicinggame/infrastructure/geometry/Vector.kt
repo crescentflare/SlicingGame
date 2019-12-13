@@ -11,6 +11,14 @@ class Vector(var start: PointF, var end: PointF) {
     // Return modified result
     // --
 
+    fun translated(translateX: Float, translateY: Float): Vector {
+        return Vector(PointF(start.x + translateX, start.y + translateY), PointF(end.x + translateX, end.y + translateY))
+    }
+
+    fun scaled(scaleX: Float, scaleY: Float): Vector {
+        return Vector(PointF(start.x * scaleX, start.y * scaleY), PointF(end.x * scaleX, end.y * scaleY))
+    }
+
     fun reversed(): Vector {
         return Vector(end, start)
     }

@@ -14,6 +14,8 @@ class GameContainerView: FrameContainerView {
     // --
     
     private var canvasView = LevelCanvasView()
+    private var dragStart: CGPoint?
+    private var dragEnd: CGPoint?
 
 
     // --
@@ -112,4 +114,45 @@ class GameContainerView: FrameContainerView {
         }
     }
     
+    
+    // --
+    // MARK: Interaction
+    // --
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        if let touch = touches.first {
+            dragStart = touch.location(in: self)
+            dragEnd = dragStart
+        }
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesMoved(touches, with: event)
+        for touch in touches {
+            if touch.previousLocation(in: self) == dragEnd {
+                dragEnd = touch.location(in: self)
+            }
+        }
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        for touch in touches {
+            if touch.previousLocation(in: self) == dragEnd {
+                dragEnd = touch.location(in: self)
+            }
+        }
+        if let dragStart = dragStart, let dragEnd = dragEnd, canvasView.frame.width > 0 && canvasView.frame.height > 0 {
+            let viewVector = Vector(start: dragStart, end: dragEnd)
+            let canvasVector = viewVector.translated(translateX: -canvasView.frame.origin.x, translateY: -canvasView.frame.origin.y)
+            let sliceVector = canvasVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+            if sliceVector.isValid() {
+                slice(vector: sliceVector)
+            }
+        }
+        dragStart = nil
+        dragEnd = nil
+    }
+
 }
