@@ -16,6 +16,7 @@
         "linearContainer",
         "pageContainer",
         "levelCanvas",
+        "levelSlicePreview",
         "gameTitleBar",
         "simpleBottomBar"
       ]
@@ -359,6 +360,41 @@
             "items": {
               "type": "number"
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "levelSlicePreview"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "start": {
+            "description": "A list with an x and y coordinate starting the slice",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/dimension"
+            }
+          },
+          "end": {
+            "description": "A list with an x and y coordinate ending the slice",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/dimension"
+            }
+          },
+          "color": {
+            "description": "The color of the slice preview",
+            "$ref": "#/definitions/color"
+          },
+          "stretchedColor": {
+            "description": "The color of the stretched slice extending to the component edges",
+            "$ref": "#/definitions/color"
           }
         }
       }

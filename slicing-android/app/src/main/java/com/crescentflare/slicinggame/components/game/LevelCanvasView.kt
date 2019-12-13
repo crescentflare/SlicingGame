@@ -98,7 +98,7 @@ open class LevelCanvasView : UniFrameContainer {
 
 
     // --
-    // Configurable values
+    // Slicing
     // --
 
     fun slice(vector: Vector) {
@@ -152,8 +152,8 @@ open class LevelCanvasView : UniFrameContainer {
         invalidate()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
+    override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight)
         updateClipPath()
     }
 

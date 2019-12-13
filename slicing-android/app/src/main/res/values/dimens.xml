@@ -8,4 +8,10 @@
     <dimen name="text">17sp</dimen>
     <dimen name="titleText">20sp</dimen>
 
+    <!-- Game -->
+    <dimen name="slicePreviewDot">10dp</dimen>
+    <dimen name="slicePreviewWidth">2dp</dimen>
+    <dimen name="slicePreviewStretchedWidth">1dp</dimen>
+    <dimen name="slicePreviewDash">8dp</dimen>
+
 </resources>

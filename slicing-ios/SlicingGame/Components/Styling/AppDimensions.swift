@@ -21,6 +21,11 @@ class AppDimensions {
                 "text": text,
                 "titleText": titleText,
                 
+                "slicePreviewDot": slicePreviewDot,
+                "slicePreviewWidth": slicePreviewWidth,
+                "slicePreviewStretchedWidth": slicePreviewStretchedWidth,
+                "slicePreviewDash": slicePreviewDash,
+                
                 "portraitTitleBarHeight": portraitTitleBarHeight,
                 "landscapeTitleBarHeight": landscapeTitleBarHeight
             ]
@@ -45,6 +50,16 @@ class AppDimensions {
     class var titleText: CGFloat { get { return 20 } }
     
     
+    // --
+    // MARK: Game
+    // --
+    
+    class var slicePreviewDot: CGFloat { get { return 10 } }
+    class var slicePreviewWidth: CGFloat { get { return 2 } }
+    class var slicePreviewStretchedWidth: CGFloat { get { return 1 } }
+    class var slicePreviewDash: CGFloat { get { return 8 } }
+
+
     // --
     // MARK: UIKit component sizes
     // --

@@ -11,6 +11,7 @@ import com.crescentflare.slicinggame.components.containers.GameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
 import com.crescentflare.slicinggame.components.containers.PageContainerView
 import com.crescentflare.slicinggame.components.game.LevelCanvasView
+import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
 import com.crescentflare.slicinggame.components.navigationbars.GameTitleBarView
 import com.crescentflare.slicinggame.components.navigationbars.SimpleBottomBarView
 import com.crescentflare.slicinggame.components.styling.AppFonts
@@ -78,6 +79,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Game
         Inflators.viewlet.register("levelCanvas", LevelCanvasView.viewlet)
+        Inflators.viewlet.register("levelSlicePreview", LevelSlicePreviewView.viewlet)
 
         // Navigation bars
         Inflators.viewlet.register("gameTitleBar", GameTitleBarView.viewlet)
