@@ -7,6 +7,7 @@ import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
 import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
+import com.crescentflare.slicinggame.components.containers.GameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
 import com.crescentflare.slicinggame.components.containers.PageContainerView
 import com.crescentflare.slicinggame.components.game.LevelCanvasView
@@ -71,6 +72,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Containers
         Inflators.viewlet.register("frameContainer", FrameContainerView.viewlet)
+        Inflators.viewlet.register("gameContainer", GameContainerView.viewlet)
         Inflators.viewlet.register("linearContainer", LinearContainerView.viewlet)
         Inflators.viewlet.register("pageContainer", PageContainerView.viewlet)
 

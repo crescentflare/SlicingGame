@@ -22,20 +22,12 @@
       },
       "contentItems": [
         {
-          "viewlet": "frameContainer",
+          "viewlet": "gameContainer",
           "width": "stretchToParent",
           "height": "stretchToParent",
-          "padding": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
           "backgroundColor": "#ddd",
-          "items": [
-            {
-              "viewlet": "levelCanvas",
-              "canvasWidth": 12,
-              "canvasHeight": 16,
-              "gravity": "center",
-              "backgroundColor": "#fff"
-            }
-          ]
+          "levelWidth": 12,
+          "levelHeight": 16
         }
       ]
     }

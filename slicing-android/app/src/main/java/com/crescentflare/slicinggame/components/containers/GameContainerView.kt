@@ -1,0 +1,131 @@
+package com.crescentflare.slicinggame.components.containers
+
+import android.annotation.TargetApi
+import android.content.Context
+import android.graphics.Color
+import android.graphics.PointF
+import android.os.Build
+import android.util.AttributeSet
+import androidx.core.view.setMargins
+import com.crescentflare.jsoninflator.JsonInflatable
+import com.crescentflare.jsoninflator.binder.InflatorBinder
+import com.crescentflare.jsoninflator.utility.InflatorMapUtil
+import com.crescentflare.slicinggame.R
+import com.crescentflare.slicinggame.components.game.LevelCanvasView
+import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import com.crescentflare.unilayout.helpers.UniLayoutParams
+
+
+/**
+ * Container view: layout of game components and slice interaction
+ */
+open class GameContainerView : FrameContainerView {
+
+    // --
+    // Static: viewlet integration
+    // --
+
+    companion object {
+
+        val viewlet: JsonInflatable = object : JsonInflatable {
+            override fun create(context: Context): Any {
+                return GameContainerView(context)
+            }
+
+            override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
+                if (obj is GameContainerView) {
+                    // Apply level size
+                    obj.levelWidth = mapUtil.optionalFloat(attributes, "levelWidth", 1f)
+                    obj.levelHeight = mapUtil.optionalFloat(attributes, "levelHeight", 1f)
+
+                    // Apply slices
+                    val sliceList = mapUtil.optionalFloatList(attributes, "slices")
+                    obj.resetSlices()
+                    for (index in sliceList.indices) {
+                        if (index % 4 == 0 && index + 3 < sliceList.size) {
+                            obj.slice(Vector(PointF(sliceList[index], sliceList[index + 1]), PointF(sliceList[index + 2], sliceList[index + 3])))
+                        }
+                    }
+
+                    // Generic view properties
+                    ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+                    return true
+                }
+                return false
+            }
+
+            override fun canRecycle(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>): Boolean {
+                return obj::class == GameContainerView::class
+            }
+        }
+    }
+
+
+    // --
+    // Members
+    // --
+
+    private var canvasView = LevelCanvasView(context)
+
+
+    // --
+    // Initialization
+    // --
+
+    @JvmOverloads
+    constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0)
+            : super(context, attrs, defStyleAttr)
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    constructor(
+        context: Context,
+        attrs: AttributeSet?,
+        defStyleAttr: Int,
+        defStyleRes: Int)
+            : super(context, attrs, defStyleAttr, defStyleRes)
+
+    init {
+        val canvasLayoutParams = UniLayoutParams(UniLayoutParams.WRAP_CONTENT, UniLayoutParams.WRAP_CONTENT)
+        canvasLayoutParams.setMargins(resources.getDimensionPixelSize(R.dimen.pagePadding))
+        canvasLayoutParams.horizontalGravity = 0.5f
+        canvasLayoutParams.verticalGravity = 0.5f
+        canvasView.layoutParams = canvasLayoutParams
+        canvasView.setBackgroundColor(Color.WHITE)
+        addView(canvasView)
+    }
+
+
+    // --
+    // Configurable values
+    // --
+
+    fun slice(vector: Vector) {
+        canvasView.slice(vector)
+    }
+
+    fun resetSlices() {
+        canvasView.resetSlices()
+    }
+
+
+    // --
+    // Configurable values
+    // --
+
+    var levelWidth: Float = 1f
+        set(levelWidth) {
+            field = levelWidth
+            canvasView.canvasWidth = levelWidth
+        }
+
+    var levelHeight: Float = 1f
+        set(levelHeight) {
+            field = levelHeight
+            canvasView.canvasHeight = levelHeight
+        }
+
+}

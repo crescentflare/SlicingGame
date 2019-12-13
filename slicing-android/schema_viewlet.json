@@ -12,6 +12,7 @@
         "text",
         "view",
         "frameContainer",
+        "gameContainer",
         "linearContainer",
         "pageContainer",
         "levelCanvas",
@@ -240,6 +241,34 @@
               "$ref": "#"
             },
             "default": []
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "gameContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "levelWidth": {
+            "description": "The width of the level in pixel independent units",
+            "type": "number"
+          },
+          "levelHeight": {
+            "description": "The height of the level in pixel independent units",
+            "type": "number"
+          },
+          "slices": {
+            "description": "A flattened list of slice vector coordinates",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
         }
       }
