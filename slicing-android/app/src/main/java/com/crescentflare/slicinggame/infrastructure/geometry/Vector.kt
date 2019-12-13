@@ -1,6 +1,8 @@
 package com.crescentflare.slicinggame.infrastructure.geometry
 
 import android.graphics.PointF
+import kotlin.math.abs
+import kotlin.math.sqrt
 
 /**
  * Geometry: defines a vector with a start/end position and direction
@@ -23,6 +25,39 @@ class Vector(var start: PointF, var end: PointF) {
         return Vector(end, start)
     }
 
+    fun stretchedToEdges(topLeft: PointF, bottomRight: PointF): Vector {
+        val newStart = PointF(start.x, start.y)
+        val newEnd = PointF(end.x, end.y)
+        if (abs(start.x - end.x) > abs(start.y - end.y)) {
+            val slope = (start.y - end.y) / (start.x - end.x)
+            if (start.x < end.x) {
+                newStart.x = topLeft.x
+                newStart.y += (topLeft.x - start.x) * slope
+                newEnd.x = bottomRight.x
+                newEnd.y += (bottomRight.x - end.x) * slope
+            } else {
+                newStart.x = bottomRight.x
+                newStart.y += (bottomRight.x - start.x) * slope
+                newEnd.x = topLeft.x
+                newEnd.y += (topLeft.x - end.x) * slope
+            }
+        } else {
+            val slope = (start.x - end.x) / (start.y - end.y)
+            if (start.y < end.y) {
+                newStart.x += (topLeft.y - start.y) * slope
+                newStart.y = topLeft.y
+                newEnd.x += (bottomRight.y - end.y) * slope
+                newEnd.y = bottomRight.y
+            } else {
+                newStart.x += (bottomRight.y - start.y) * slope
+                newStart.y = bottomRight.y
+                newEnd.x += (topLeft.y - end.y) * slope
+                newEnd.y = topLeft.y
+            }
+        }
+        return Vector(newStart, newEnd)
+    }
+
 
     // --
     // Checks
@@ -30,6 +65,10 @@ class Vector(var start: PointF, var end: PointF) {
 
     fun isValid(): Boolean {
         return start.x != end.x || start.y != end.y
+    }
+
+    fun distance(): Float {
+        return sqrt((start.x - end.x) * (start.x - end.x) + (start.y - end.y) * (start.y - end.y))
     }
 
     fun directionOfPoint(point: PointF): Float {

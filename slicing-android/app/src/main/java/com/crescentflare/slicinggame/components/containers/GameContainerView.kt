@@ -3,6 +3,7 @@ package com.crescentflare.slicinggame.components.containers
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
@@ -72,6 +73,7 @@ open class GameContainerView : FrameContainerView {
     private var dragStart: PointF? = null
     private var dragEnd: PointF? = null
     private var dragPointerId = 0
+    private val minimumDragDistance = Resources.getSystem().displayMetrics.density * 32
 
 
     // --
@@ -173,10 +175,12 @@ open class GameContainerView : FrameContainerView {
                                 val vectorEnd = dragEnd
                                 if (vectorStart != null && vectorEnd != null && canvasView.width > 0 && canvasView.height > 0) {
                                     val viewVector = Vector(vectorStart, vectorEnd)
-                                    val canvasVector = viewVector.translated(-canvasView.left.toFloat(), -canvasView.top.toFloat())
-                                    val sliceVector = canvasVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
-                                    if (sliceVector.isValid()) {
-                                        slice(sliceVector)
+                                    if (viewVector.distance() >= minimumDragDistance) {
+                                        val canvasVector = viewVector.translated(-canvasView.left.toFloat(), -canvasView.top.toFloat())
+                                        val sliceVector = canvasVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
+                                        if (sliceVector.isValid()) {
+                                            slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
+                                        }
                                     }
                                 }
 

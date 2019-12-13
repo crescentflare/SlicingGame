@@ -10,6 +10,13 @@ import JsonInflator
 class GameContainerView: FrameContainerView {
     
     // --
+    // MARK: Statics
+    // --
+    
+    private let minimumDragDistance: CGFloat = 32
+
+
+    // --
     // MARK: Members
     // --
     
@@ -145,10 +152,12 @@ class GameContainerView: FrameContainerView {
         }
         if let dragStart = dragStart, let dragEnd = dragEnd, canvasView.frame.width > 0 && canvasView.frame.height > 0 {
             let viewVector = Vector(start: dragStart, end: dragEnd)
-            let canvasVector = viewVector.translated(translateX: -canvasView.frame.origin.x, translateY: -canvasView.frame.origin.y)
-            let sliceVector = canvasVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
-            if sliceVector.isValid() {
-                slice(vector: sliceVector)
+            if viewVector.distance() >= minimumDragDistance {
+                let canvasVector = viewVector.translated(translateX: -canvasView.frame.origin.x, translateY: -canvasView.frame.origin.y)
+                let sliceVector = canvasVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+                if sliceVector.isValid() {
+                    slice(vector: sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))))
+                }
             }
         }
         dragStart = nil
