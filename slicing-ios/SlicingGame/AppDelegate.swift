@@ -74,6 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.register(name: "pageContainer", inflatable: PageContainerView.viewlet())
         
         // Game
+        Inflators.viewlet.register(name: "level", inflatable: LevelView.viewlet())
         Inflators.viewlet.register(name: "levelCanvas", inflatable: LevelCanvasView.viewlet())
         Inflators.viewlet.register(name: "levelSlicePreview", inflatable: LevelSlicePreviewView.viewlet())
 
