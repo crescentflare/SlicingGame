@@ -21,6 +21,7 @@ class GameContainerView: FrameContainerView {
     // --
     
     private var canvasView = LevelCanvasView()
+    private var slicePreviewView = LevelSlicePreviewView()
     private var dragStart: CGPoint?
     private var dragEnd: CGPoint?
 
@@ -83,12 +84,20 @@ class GameContainerView: FrameContainerView {
     }
     
     private func setup() {
+        // Add level canvas
         let margin = AppDimensions.pagePadding
         canvasView.layoutProperties.margin = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
         canvasView.layoutProperties.horizontalGravity = 0.5
         canvasView.layoutProperties.verticalGravity = 0.5
         canvasView.backgroundColor = .white
         addSubview(canvasView)
+        
+        // Add slice preview
+        slicePreviewView.layoutProperties.width = UniLayoutProperties.stretchToParent
+        slicePreviewView.layoutProperties.height = UniLayoutProperties.stretchToParent
+        slicePreviewView.color = .slicePreviewLine
+        slicePreviewView.stretchedColor = .stretchedSlicePreviewLine
+        addSubview(slicePreviewView)
     }
     
     
@@ -131,6 +140,7 @@ class GameContainerView: FrameContainerView {
         if let touch = touches.first {
             dragStart = touch.location(in: self)
             dragEnd = dragStart
+            slicePreviewView.start = dragStart
         }
     }
     
@@ -139,6 +149,14 @@ class GameContainerView: FrameContainerView {
         for touch in touches {
             if touch.previousLocation(in: self) == dragEnd {
                 dragEnd = touch.location(in: self)
+                if let dragStart = dragStart, let dragEnd = dragEnd {
+                    let viewVector = Vector(start: dragStart, end: dragEnd)
+                    if viewVector.distance() >= minimumDragDistance {
+                        slicePreviewView.end = dragEnd
+                    } else {
+                        slicePreviewView.end = nil
+                    }
+                }
             }
         }
     }
@@ -162,6 +180,8 @@ class GameContainerView: FrameContainerView {
         }
         dragStart = nil
         dragEnd = nil
+        slicePreviewView.start = nil
+        slicePreviewView.end = nil
     }
 
 }
