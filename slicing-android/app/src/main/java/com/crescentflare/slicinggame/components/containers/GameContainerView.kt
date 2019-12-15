@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.Color
 import android.graphics.Point
 import android.graphics.PointF
 import android.os.Build
@@ -16,8 +15,9 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.R
-import com.crescentflare.slicinggame.components.game.LevelCanvasView
 import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
+import com.crescentflare.slicinggame.components.game.LevelView
+import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.unilayout.helpers.UniLayoutParams
@@ -44,6 +44,9 @@ open class GameContainerView : FrameContainerView {
                     // Apply level size
                     obj.levelWidth = mapUtil.optionalFloat(attributes, "levelWidth", 1f)
                     obj.levelHeight = mapUtil.optionalFloat(attributes, "levelHeight", 1f)
+
+                    // Apply background
+                    obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
                     // Apply slices
                     val sliceList = mapUtil.optionalFloatList(attributes, "slices")
@@ -72,7 +75,7 @@ open class GameContainerView : FrameContainerView {
     // Members
     // --
 
-    private var canvasView = LevelCanvasView(context)
+    private var levelView = LevelView(context)
     private var slicePreviewView = LevelSlicePreviewView(context)
     private var dragStart: PointF? = null
     private var dragEnd: PointF? = null
@@ -100,14 +103,13 @@ open class GameContainerView : FrameContainerView {
             : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
-        // Add level canvas
-        val canvasLayoutParams = UniLayoutParams(UniLayoutParams.WRAP_CONTENT, UniLayoutParams.WRAP_CONTENT)
-        canvasLayoutParams.setMargins(resources.getDimensionPixelSize(R.dimen.pagePadding))
-        canvasLayoutParams.horizontalGravity = 0.5f
-        canvasLayoutParams.verticalGravity = 0.5f
-        canvasView.layoutParams = canvasLayoutParams
-        canvasView.setBackgroundColor(Color.WHITE)
-        addView(canvasView)
+        // Add level
+        val levelLayoutParams = UniLayoutParams(UniLayoutParams.WRAP_CONTENT, UniLayoutParams.WRAP_CONTENT)
+        levelLayoutParams.setMargins(resources.getDimensionPixelSize(R.dimen.pagePadding))
+        levelLayoutParams.horizontalGravity = 0.5f
+        levelLayoutParams.verticalGravity = 0.5f
+        levelView.layoutParams = levelLayoutParams
+        addView(levelView)
 
         // Add slice preview
         slicePreviewView.layoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
@@ -118,15 +120,15 @@ open class GameContainerView : FrameContainerView {
 
 
     // --
-    // Configurable values
+    // Slicing
     // --
 
     fun slice(vector: Vector) {
-        canvasView.slice(vector)
+        levelView.slice(vector)
     }
 
     fun resetSlices() {
-        canvasView.resetSlices()
+        levelView.resetSlices()
     }
 
 
@@ -137,13 +139,19 @@ open class GameContainerView : FrameContainerView {
     var levelWidth: Float = 1f
         set(levelWidth) {
             field = levelWidth
-            canvasView.canvasWidth = levelWidth
+            levelView.levelWidth = levelWidth
         }
 
     var levelHeight: Float = 1f
         set(levelHeight) {
             field = levelHeight
-            canvasView.canvasHeight = levelHeight
+            levelView.levelHeight = levelHeight
+        }
+
+    var backgroundImage: ImageSource?
+        get() = levelView.backgroundImage
+        set(backgroundImage) {
+            levelView.backgroundImage = backgroundImage
         }
 
 
@@ -197,11 +205,11 @@ open class GameContainerView : FrameContainerView {
                                 // Make vector and slice
                                 val vectorStart = dragStart
                                 val vectorEnd = dragEnd
-                                if (vectorStart != null && vectorEnd != null && canvasView.width > 0 && canvasView.height > 0) {
+                                if (vectorStart != null && vectorEnd != null && levelView.width > 0 && levelView.height > 0) {
                                     val viewVector = Vector(vectorStart, vectorEnd)
                                     if (viewVector.distance() >= minimumDragDistance) {
-                                        val canvasVector = viewVector.translated(-canvasView.left.toFloat(), -canvasView.top.toFloat())
-                                        val sliceVector = canvasVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
+                                        val levelVector = viewVector.translated(-levelView.left.toFloat(), -levelView.top.toFloat())
+                                        val sliceVector = levelVector.scaled(levelWidth / levelView.width.toFloat(), levelHeight / levelView.height.toFloat())
                                         if (sliceVector.isValid()) {
                                             slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
                                         }

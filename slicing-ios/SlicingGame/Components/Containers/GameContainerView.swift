@@ -20,7 +20,7 @@ class GameContainerView: FrameContainerView {
     // MARK: Members
     // --
     
-    private var canvasView = LevelCanvasView()
+    private var levelView = LevelView()
     private var slicePreviewView = LevelSlicePreviewView()
     private var dragStart: CGPoint?
     private var dragEnd: CGPoint?
@@ -42,10 +42,13 @@ class GameContainerView: FrameContainerView {
         
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let gameContainer = object as? GameContainerView {
-                // Apply canvas size
+                // Apply level size
                 gameContainer.levelWidth = convUtil.asFloat(value: attributes["levelWidth"]) ?? 1
                 gameContainer.levelHeight = convUtil.asFloat(value: attributes["levelHeight"]) ?? 1
                 
+                // Apply background
+                gameContainer.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
+
                 // Apply slices
                 let sliceArray = convUtil.asFloatArray(value: attributes["slices"])
                 gameContainer.resetSlices()
@@ -84,13 +87,12 @@ class GameContainerView: FrameContainerView {
     }
     
     private func setup() {
-        // Add level canvas
+        // Add level
         let margin = AppDimensions.pagePadding
-        canvasView.layoutProperties.margin = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
-        canvasView.layoutProperties.horizontalGravity = 0.5
-        canvasView.layoutProperties.verticalGravity = 0.5
-        canvasView.backgroundColor = .white
-        addSubview(canvasView)
+        levelView.layoutProperties.margin = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
+        levelView.layoutProperties.horizontalGravity = 0.5
+        levelView.layoutProperties.verticalGravity = 0.5
+        addSubview(levelView)
         
         // Add slice preview
         slicePreviewView.layoutProperties.width = UniLayoutProperties.stretchToParent
@@ -106,11 +108,11 @@ class GameContainerView: FrameContainerView {
     // --
     
     func slice(vector: Vector) {
-        canvasView.slice(vector: vector)
+        levelView.slice(vector: vector)
     }
 
     func resetSlices() {
-        canvasView.resetSlices()
+        levelView.resetSlices()
     }
     
 
@@ -120,16 +122,23 @@ class GameContainerView: FrameContainerView {
     
     var levelWidth: Float = 1 {
         didSet {
-            canvasView.canvasWidth = levelWidth
+            levelView.levelWidth = levelWidth
         }
     }
 
     var levelHeight: Float = 1 {
         didSet {
-            canvasView.canvasHeight = levelHeight
+            levelView.levelHeight = levelHeight
         }
     }
     
+    var backgroundImage: ImageSource? {
+        set {
+            levelView.backgroundImage = newValue
+        }
+        get { return levelView.backgroundImage }
+    }
+
     
     // --
     // MARK: Interaction
@@ -168,11 +177,11 @@ class GameContainerView: FrameContainerView {
                 dragEnd = touch.location(in: self)
             }
         }
-        if let dragStart = dragStart, let dragEnd = dragEnd, canvasView.frame.width > 0 && canvasView.frame.height > 0 {
+        if let dragStart = dragStart, let dragEnd = dragEnd, levelView.frame.width > 0 && levelView.frame.height > 0 {
             let viewVector = Vector(start: dragStart, end: dragEnd)
             if viewVector.distance() >= minimumDragDistance {
-                let canvasVector = viewVector.translated(translateX: -canvasView.frame.origin.x, translateY: -canvasView.frame.origin.y)
-                let sliceVector = canvasVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+                let levelVector = viewVector.translated(translateX: -levelView.frame.origin.x, translateY: -levelView.frame.origin.y)
+                let sliceVector = levelVector.scaled(scaleX: CGFloat(levelWidth) / levelView.frame.width, scaleY: CGFloat(levelHeight) / levelView.frame.height)
                 if sliceVector.isValid() {
                     slice(vector: sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))))
                 }

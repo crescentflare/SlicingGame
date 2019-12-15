@@ -15,6 +15,7 @@
         "gameContainer",
         "linearContainer",
         "pageContainer",
+        "level",
         "levelCanvas",
         "levelSlicePreview",
         "gameTitleBar",
@@ -264,6 +265,10 @@
             "description": "The height of the level in pixel independent units",
             "type": "number"
           },
+          "backgroundImage": {
+            "description": "The image to reveal behind the level canvas",
+            "$ref": "#/definitions/imageSource"
+          },
           "slices": {
             "description": "A flattened list of slice vector coordinates",
             "type": "array",
@@ -332,6 +337,38 @@
           "backgroundItem": {
             "description": "A background view that's behind the content items and ignores the safe area",
             "$ref": "#"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "level"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "levelWidth": {
+            "description": "The width of the level in pixel independent units",
+            "type": "number"
+          },
+          "levelHeight": {
+            "description": "The height of the level in pixel independent units",
+            "type": "number"
+          },
+          "backgroundImage": {
+            "description": "The image to reveal behind the level canvas",
+            "$ref": "#/definitions/imageSource"
+          },
+          "slices": {
+            "description": "A flattened list of slice vector coordinates",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
           }
         }
       }
