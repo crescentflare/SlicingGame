@@ -7,7 +7,7 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class PageContainerView: UIView, UniLayoutView {
+class PageContainerView: UIView, UniLayoutView, AppEventObserver {
 
     // --
     // MARK: UniLayout integration
@@ -79,6 +79,11 @@ class PageContainerView: UIView, UniLayoutView {
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: pageContainer, attributes: attributes)
+
+                // Chain event observer
+                if let eventObserver = parent as? AppEventObserver {
+                    pageContainer.eventObserver = eventObserver
+                }
                 return true
             }
             return false
@@ -158,6 +163,22 @@ class PageContainerView: UIView, UniLayoutView {
         for view in contentContainer.subviews {
             view.removeFromSuperview()
         }
+    }
+
+
+    // --
+    // MARK: Configurable values
+    // --
+
+    weak var eventObserver: AppEventObserver?
+
+
+    // --
+    // MARK: Interaction
+    // --
+    
+    func observedEvent(_ event: AppEvent, sender: Any?) {
+        eventObserver?.observedEvent(event, sender: sender)
     }
 
 

@@ -8,12 +8,15 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.events.AppEvent
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.unilayout.containers.UniLinearContainer
+import java.lang.ref.WeakReference
 
 /**
  * Container view: basic layout container for horizontally or vertically aligned views
  */
-open class LinearContainerView : UniLinearContainer {
+open class LinearContainerView : UniLinearContainer, AppEventObserver {
 
     // --
     // Static: viewlet integration
@@ -41,6 +44,11 @@ open class LinearContainerView : UniLinearContainer {
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+
+                    // Chain event observer
+                    if (parent is AppEventObserver) {
+                        obj.eventObserver = parent
+                    }
                     return true
                 }
                 return false
@@ -51,6 +59,13 @@ open class LinearContainerView : UniLinearContainer {
             }
         }
     }
+
+
+    // --
+    // Members
+    // --
+
+    private var eventObserverReference : WeakReference<AppEventObserver>? = null
 
 
     // --
@@ -74,6 +89,30 @@ open class LinearContainerView : UniLinearContainer {
 
     init {
         orientation = VERTICAL
+    }
+
+
+    // --
+    // Configurable values
+    // --
+
+    var eventObserver: AppEventObserver?
+        get() = eventObserverReference?.get()
+        set(newValue) {
+            eventObserverReference = if (newValue != null) {
+                WeakReference(newValue)
+            } else {
+                null
+            }
+        }
+
+
+    // --
+    // Interaction
+    // --
+
+    override fun observedEvent(event: AppEvent, sender: Any?) {
+        eventObserver?.observedEvent(event, sender)
     }
 
 }

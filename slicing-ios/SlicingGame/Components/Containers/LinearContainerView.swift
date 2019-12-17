@@ -7,7 +7,7 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class LinearContainerView: UniLinearContainer {
+class LinearContainerView: UniLinearContainer, AppEventObserver {
     
     // --
     // MARK: Viewlet integration
@@ -37,6 +37,11 @@ class LinearContainerView: UniLinearContainer {
                 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: linearContainer, attributes: attributes)
+
+                // Chain event observer
+                if let eventObserver = parent as? AppEventObserver {
+                    linearContainer.eventObserver = eventObserver
+                }
                 return true
             }
             return false
@@ -67,4 +72,20 @@ class LinearContainerView: UniLinearContainer {
         // No implementation
     }
     
+    
+    // --
+    // MARK: Configurable values
+    // --
+
+    weak var eventObserver: AppEventObserver?
+
+
+    // --
+    // MARK: Interaction
+    // --
+    
+    func observedEvent(_ event: AppEvent, sender: Any?) {
+        eventObserver?.observedEvent(event, sender: sender)
+    }
+
 }

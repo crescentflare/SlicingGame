@@ -19,6 +19,7 @@ import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
 import com.crescentflare.slicinggame.components.game.LevelView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 
@@ -62,6 +63,11 @@ open class GameContainerView : FrameContainerView {
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+
+                    // Chain event observer
+                    if (parent is AppEventObserver) {
+                        obj.eventObserver = parent
+                    }
                     return true
                 }
                 return false

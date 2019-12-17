@@ -63,6 +63,11 @@ class GameContainerView: FrameContainerView {
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: gameContainer, attributes: attributes)
+
+                // Chain event observer
+                if let eventObserver = parent as? AppEventObserver {
+                    gameContainer.eventObserver = eventObserver
+                }
                 return true
             }
             return false
