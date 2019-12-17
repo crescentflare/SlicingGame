@@ -269,6 +269,10 @@
             "description": "The image to reveal behind the level canvas",
             "$ref": "#/definitions/imageSource"
           },
+          "requireClearRate": {
+            "description": "The clear rate required to complete the level",
+            "type": "integer"
+          },
           "slices": {
             "description": "A flattened list of slice vector coordinates",
             "type": "array",
@@ -362,6 +366,10 @@
           "backgroundImage": {
             "description": "The image to reveal behind the level canvas",
             "$ref": "#/definitions/imageSource"
+          },
+          "requireClearRate": {
+            "description": "The clear rate required to complete the level",
+            "type": "integer"
           },
           "slices": {
             "description": "A flattened list of slice vector coordinates",

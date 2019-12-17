@@ -28,6 +28,7 @@
           "backgroundColor": "#ddd",
           "levelWidth": 12,
           "levelHeight": 16,
+          "requireClearRate": 75,
           "backgroundImage": "app://background_level_starry_night"
         }
       ]

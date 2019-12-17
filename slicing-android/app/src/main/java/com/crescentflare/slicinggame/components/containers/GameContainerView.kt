@@ -48,6 +48,9 @@ open class GameContainerView : FrameContainerView {
                     // Apply background
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
+                    // Apply clear goal
+                    obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
+
                     // Apply slices
                     val sliceList = mapUtil.optionalFloatList(attributes, "slices")
                     obj.resetSlices()
@@ -154,6 +157,12 @@ open class GameContainerView : FrameContainerView {
             levelView.backgroundImage = backgroundImage
         }
 
+    var requireClearRate: Int
+        get() = levelView.requireClearRate
+        set(requireClearRate) {
+            levelView.requireClearRate = requireClearRate
+        }
+
 
     // --
     // Interaction
@@ -208,8 +217,7 @@ open class GameContainerView : FrameContainerView {
                                 if (vectorStart != null && vectorEnd != null && levelView.width > 0 && levelView.height > 0) {
                                     val viewVector = Vector(vectorStart, vectorEnd)
                                     if (viewVector.distance() >= minimumDragDistance) {
-                                        val levelVector = viewVector.translated(-levelView.left.toFloat(), -levelView.top.toFloat())
-                                        val sliceVector = levelVector.scaled(levelWidth / levelView.width.toFloat(), levelHeight / levelView.height.toFloat())
+                                        val sliceVector = levelView.transformedSliceVector(viewVector)
                                         if (sliceVector.isValid()) {
                                             slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
                                         }

@@ -2,14 +2,18 @@ package com.crescentflare.slicinggame.components.game
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.PointF
 import android.os.Build
 import android.util.AttributeSet
+import android.view.Gravity
 import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
+import com.crescentflare.slicinggame.R
 import com.crescentflare.slicinggame.components.basicviews.ImageView
+import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
@@ -42,6 +46,9 @@ open class LevelView : FrameContainerView {
                     // Apply background
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
+                    // Apply clear goal
+                    obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
+
                     // Apply slices
                     val sliceList = mapUtil.optionalFloatList(attributes, "slices")
                     obj.resetSlices()
@@ -71,6 +78,8 @@ open class LevelView : FrameContainerView {
 
     private var backgroundView = ImageView(context)
     private var canvasView = LevelCanvasView(context)
+    private var progressView = TextView(context)
+    private val progressViewMargin = resources.getDimensionPixelSize(R.dimen.text) + (Resources.getSystem().displayMetrics.density * 8).toInt()
 
 
     // --
@@ -94,14 +103,27 @@ open class LevelView : FrameContainerView {
 
     init {
         // Add background
-        backgroundView.layoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
+        val backgroundLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
+        backgroundLayoutParams.bottomMargin = progressViewMargin
+        backgroundView.layoutParams = backgroundLayoutParams
         backgroundView.scaleType = android.widget.ImageView.ScaleType.CENTER_CROP
         addView(backgroundView)
 
         // Add level canvas
-        canvasView.layoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
+        val canvasLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
+        canvasLayoutParams.bottomMargin = progressViewMargin
+        canvasView.layoutParams = canvasLayoutParams
         canvasView.setBackgroundColor(Color.WHITE)
         addView(canvasView)
+
+        // Add progress view
+        val progressLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.WRAP_CONTENT)
+        progressLayoutParams.verticalGravity = 1f
+        progressView.layoutParams = progressLayoutParams
+        progressView.maxLines = 1
+        progressView.gravity = Gravity.CENTER_HORIZONTAL
+        progressView.text = "0 / 100%"
+        addView(progressView)
     }
 
 
@@ -115,6 +137,11 @@ open class LevelView : FrameContainerView {
 
     fun resetSlices() {
         canvasView.resetSlices()
+    }
+
+    fun transformedSliceVector(vector: Vector): Vector {
+        val translatedVector = vector.translated(-left.toFloat(), -top.toFloat())
+        return translatedVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
     }
 
 
@@ -140,6 +167,12 @@ open class LevelView : FrameContainerView {
             backgroundView.source = backgroundImage
         }
 
+    var requireClearRate: Int = 100
+        set(requireClearRate) {
+            field = requireClearRate
+            progressView.text = "0 / $requireClearRate%"
+        }
+
 
     // --
     // Custom layout
@@ -147,7 +180,7 @@ open class LevelView : FrameContainerView {
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(canvasView.measuredWidth, canvasView.measuredHeight)
+        setMeasuredDimension(canvasView.measuredWidth, canvasView.measuredHeight + progressViewMargin)
     }
 
 }
