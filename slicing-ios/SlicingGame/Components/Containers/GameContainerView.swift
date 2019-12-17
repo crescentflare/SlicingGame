@@ -156,10 +156,12 @@ class GameContainerView: FrameContainerView {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        if let touch = touches.first {
-            dragStart = touch.location(in: self)
-            dragEnd = dragStart
-            slicePreviewView.start = dragStart
+        if !levelView.cleared() {
+            if let touch = touches.first {
+                dragStart = touch.location(in: self)
+                dragEnd = dragStart
+                slicePreviewView.start = dragStart
+            }
         }
     }
     

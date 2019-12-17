@@ -140,16 +140,27 @@ open class LevelView : FrameContainerView {
             canvasView.slice(vector)
         }
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
+        canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
     }
 
     fun resetSlices() {
         canvasView.resetSlices()
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
+        canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
     }
 
     fun transformedSliceVector(vector: Vector): Vector {
         val translatedVector = vector.translated(-left.toFloat(), -top.toFloat())
         return translatedVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
+    }
+
+
+    // --
+    // Obtain state
+    // --
+
+    fun cleared(): Boolean {
+        return canvasView.clearRate() >= requireClearRate
     }
 
 
@@ -179,6 +190,7 @@ open class LevelView : FrameContainerView {
         set(requireClearRate) {
             field = requireClearRate
             progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
+            canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
         }
 
 

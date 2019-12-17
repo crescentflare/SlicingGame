@@ -120,16 +120,27 @@ class LevelView: FrameContainerView {
             canvasView.slice(vector: vector)
         }
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+        canvasView.visibility = cleared() ? .invisible : .visible
     }
 
     func resetSlices() {
         canvasView.resetSlices()
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+        canvasView.visibility = cleared() ? .invisible : .visible
     }
     
     func transformedSliceVector(vector: Vector) -> Vector {
         let translatedVector = vector.translated(translateX: -frame.origin.x, translateY: -frame.origin.y)
         return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+    }
+    
+
+    // --
+    // MARK: Obtain state
+    // --
+    
+    func cleared() -> Bool {
+        return Int(canvasView.clearRate()) >= requireClearRate
     }
     
 
@@ -159,6 +170,7 @@ class LevelView: FrameContainerView {
     var requireClearRate: Int = 100 {
         didSet {
             progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+            canvasView.visibility = cleared() ? .invisible : .visible
         }
     }
 

@@ -173,7 +173,7 @@ open class GameContainerView : FrameContainerView {
         if (event != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                    if (dragStart == null && event.pointerCount > 0) {
+                    if (!levelView.cleared() && dragStart == null && event.pointerCount > 0) {
                         dragStart = PointF(event.getX(0), event.getY(0))
                         dragEnd = dragStart
                         dragPointerId = event.getPointerId(0)
