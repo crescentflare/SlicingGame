@@ -6,7 +6,7 @@
 import UIKit
 import UniLayout
 
-class PageViewController: UIViewController, PageLoaderDelegate {
+class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver {
 
     // --
     // MARK: Members
@@ -80,6 +80,23 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     
     
     // --
+    // MARK: Interaction
+    // --
+
+    func observedEvent(_ event: AppEvent, sender: Any?) {
+        if event.type == "alert" && event.name == "simple" {
+            let title = (event.parameters["title"] as? String) ?? "Alert"
+            let text = (event.parameters["text"] as? String) ?? "No text specified"
+            let actionText = (event.parameters["actionText"] as? String) ?? "OK"
+            let alertController = UIAlertController(title: title, message: text, preferredStyle: .alert)
+            let okAction = UIAlertAction(title: actionText, style: .default)
+            alertController.addAction(okAction)
+            present(alertController, animated: true, completion: nil)
+        }
+    }
+    
+
+    // --
     // MARK: Handle status bar
     // --
     
@@ -145,6 +162,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
             ]
         }
         ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout)
+        pageView.eventObserver = self
         currentPageHash = page.hash
         setNeedsStatusBarAppearanceUpdate()
     }
