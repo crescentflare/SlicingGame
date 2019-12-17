@@ -273,6 +273,10 @@
             "description": "The clear rate required to complete the level",
             "type": "integer"
           },
+          "clearEvent": {
+            "description": "Sends event when the level is cleared",
+            "$ref": "#/definitions/appEvent"
+          },
           "slices": {
             "description": "A flattened list of slice vector coordinates",
             "type": "array",
@@ -599,6 +603,30 @@
             "density": {
               "description": "Online images only: the image has this density, scale up/down for devices with another density",
               "type": "number"
+            }
+          }
+        }
+      ]
+    },
+    "appEvent": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^(alert):\/\/.+$"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The type of event",
+              "type": "string",
+              "enum": [
+                "alert"
+              ]
+            },
+            "name": {
+              "description": "The name or subtype of the event",
+              "type": "string"
             }
           }
         }
