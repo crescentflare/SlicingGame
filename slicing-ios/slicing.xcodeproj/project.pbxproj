@@ -14,6 +14,8 @@
 		0473BA0F23A16DFA0020FC93 /* ImageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0473BA0E23A16DFA0020FC93 /* ImageSource.swift */; };
 		0473BA1123A16F700020FC93 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0473BA1023A16F700020FC93 /* ImageView.swift */; };
 		0473BA1323A175470020FC93 /* String+URLCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0473BA1223A175470020FC93 /* String+URLCoding.swift */; };
+		0475353023A9657E00F3C216 /* AppEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0475352E23A9657D00F3C216 /* AppEvent.swift */; };
+		0475353123A9657E00F3C216 /* AppEventObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0475352F23A9657D00F3C216 /* AppEventObserver.swift */; };
 		04875384239BDACB002FC386 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875383239BDACB002FC386 /* AppDelegate.swift */; };
 		0487538D239BDACC002FC386 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0487538C239BDACC002FC386 /* Assets.xcassets */; };
 		04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0487538E239BDACC002FC386 /* LaunchScreen.storyboard */; };
@@ -56,6 +58,8 @@
 		0473BA0E23A16DFA0020FC93 /* ImageSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSource.swift; sourceTree = "<group>"; };
 		0473BA1023A16F700020FC93 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
 		0473BA1223A175470020FC93 /* String+URLCoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+URLCoding.swift"; sourceTree = "<group>"; };
+		0475352E23A9657D00F3C216 /* AppEvent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppEvent.swift; sourceTree = "<group>"; };
+		0475352F23A9657D00F3C216 /* AppEventObserver.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppEventObserver.swift; sourceTree = "<group>"; };
 		04875380239BDACB002FC386 /* Slicing game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Slicing game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04875383239BDACB002FC386 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0487538C239BDACC002FC386 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -113,6 +117,7 @@
 			children = (
 				04ECB574239D8AA4006CFC0D /* AppConfig */,
 				0487D2ED239C519600515520 /* CoreExtensions */,
+				0475352D23A9657D00F3C216 /* Events */,
 				04AC540B23A0020400111C91 /* Geometry */,
 				043D726A239C2C0D00A79415 /* Inflator */,
 			);
@@ -148,6 +153,15 @@
 				043D726F239C2D2300A79415 /* ViewletUtil.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		0475352D23A9657D00F3C216 /* Events */ = {
+			isa = PBXGroup;
+			children = (
+				0475352E23A9657D00F3C216 /* AppEvent.swift */,
+				0475352F23A9657D00F3C216 /* AppEventObserver.swift */,
+			);
+			path = Events;
 			sourceTree = "<group>";
 		};
 		04875377239BDACB002FC386 = {
@@ -467,6 +481,7 @@
 				0473BA1323A175470020FC93 /* String+URLCoding.swift in Sources */,
 				04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */,
 				04F2AA79239EDAE000126CD1 /* AppDimensions.swift in Sources */,
+				0475353123A9657E00F3C216 /* AppEventObserver.swift in Sources */,
 				04F2AA7A239EDAE000126CD1 /* UIColor+AppColors.swift in Sources */,
 				04F2AA8E239EE6FA00126CD1 /* SimpleBottomBarView.swift in Sources */,
 				04CC779B23A3B9F3003D1BB0 /* GameContainerView.swift in Sources */,
@@ -487,6 +502,7 @@
 				04F2AA75239EDA8700126CD1 /* UIColor+HexValue.swift in Sources */,
 				04CC779D23A3BEFD003D1BB0 /* LevelSlicePreviewView.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
+				0475353023A9657E00F3C216 /* AppEvent.swift in Sources */,
 				04F2AA7C239EDD1F00126CD1 /* AppFonts.swift in Sources */,
 				04F2AA89239EE43600126CD1 /* GameTitleBarView.swift in Sources */,
 				0487D2EC239C518500515520 /* Page.swift in Sources */,
