@@ -3,6 +3,7 @@ package com.crescentflare.slicinggame.page.modules.basicmodules
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import com.crescentflare.slicinggame.infrastructure.coreextensions.localized
 import com.crescentflare.slicinggame.infrastructure.events.AppEvent
 import com.crescentflare.slicinggame.page.activities.PageActivity
 import com.crescentflare.slicinggame.page.modules.PageModule
@@ -92,12 +93,12 @@ class AlertModule: PageModule {
     private fun tryHandleQueuedEvent() {
         if (!paused && !alertShown) {
             queuedEvents.firstOrNull()?.let {
-                val title = it.parameters["title"] as? String ?: "Alert"
-                val text = it.parameters["text"] as? String ?: "No text specified"
-                val actionText = it.parameters["actionText"] as? String ?: "OK"
-                queuedEvents.removeAt(0)
-                alertShown = true
                 activityReference?.get()?.let { activity ->
+                    val title = (it.parameters["localizedTitle"] as? String)?.localized(activity) ?: it.parameters["title"] as? String ?: "ALERT_UNSPECIFIED_TITLE".localized(activity)
+                    val text = (it.parameters["localizedText"] as? String)?.localized(activity) ?: it.parameters["text"] as? String ?: "ALERT_UNSPECIFIED_TEXT".localized(activity)
+                    val actionText = (it.parameters["localizedActionText"] as? String)?.localized(activity) ?: it.parameters["actionText"] as? String ?: "ALERT_OK".localized(activity)
+                    queuedEvents.removeAt(0)
+                    alertShown = true
                     showSimpleAlert(activity, title, text, actionText) { _, _ ->
                         alertShown = false
                         tryHandleQueuedEvent()

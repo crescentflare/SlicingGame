@@ -3,4 +3,13 @@
     <!-- Global app strings -->
     <string name="global_app_name">Slicing game</string>
 
+    <!-- Alerts -->
+    <string name="alert_ok">OK</string>
+    <string name="alert_unspecified_title">Alert</string>
+    <string name="alert_unspecified_text">No text specified</string>
+
+    <!-- Game -->
+    <string name="game_complete_level_title">Congratulations!</string>
+    <string name="game_complete_level_text">You\'ve reached the clear target to reveal the background</string>
+
 </resources>

@@ -5,3 +5,12 @@
 
 // Global app strings
 "GLOBAL_APP_NAME" = "Slicing game";
+
+// Alerts
+"ALERT_OK" = "OK";
+"ALERT_UNSPECIFIED_TITLE" = "Alert";
+"ALERT_UNSPECIFIED_TEXT" = "No text specified";
+
+// Game
+"GAME_COMPLETE_LEVEL_TITLE" = "Congratulations!";
+"GAME_COMPLETE_LEVEL_TEXT" = "You've reached the clear target to reveal the background";

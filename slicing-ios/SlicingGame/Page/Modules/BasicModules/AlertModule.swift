@@ -79,9 +79,9 @@ class AlertModule: PageModule {
     private func tryHandleQueuedEvent() {
         if !paused && !alertShown {
             if let nextEvent = queuedEvents.first {
-                let title = (nextEvent.parameters["title"] as? String) ?? "Alert"
-                let text = (nextEvent.parameters["text"] as? String) ?? "No text specified"
-                let actionText = (nextEvent.parameters["actionText"] as? String) ?? "OK"
+                let title = (nextEvent.parameters["localizedTitle"] as? String)?.localized() ?? (nextEvent.parameters["title"] as? String) ?? "ALERT_UNSPECIFIED_TITLE".localized()
+                let text = (nextEvent.parameters["localizedText"] as? String)?.localized() ?? (nextEvent.parameters["text"] as? String) ?? "ALERT_UNSPECIFIED_TEXT".localized()
+                let actionText = (nextEvent.parameters["localizedActionText"] as? String)?.localized() ?? (nextEvent.parameters["actionText"] as? String) ?? "ALERT_OK".localized()
                 queuedEvents.removeFirst()
                 alertShown = true
                 AlertModule.showSimpleAlert(viewController: viewController, title: title, text: text, actionText: actionText, completion: {
