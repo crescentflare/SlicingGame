@@ -12,6 +12,7 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     // MARK: Members
     // --
     
+    private var modules = [PageModule]()
     private let pageView = PageContainerView()
     private let pageJson: String
     private var pageLoader: PageLoader?
@@ -33,7 +34,16 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        for module in modules {
+            if isResumed {
+                module.didPause()
+            }
+            module.willDestroy()
+        }
+    }
 
+    
     // --
     // MARK: Lifecycle
     // --
@@ -44,7 +54,13 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     }
     
     override func viewDidLoad() {
+        // Add alert module
         super.viewDidLoad()
+        let alertModule = AlertModule()
+        alertModule.didCreate(viewController: self)
+        modules.append(alertModule)
+        
+        // Handle page loading
         if let cachedPage = PageCache.shared.getEntry(cacheKey: pageJson) {
             didUpdatePage(page: cachedPage)
         } else if (!CustomAppConfigManager.currentConfig().devServerUrl.isEmpty && CustomAppConfigManager.currentConfig().pageLoadingMode != .local) || pageJson.contains("://") {
@@ -68,13 +84,24 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
             }
         }
 
+        // Resume modules
+        for module in modules {
+            module.didResume()
+        }
+
         // Check for page updates
         checkPageLoad()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        // Pause modules
         super.viewWillDisappear(animated)
         isResumed = false
+        for module in modules {
+            module.didPause()
+        }
+
+        // Abort page loading
         stopPageLoad()
     }
     
@@ -84,14 +111,12 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     // --
 
     func observedEvent(_ event: AppEvent, sender: Any?) {
-        if event.type == "alert" && event.name == "simple" {
-            let title = (event.parameters["title"] as? String) ?? "Alert"
-            let text = (event.parameters["text"] as? String) ?? "No text specified"
-            let actionText = (event.parameters["actionText"] as? String) ?? "OK"
-            let alertController = UIAlertController(title: title, message: text, preferredStyle: .alert)
-            let okAction = UIAlertAction(title: actionText, style: .default)
-            alertController.addAction(okAction)
-            present(alertController, animated: true, completion: nil)
+        for module in modules {
+            if module.handleEventTypes.contains(event.type) {
+                if module.handleEvent(event, sender: sender) {
+                    break
+                }
+            }
         }
     }
     

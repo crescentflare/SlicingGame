@@ -1,6 +1,5 @@
 package com.crescentflare.slicinggame.page.activities
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -22,6 +21,8 @@ import com.crescentflare.slicinggame.infrastructure.coreextensions.colorIntensit
 import com.crescentflare.slicinggame.infrastructure.events.AppEvent
 import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
+import com.crescentflare.slicinggame.page.modules.PageModule
+import com.crescentflare.slicinggame.page.modules.basicmodules.AlertModule
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
 import com.crescentflare.slicinggame.page.storage.PageLoader
@@ -55,6 +56,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
     // --
 
     private val activityView by lazy { PageContainerView(this) }
+    private var modules = mutableListOf<PageModule>()
     private var statusBarColor = Color.BLACK
     private var navigationBarColor = Color.BLACK
     private var pageJson = ""
@@ -91,6 +93,11 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
         }
         updateSystemBars()
 
+        // Add alert module
+        val alertModule = AlertModule()
+        alertModule.onCreate(this)
+        modules.add(alertModule)
+
         // Determine page to load
         pageJson = intent.getStringExtra(pageParam) ?: defaultPage
 
@@ -126,14 +133,51 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
             }
         }
 
+        // Resume modules
+        for (module in modules) {
+            module.onResume()
+        }
+
         // Check for page updates
         checkPageLoad()
     }
 
     override fun onPause() {
+        // Pause modules
         super.onPause()
         isResumed = false
+        for (module in modules) {
+            module.onPause()
+        }
+
+        // Abort page loading
         stopPageLoad()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        for (module in modules) {
+            if (isResumed) {
+                module.onPause()
+            }
+            module.onDestroy()
+        }
+    }
+
+    override fun onLowMemory() {
+        super.onLowMemory()
+        for (module in modules) {
+            module.onLowMemory()
+        }
+    }
+
+    override fun onBackPressed() {
+        for (module in modules) {
+            if (module.onBackPressed()) {
+                return
+            }
+        }
+        super.onBackPressed()
     }
 
 
@@ -142,15 +186,12 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
     // --
 
     override fun observedEvent(event: AppEvent, sender: Any?) {
-        if (event.type == "alert" && event.name == "simple") {
-            val title = event.parameters["title"] as? String ?: "Alert"
-            val text = event.parameters["text"] as? String ?: "No text specified"
-            val actionText = event.parameters["actionText"] as? String ?: "OK"
-            val builder = AlertDialog.Builder(this)
-                .setTitle(title)
-                .setMessage(text)
-                .setPositiveButton(actionText, null)
-            builder.show()
+        for (module in modules) {
+            if (module.handleEventTypes.contains(event.type)) {
+                if (module.handleEvent(event, sender)) {
+                    break
+                }
+            }
         }
     }
 
