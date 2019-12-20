@@ -19,6 +19,7 @@ import com.crescentflare.slicinggame.components.styling.AppFonts
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
+import com.crescentflare.slicinggame.page.modules.basicmodules.AlertModule
 
 
 /**
@@ -41,6 +42,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Configure framework
         AppFonts.setContext(this)
+        registerModules()
         registerViewlets()
     }
 
@@ -57,6 +59,15 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
     // --
     // Inflatable registration
     // --
+
+    private fun registerModules() {
+        // Enable platform specific attributes
+        Inflators.module.setMergeSubAttributes(listOf("android"))
+        Inflators.module.setExcludeAttributes(listOf("ios"))
+
+        // Basic modules
+        Inflators.module.register("alert", AlertModule.inflatable)
+    }
 
     private fun registerViewlets() {
         // Enable platform specific attributes

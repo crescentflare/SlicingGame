@@ -3,6 +3,9 @@ package com.crescentflare.slicinggame.page.modules.basicmodules
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import com.crescentflare.jsoninflator.JsonInflatable
+import com.crescentflare.jsoninflator.binder.InflatorBinder
+import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.infrastructure.coreextensions.localized
 import com.crescentflare.slicinggame.infrastructure.events.AppEvent
 import com.crescentflare.slicinggame.page.activities.PageActivity
@@ -15,10 +18,35 @@ import java.lang.ref.WeakReference
 class AlertModule: PageModule {
 
     // --
-    // Static: show alert popups
+    // Statics
     // --
 
     companion object {
+
+        // --
+        // Static: inflatable integration
+        // --
+
+        val inflatable: JsonInflatable = object : JsonInflatable {
+
+            override fun create(context: Context): Any {
+                return AlertModule()
+            }
+
+            override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
+                return obj is AlertModule
+            }
+
+            override fun canRecycle(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>): Boolean {
+                return obj::class == AlertModule::class
+            }
+
+        }
+
+
+        // --
+        // Static: show alert popups
+        // --
 
         fun showSimpleAlert(context: Context, title: String, text: String, actionText: String, completion: ((dialog: DialogInterface?, buttonId: Int) -> Unit)? = null) {
             val builder = AlertDialog.Builder(context)

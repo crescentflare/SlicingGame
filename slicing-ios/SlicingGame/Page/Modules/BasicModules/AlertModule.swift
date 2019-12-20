@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import JsonInflator
 
 class AlertModule: PageModule {
     
@@ -32,6 +33,31 @@ class AlertModule: PageModule {
     private var alertShown = false
 
     
+    // --
+    // MARK: Inflator integration
+    // --
+    
+    class func inflatable() -> JsonInflatable {
+        return InflatorClass()
+    }
+    
+    private class InflatorClass: JsonInflatable {
+        
+        func create() -> Any {
+            return AlertModule()
+        }
+        
+        func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
+            return object is AlertModule
+        }
+        
+        func canRecycle(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any]) -> Bool {
+            return type(of: object) == AlertModule.self
+        }
+        
+    }
+
+
     // --
     // MARK: Initialization
     // --
