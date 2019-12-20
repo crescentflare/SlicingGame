@@ -76,6 +76,12 @@ class Page {
     // MARK: Extract data
     // --
     
+    var modules: [[String: Any]]? {
+        get {
+            return originalData["modules"] as? [[String: Any]]
+        }
+    }
+    
     var layout: [String: Any]? {
         get {
             if let dataSets = originalData["dataSets"] as? [String: Any] {

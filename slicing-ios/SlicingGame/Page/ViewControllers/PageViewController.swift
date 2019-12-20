@@ -54,13 +54,7 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     }
     
     override func viewDidLoad() {
-        // Add alert module
         super.viewDidLoad()
-        let alertModule = AlertModule()
-        alertModule.didCreate(viewController: self)
-        modules.append(alertModule)
-        
-        // Handle page loading
         if let cachedPage = PageCache.shared.getEntry(cacheKey: pageJson) {
             didUpdatePage(page: cachedPage)
         } else if (!CustomAppConfigManager.currentConfig().devServerUrl.isEmpty && CustomAppConfigManager.currentConfig().pageLoadingMode != .local) || pageJson.contains("://") {
@@ -187,6 +181,7 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
             ]
         }
         ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout)
+        inflateModules(moduleItems: page.modules)
         pageView.eventObserver = self
         currentPageHash = page.hash
         setNeedsStatusBarAppearanceUpdate()
@@ -195,6 +190,37 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     func didReceivePageLoadingEvent(event: PageLoaderEvent) {
         if event == .loadingFailed {
             pageView.backgroundColor = .red
+        }
+    }
+
+    private func inflateModules(moduleItems: Any?) {
+        // Inflate
+        let result = Inflators.module.inflateNestedItemList(currentItems: modules, newItems: moduleItems, enableRecycling: true, parent: self, binder: nil)
+        modules.removeAll()
+        for item in result.items {
+            if let module = item as? PageModule {
+                modules.append(module)
+            }
+        }
+        
+        // Destroy removed modules
+        for removedItem in result.removedItems {
+            if let removedModule = removedItem as? PageModule {
+                if isResumed {
+                    removedModule.didPause()
+                }
+                removedModule.willDestroy()
+            }
+        }
+        
+        // Update new modules if needed
+        for index in result.items.indices {
+            if let module = result.items[index] as? PageModule, !result.isRecycled(index: index) {
+                module.didCreate(viewController: self)
+                if isResumed {
+                    module.didResume()
+                }
+            }
         }
     }
 

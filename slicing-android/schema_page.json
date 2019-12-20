@@ -8,6 +8,13 @@
       "description": "An object defining a free-form format for additional properties on the page",
       "type": "object"
     },
+    "modules": {
+      "description": "A number of page modules for with controller logic",
+      "type": "array",
+      "items": {
+        "$ref": "/schema_module.json"
+      }
+    },
     "dataSets": {
       "description": "A number of data sets in the page, including the layout",
       "type": "object",

@@ -1,4 +1,9 @@
 {
+  "modules": [
+    {
+      "module": "alert"
+    }
+  ],
   "dataSets": {
     "layout": {
       "viewlet": "pageContainer",

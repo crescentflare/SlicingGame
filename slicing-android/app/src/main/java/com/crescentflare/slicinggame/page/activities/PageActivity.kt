@@ -22,7 +22,6 @@ import com.crescentflare.slicinggame.infrastructure.events.AppEvent
 import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.modules.PageModule
-import com.crescentflare.slicinggame.page.modules.basicmodules.AlertModule
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
 import com.crescentflare.slicinggame.page.storage.PageLoader
@@ -92,11 +91,6 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
             }
         }
         updateSystemBars()
-
-        // Add alert module
-        val alertModule = AlertModule()
-        alertModule.onCreate(this)
-        modules.add(alertModule)
 
         // Determine page to load
         pageJson = intent.getStringExtra(pageParam) ?: defaultPage
@@ -313,6 +307,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
             )
         }
         ViewletUtil.assertInflateOn(activityView, inflateLayout)
+        inflateModules(page.modules)
         activityView.eventObserver = this
         currentPageHash = page.hash
         updateSystemBars()
@@ -321,6 +316,38 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
     override fun onPageLoadingEvent(event: PageLoader.Event) {
         if (event == PageLoader.Event.LoadingFailed) {
             activityView.setBackgroundColor(Color.RED)
+        }
+    }
+
+    private fun inflateModules(moduleItems: Any?) {
+        // Inflate
+        val result = Inflators.module.inflateNestedItemList(this, modules.toList(), moduleItems, true, this)
+        modules.clear()
+        for (module in result.items) {
+            if (module is PageModule) {
+                modules.add(module)
+            }
+        }
+
+        // Destroy removed modules
+        for (removedModule in result.removedItems) {
+            if (removedModule is PageModule) {
+                if (isResumed) {
+                    removedModule.onPause()
+                }
+                removedModule.onDestroy()
+            }
+        }
+
+        // Update new modules if needed
+        for (index in result.items.indices) {
+            val module = result.items[index]
+            if (module is PageModule && !result.isRecycled(index)) {
+                module.onCreate(this)
+                if (isResumed) {
+                    module.onResume()
+                }
+            }
         }
     }
 
