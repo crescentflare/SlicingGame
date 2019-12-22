@@ -5,6 +5,7 @@
 
 import UIKit
 import UniLayout
+import JsonInflator
 
 class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver {
 
@@ -12,6 +13,7 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     // MARK: Members
     // --
     
+    var binder: InflatorDictBinder?
     private var modules = [PageModule]()
     private let pageView = PageContainerView()
     private let pageJson: String
@@ -180,7 +182,8 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
                 ]
             ]
         }
-        ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout)
+        binder = InflatorDictBinder()
+        ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout, binder: binder)
         inflateModules(moduleItems: page.modules)
         pageView.eventObserver = self
         currentPageHash = page.hash

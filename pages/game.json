@@ -2,6 +2,10 @@
   "modules": [
     {
       "module": "alert"
+    },
+    {
+      "module": "game",
+      "gameContainer": "gameContainer"
     }
   ],
   "dataSets": {
@@ -27,6 +31,7 @@
       },
       "contentItems": [
         {
+          "refId": "gameContainer",
           "viewlet": "gameContainer",
           "width": "stretchToParent",
           "height": "stretchToParent",
@@ -47,7 +52,7 @@
           "source": "app://icon_game_restart",
           "highlightedColorize": "#8fff",
           "disabledColorize": "#4fff",
-          "tapEvent": "alert://simple?text=TODO:+implement+game+restart+button"
+          "tapEvent": "game://reset"
         }
       ]
     }

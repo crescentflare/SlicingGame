@@ -21,6 +21,7 @@ import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.modules.basicmodules.AlertModule
+import com.crescentflare.slicinggame.page.modules.custommodules.GameModule
 
 
 /**
@@ -68,6 +69,9 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Basic modules
         Inflators.module.register("alert", AlertModule.inflatable)
+
+        // Custom modules
+        Inflators.module.register("game", GameModule.inflatable)
     }
 
     private fun registerViewlets() {

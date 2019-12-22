@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.view.ViewParent
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import com.crescentflare.jsoninflator.binder.InflatorMapBinder
 import com.crescentflare.slicinggame.components.containers.PageContainerView
 import com.crescentflare.slicinggame.components.types.NavigationBarComponent
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
@@ -54,6 +55,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
     // Members
     // --
 
+    var binder: InflatorMapBinder? = null
     private val activityView by lazy { PageContainerView(this) }
     private var modules = mutableListOf<PageModule>()
     private var statusBarColor = Color.BLACK
@@ -306,7 +308,8 @@ class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
                 Pair("contentItems", listOf(wrappedLayout))
             )
         }
-        ViewletUtil.assertInflateOn(activityView, inflateLayout)
+        binder = InflatorMapBinder()
+        ViewletUtil.assertInflateOn(activityView, inflateLayout, binder)
         inflateModules(page.modules)
         activityView.eventObserver = this
         currentPageHash = page.hash
