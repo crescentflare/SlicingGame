@@ -8,6 +8,7 @@ import android.view.View
 import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
+import com.crescentflare.slicinggame.components.utility.ComponentStateDrawable
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.events.AppEvent
@@ -38,6 +39,8 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
                     val stretchType = ImageView.StretchType.fromString(mapUtil.optionalString(attributes, "stretchType", ""))
                     obj.scaleType = stretchType.toScaleType()
                     obj.source = ImageSource.fromValue(attributes["source"])
+                    obj.highlightedSource = ImageSource.fromValue(attributes["highlightedSource"])
+                    obj.disabledSource = ImageSource.fromValue(attributes["disabledSource"])
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
@@ -65,6 +68,7 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
     // Members
     // --
 
+    private val stateDrawable = ComponentStateDrawable()
     private var eventObserverReference : WeakReference<AppEventObserver>? = null
 
 
@@ -88,7 +92,7 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
             : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
-        // No implementation
+        setImageDrawable(stateDrawable)
     }
 
 
@@ -114,15 +118,49 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
 
     var source: ImageSource? = null
         set(source) {
-            field = source
-            if (source != null) {
-                source.getDrawable(context) {
-                    if (field === source) {
-                        setImageDrawable(it)
+            if (field !== source) {
+                field = source
+                if (source != null) {
+                    source.getDrawable(context) {
+                        if (field === source) {
+                            stateDrawable.drawable = it
+                        }
                     }
+                } else {
+                    stateDrawable.drawable = null
                 }
-            } else {
-                setImageDrawable(null)
+            }
+        }
+
+    var highlightedSource: ImageSource? = null
+        set(highlightedSource) {
+            if (field !== highlightedSource) {
+                field = highlightedSource
+                if (highlightedSource != null) {
+                    highlightedSource.getDrawable(context) {
+                        if (field === highlightedSource) {
+                            stateDrawable.pressedDrawable = it
+                        }
+                    }
+                } else {
+                    stateDrawable.pressedDrawable = null
+                }
+            }
+        }
+
+    var disabledSource: ImageSource? = null
+        set(disabledSource) {
+            if (field !== disabledSource) {
+                field = disabledSource
+                if (disabledSource != null) {
+                    disabledSource.getDrawable(context) {
+                        if (field === disabledSource) {
+                            stateDrawable.disabledDrawable = it
+                        }
+                    }
+                } else {
+                    stateDrawable.disabledDrawable = null
+                }
             }
         }
 

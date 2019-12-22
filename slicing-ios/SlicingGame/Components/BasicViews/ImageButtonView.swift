@@ -20,8 +20,14 @@ class ImageButtonView: UniImageView, ControlComponent {
         get { return isUserInteractionEnabled }
     }
 
-    var isHighlighted: Bool = false
+    var isHighlighted = false {
+        didSet {
+            updateState()
+        }
+    }
+
     private let touchInsideTolerance: CGFloat = 64
+    private var stateImage = ComponentStateImage()
 
     
     // --
@@ -44,7 +50,9 @@ class ImageButtonView: UniImageView, ControlComponent {
                 let stretchType = ImageStretchType(rawValue: convUtil.asString(value: attributes["stretchType"]) ?? "") ?? .none
                 imageButton.internalImageView.contentMode = stretchType.toContentMode()
                 imageButton.source = ImageSource.fromValue(value: attributes["source"])
-                
+                imageButton.highlightedSource = ImageSource.fromValue(value: attributes["highlightedSource"])
+                imageButton.disabledSource = ImageSource.fromValue(value: attributes["disabledSource"])
+
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: imageButton, attributes: attributes)
 
@@ -96,14 +104,54 @@ class ImageButtonView: UniImageView, ControlComponent {
 
     var source: ImageSource? {
         didSet {
-            if let source = source {
-                source.getImage(completion: { [weak self] image in
-                    if self?.source === source {
-                        self?.image = image
-                    }
-                })
-            } else {
-                image = nil
+            if source !== oldValue {
+                if let source = source {
+                    source.getImage(completion: { [weak self] image in
+                        if self?.source === source {
+                            self?.stateImage.image = image
+                            self?.updateState()
+                        }
+                    })
+                } else {
+                    stateImage.image = nil
+                    updateState()
+                }
+            }
+        }
+    }
+
+    var highlightedSource: ImageSource? {
+        didSet {
+            if highlightedSource !== oldValue {
+                if let highlightedSource = highlightedSource {
+                    highlightedSource.getImage(completion: { [weak self] image in
+                        if self?.highlightedSource === highlightedSource {
+                            self?.stateImage.highlightedImage = image
+                            self?.updateState()
+                        }
+                    })
+                } else {
+                    stateImage.highlightedImage = nil
+                    updateState()
+                }
+            }
+        }
+    }
+
+    var disabledSource: ImageSource? {
+        didSet {
+            if disabledSource !== oldValue {
+                if let disabledSource = disabledSource {
+                    disabledSource.getImage(completion: { [weak self] image in
+                        if self?.disabledSource === disabledSource {
+                            self?.stateImage.disabledImage = image
+                            self?.updateState()
+                        }
+                    })
+                } else {
+                    stateImage.disabledImage = nil
+                    updateState()
+                }
             }
         }
     }
@@ -148,4 +196,24 @@ class ImageButtonView: UniImageView, ControlComponent {
         }
     }
     
+    
+    // --
+    // MARK: State handling
+    // --
+    
+    override var isUserInteractionEnabled: Bool {
+        didSet {
+            updateState()
+        }
+    }
+    
+    private func updateState() {
+        if isEnabled {
+            stateImage.state = isHighlighted ? .highlighted : .normal
+        } else {
+            stateImage.state = .disabled
+        }
+        image = stateImage.currentImage()
+    }
+
 }
