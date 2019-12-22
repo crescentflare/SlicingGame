@@ -99,6 +99,7 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
 
     init {
         setImageDrawable(stateDrawable)
+        isEnabled = false
     }
 
 
@@ -119,6 +120,7 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
     var tapEvent: AppEvent? = null
         set(tapEvent) {
             field = tapEvent
+            isEnabled = tapEvent != null
             setOnClickListener(if (tapEvent != null) this else null)
         }
 

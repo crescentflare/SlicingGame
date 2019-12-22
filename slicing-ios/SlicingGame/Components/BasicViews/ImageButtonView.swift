@@ -96,6 +96,7 @@ class ImageButtonView: UniImageView, ControlComponent {
     
     private func setup() {
         clipsToBounds = true
+        isUserInteractionEnabled = false
         tintAdjustmentMode = .normal
         internalImageView.contentMode = .center
     }
@@ -106,7 +107,12 @@ class ImageButtonView: UniImageView, ControlComponent {
     // --
     
     weak var eventObserver: AppEventObserver?
-    var tapEvent: AppEvent?
+    
+    var tapEvent: AppEvent? {
+        didSet {
+            isEnabled = tapEvent != nil
+        }
+    }
 
     var source: ImageSource? {
         didSet {
