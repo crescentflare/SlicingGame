@@ -194,6 +194,18 @@
             "description": "An alternative image source for the disabled state",
             "$ref": "#/definitions/imageSource"
           },
+          "colorize": {
+            "description": "Colorize the image source with a single color",
+            "$ref": "#/definitions/color"
+          },
+          "highlightedColorize": {
+            "description": "Colorize the highlighted state",
+            "$ref": "#/definitions/color"
+          },
+          "disabledColorize": {
+            "description": "Colorize the disabled state",
+            "$ref": "#/definitions/color"
+          },
           "stretchType": {
             "description": "Determines how the image is stretched within its frame",
             "type": "string",

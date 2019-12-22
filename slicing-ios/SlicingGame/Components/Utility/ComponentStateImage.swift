@@ -1,6 +1,6 @@
 //
 //  ComponentStateImage.swift
-//  Component utility: handles images for component states
+//  Component utility: handles images for component states and colorization
 //
 
 import UIKit
@@ -14,6 +14,7 @@ class ComponentStateImage {
     var image: UIImage? {
         didSet {
             if image !== oldValue {
+                templateImage = nil
                 updateImage()
             }
         }
@@ -22,6 +23,7 @@ class ComponentStateImage {
     var highlightedImage: UIImage? {
         didSet {
             if highlightedImage !== oldValue {
+                templateHighlightedImage = nil
                 updateImage()
             }
         }
@@ -30,6 +32,31 @@ class ComponentStateImage {
     var disabledImage: UIImage? {
         didSet {
             if disabledImage !== oldValue {
+                templateDisabledImage = nil
+                updateImage()
+            }
+        }
+    }
+    
+    var colorize: UIColor? {
+        didSet {
+            if colorize !== oldValue {
+                updateImage()
+            }
+        }
+    }
+    
+    var highlightedColorize: UIColor? {
+        didSet {
+            if highlightedColorize !== oldValue {
+                updateImage()
+            }
+        }
+    }
+    
+    var disabledColorize: UIColor? {
+        didSet {
+            if disabledColorize !== oldValue {
                 updateImage()
             }
         }
@@ -43,7 +70,11 @@ class ComponentStateImage {
         }
     }
 
+    private var templateImage: UIImage?
+    private var templateHighlightedImage: UIImage?
+    private var templateDisabledImage: UIImage?
     private var activeStateImage: UIImage?
+    private var activeStateColorize: UIColor?
     
 
     // --
@@ -54,15 +85,51 @@ class ComponentStateImage {
         return activeStateImage
     }
     
+    func currentColorize() -> UIColor? {
+        return activeStateColorize
+    }
+    
     private func updateImage() {
         switch state {
         case .disabled:
-            activeStateImage = disabledImage ?? image
+            activeStateColorize = disabledColorize ?? colorize
+            if activeStateColorize != nil {
+                if let disabledImage = disabledImage {
+                    if templateDisabledImage == nil {
+                        templateDisabledImage = disabledImage.withRenderingMode(.alwaysTemplate)
+                    }
+                } else if let image = image, templateImage == nil {
+                    templateImage = image.withRenderingMode(.alwaysTemplate)
+                }
+                activeStateImage = templateDisabledImage ?? templateImage
+            } else {
+                activeStateImage = disabledImage ?? image
+            }
         case .highlighted:
-            activeStateImage = highlightedImage ?? image
+            activeStateColorize = highlightedColorize ?? colorize
+            if activeStateColorize != nil {
+                if let highlightedImage = highlightedImage {
+                    if templateHighlightedImage == nil {
+                        templateHighlightedImage = highlightedImage.withRenderingMode(.alwaysTemplate)
+                    }
+                } else if let image = image, templateImage == nil {
+                    templateImage = image.withRenderingMode(.alwaysTemplate)
+                }
+                activeStateImage = templateHighlightedImage ?? templateImage
+            } else {
+                activeStateImage = highlightedImage ?? image
+            }
         default:
-            activeStateImage = image
+            activeStateColorize = colorize
+            if activeStateColorize != nil {
+                if let image = image, templateImage == nil {
+                    templateImage = image.withRenderingMode(.alwaysTemplate)
+                }
+                activeStateImage = templateImage
+            } else {
+                activeStateImage = image
+            }
         }
     }
-
+    
 }

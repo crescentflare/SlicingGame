@@ -52,6 +52,11 @@ class ImageButtonView: UniImageView, ControlComponent {
                 imageButton.source = ImageSource.fromValue(value: attributes["source"])
                 imageButton.highlightedSource = ImageSource.fromValue(value: attributes["highlightedSource"])
                 imageButton.disabledSource = ImageSource.fromValue(value: attributes["disabledSource"])
+                
+                // Apply colorization
+                imageButton.colorize = convUtil.asColor(value: attributes["colorize"])
+                imageButton.highlightedColorize = convUtil.asColor(value: attributes["highlightedColorize"])
+                imageButton.disabledColorize = convUtil.asColor(value: attributes["disabledColorize"])
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: imageButton, attributes: attributes)
@@ -91,6 +96,7 @@ class ImageButtonView: UniImageView, ControlComponent {
     
     private func setup() {
         clipsToBounds = true
+        tintAdjustmentMode = .normal
         internalImageView.contentMode = .center
     }
     
@@ -155,6 +161,30 @@ class ImageButtonView: UniImageView, ControlComponent {
             }
         }
     }
+    
+    var colorize: UIColor? {
+        set {
+            stateImage.colorize = newValue
+            updateState()
+        }
+        get { return stateImage.colorize }
+    }
+
+    var highlightedColorize: UIColor? {
+        set {
+            stateImage.highlightedColorize = newValue
+            updateState()
+        }
+        get { return stateImage.highlightedColorize }
+    }
+
+    var disabledColorize: UIColor? {
+        set {
+            stateImage.disabledColorize = newValue
+            updateState()
+        }
+        get { return stateImage.disabledColorize }
+    }
 
     
     // --
@@ -195,7 +225,7 @@ class ImageButtonView: UniImageView, ControlComponent {
             eventObserver?.observedEvent(tapEvent, sender: self)
         }
     }
-    
+
     
     // --
     // MARK: State handling
@@ -214,6 +244,7 @@ class ImageButtonView: UniImageView, ControlComponent {
             stateImage.state = .disabled
         }
         image = stateImage.currentImage()
+        internalImageView.tintColor = stateImage.currentColorize()
     }
-
+    
 }

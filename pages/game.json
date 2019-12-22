@@ -45,6 +45,8 @@
           "padding": [ 16, 16, 16, 16 ],
           "backgroundColor": "#8000",
           "source": "app://icon_game_restart",
+          "highlightedColorize": "#8fff",
+          "disabledColorize": "#4fff",
           "tapEvent": "alert://simple?text=TODO:+implement+game+restart+button"
         }
       ]

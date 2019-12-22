@@ -1,14 +1,11 @@
 package com.crescentflare.slicinggame.components.utility
 
-import android.graphics.Canvas
-import android.graphics.ColorFilter
-import android.graphics.PixelFormat
-import android.graphics.Rect
+import android.graphics.*
 import android.graphics.drawable.Drawable
 
 
 /**
- * Component utility: a flexible drawable container for component states
+ * Component utility: a flexible drawable container for component states and colorization
  */
 class ComponentStateDrawable : Drawable() {
 
@@ -20,6 +17,7 @@ class ComponentStateDrawable : Drawable() {
         set(drawable) {
             if (field !== drawable) {
                 field = drawable
+                colorizeDrawable = null
                 onStateChange(state)
             }
         }
@@ -28,6 +26,7 @@ class ComponentStateDrawable : Drawable() {
         set(drawable) {
             if (field !== drawable) {
                 field = drawable
+                colorizePressedDrawable = null
                 onStateChange(state)
             }
         }
@@ -36,11 +35,40 @@ class ComponentStateDrawable : Drawable() {
         set(drawable) {
             if (field !== drawable) {
                 field = drawable
+                colorizeDisabledDrawable = null
                 onStateChange(state)
             }
         }
 
+    var colorize: Int? = null
+        set(colorize) {
+            if (field != colorize) {
+                field = colorize
+                onStateChange(state)
+            }
+        }
+
+    var pressedColorize: Int? = null
+        set(pressedColorize) {
+            if (field != pressedColorize) {
+                field = pressedColorize
+                onStateChange(state)
+            }
+        }
+
+    var disabledColorize: Int? = null
+        set(disabledColorize) {
+            if (field != disabledColorize) {
+                field = disabledColorize
+                onStateChange(state)
+            }
+        }
+
+    private var colorizeDrawable: Drawable? = null
+    private var colorizePressedDrawable: Drawable? = null
+    private var colorizeDisabledDrawable: Drawable? = null
     private var activeStateDrawable: Drawable? = null
+    private var activeStateColorize: Int? = null
 
 
     // --
@@ -57,15 +85,52 @@ class ComponentStateDrawable : Drawable() {
 
     private fun updateDrawable(): Boolean {
         val previousDrawable = activeStateDrawable
+        val previousColorize = activeStateColorize
         val checkState = state ?: IntArray(0)
         if (!checkState.contains(android.R.attr.state_enabled)) {
-            activeStateDrawable = disabledDrawable ?: drawable
+            activeStateColorize = disabledColorize ?: colorize
+            if (activeStateColorize != null) {
+                if (disabledDrawable != null) {
+                    if (colorizeDisabledDrawable == null) {
+                        colorizeDisabledDrawable = disabledDrawable?.mutate()
+                    }
+                } else if (drawable != null && colorizeDrawable == null) {
+                    colorizeDrawable = drawable?.mutate()
+                }
+                activeStateDrawable = colorizeDisabledDrawable ?: colorizeDrawable
+            } else {
+                activeStateDrawable = disabledDrawable ?: drawable
+            }
         } else if (checkState.contains(android.R.attr.state_pressed)) {
-            activeStateDrawable = pressedDrawable ?: drawable
+            activeStateColorize = pressedColorize ?: colorize
+            if (activeStateColorize != null) {
+                if (pressedDrawable != null) {
+                    if (colorizePressedDrawable == null) {
+                        colorizePressedDrawable = pressedDrawable?.mutate()
+                    }
+                } else if (drawable != null && colorizeDrawable == null) {
+                    colorizeDrawable = drawable?.mutate()
+                }
+                activeStateDrawable = colorizePressedDrawable ?: colorizeDrawable
+            } else {
+                activeStateDrawable = pressedDrawable ?: drawable
+            }
         } else {
-            activeStateDrawable = drawable
+            activeStateColorize = colorize
+            if (activeStateColorize != null) {
+                if (drawable != null && colorizeDrawable == null) {
+                    colorizeDrawable = drawable?.mutate()
+                }
+                activeStateDrawable = colorizeDrawable
+            } else {
+                activeStateDrawable = drawable
+            }
         }
-        if (activeStateDrawable !== previousDrawable) {
+        if (activeStateDrawable !== previousDrawable || activeStateColorize != previousColorize) {
+            activeStateDrawable?.colorFilter = null
+            activeStateColorize?.let {
+                activeStateDrawable?.colorFilter = PorterDuffColorFilter(it, PorterDuff.Mode.SRC_IN)
+            }
             activeStateDrawable?.bounds = bounds
             invalidateSelf()
             return true

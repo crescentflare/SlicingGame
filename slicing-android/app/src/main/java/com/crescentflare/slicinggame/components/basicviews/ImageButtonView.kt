@@ -2,6 +2,7 @@ package com.crescentflare.slicinggame.components.basicviews
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.graphics.Color
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
@@ -41,6 +42,11 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
                     obj.source = ImageSource.fromValue(attributes["source"])
                     obj.highlightedSource = ImageSource.fromValue(attributes["highlightedSource"])
                     obj.disabledSource = ImageSource.fromValue(attributes["disabledSource"])
+
+                    // Apply colorization
+                    obj.colorize = mapUtil.optionalColor(attributes, "colorize", Color.TRANSPARENT)
+                    obj.highlightedColorize = mapUtil.optionalColor(attributes, "highlightedColorize", Color.TRANSPARENT)
+                    obj.disabledColorize = mapUtil.optionalColor(attributes, "disabledColorize", Color.TRANSPARENT)
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
@@ -163,6 +169,24 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
                 }
             }
         }
+
+    var colorize: Int?
+        set(colorize) {
+            stateDrawable.colorize = if (colorize == Color.TRANSPARENT) null else colorize
+        }
+        get() = stateDrawable.colorize
+
+    var highlightedColorize: Int?
+        set(highlightedColorize) {
+            stateDrawable.pressedColorize = if (highlightedColorize == Color.TRANSPARENT) null else highlightedColorize
+        }
+        get() = stateDrawable.pressedColorize
+
+    var disabledColorize: Int?
+        set(disabledColorize) {
+            stateDrawable.disabledColorize = if (disabledColorize == Color.TRANSPARENT) null else disabledColorize
+        }
+        get() = stateDrawable.disabledColorize
 
 
     // --
