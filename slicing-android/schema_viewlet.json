@@ -9,6 +9,7 @@
       "type": "string",
       "enum": [
         "image",
+        "imageButton",
         "text",
         "view",
         "frameContainer",
@@ -167,6 +168,38 @@
               "aspectCrop"
             ],
             "default": "none"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "imageButton"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "description": "The source to retrieve the image from",
+            "$ref": "#/definitions/imageSource"
+          },
+          "stretchType": {
+            "description": "Determines how the image is stretched within its frame",
+            "type": "string",
+            "enum": [
+              "none",
+              "fill",
+              "aspectFit",
+              "aspectCrop"
+            ],
+            "default": "none"
+          },
+          "tapEvent": {
+            "description": "Sends event when the button is tapped",
+            "$ref": "#/definitions/appEvent"
           }
         }
       }

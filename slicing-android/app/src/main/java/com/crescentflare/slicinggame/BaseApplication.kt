@@ -4,6 +4,7 @@ import android.app.Application
 import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
 import com.crescentflare.jsoninflator.utility.InflatorResourceColorLookup
 import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
+import com.crescentflare.slicinggame.components.basicviews.ImageButtonView
 import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
@@ -80,6 +81,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Basic views
         Inflators.viewlet.register("image", ImageView.viewlet)
+        Inflators.viewlet.register("imageButton", ImageButtonView.viewlet)
         Inflators.viewlet.register("text", TextView.viewlet)
         Inflators.viewlet.register("view", ViewletUtil.basicViewViewlet)
 

@@ -74,6 +74,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Basic views
         Inflators.viewlet.register(name: "image", inflatable: ImageView.viewlet())
+        Inflators.viewlet.register(name: "imageButton", inflatable: ImageButtonView.viewlet())
         Inflators.viewlet.register(name: "text", inflatable: TextView.viewlet())
         Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
 
