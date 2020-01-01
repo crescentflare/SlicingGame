@@ -519,6 +519,22 @@
             "description": "The bar title",
             "type": "string"
           },
+          "menuIcon": {
+            "description": "Defines the icon for a menu button",
+            "$ref": "#/definitions/imageSource"
+          },
+          "menuEvent": {
+            "description": "Sends event when the menu icon is tapped",
+            "$ref": "#/definitions/appEvent"
+          },
+          "actionIcon": {
+            "description": "Defines the icon for an action button",
+            "$ref": "#/definitions/imageSource"
+          },
+          "actionEvent": {
+            "description": "Sends event when the action icon is tapped",
+            "$ref": "#/definitions/appEvent"
+          },
           "showDivider": {
             "description": "Set visibility of the divider between the bar and the rest of the content",
             "type": "boolean"
