@@ -5,6 +5,7 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.containers.GameContainerView
+import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.infrastructure.events.AppEvent
 import com.crescentflare.slicinggame.page.activities.PageActivity
 import com.crescentflare.slicinggame.page.modules.PageModule
@@ -28,9 +29,20 @@ class GameModule: PageModule {
 
             override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
                 if (obj is GameModule) {
+                    // Apply component reference
                     val layoutBinder = (parent as? PageActivity)?.binder
                     val component = layoutBinder?.findByReference(mapUtil.optionalString(attributes, "gameContainer", null) ?: "")
                     obj.gameContainer = component as? GameContainerView
+
+                    // Apply random backgrounds
+                    val randomBackgrounds = mutableListOf<ImageSource>()
+                    mapUtil.optionalObjectList(attributes, "randomBackgrounds").forEach {
+                        val randomBackground = ImageSource.fromValue(it)
+                        if (randomBackground != null) {
+                            randomBackgrounds.add(randomBackground)
+                        }
+                    }
+                    obj.randomBackgrounds = randomBackgrounds
                     return true
                 }
                 return false
@@ -50,6 +62,8 @@ class GameModule: PageModule {
     // --
 
     override val handleEventTypes = listOf("game")
+    private var currentBackground = 0
+    private var shuffledBackgrounds: List<ImageSource> = emptyList()
 
 
     // --
@@ -57,6 +71,22 @@ class GameModule: PageModule {
     // --
 
     var gameContainer: GameContainerView? = null
+        set(gameContainer) {
+            if (gameContainer !== field && currentBackground < shuffledBackgrounds.size) {
+                gameContainer?.backgroundImage = shuffledBackgrounds[currentBackground]
+            }
+            field = gameContainer
+        }
+
+    var randomBackgrounds: List<ImageSource> = emptyList()
+        set(randomBackgrounds) {
+            if (randomBackgrounds != field && randomBackgrounds.isNotEmpty()) {
+                currentBackground = 0
+                shuffledBackgrounds = randomBackgrounds.shuffled()
+                gameContainer?.backgroundImage = shuffledBackgrounds[currentBackground]
+            }
+            field = randomBackgrounds
+        }
 
 
     // --
@@ -97,6 +127,10 @@ class GameModule: PageModule {
             when (event.name) {
                 "reset" -> {
                     gameContainer?.resetSlices()
+                    if (shuffledBackgrounds.isNotEmpty()) {
+                        currentBackground = (currentBackground + 1) % shuffledBackgrounds.size
+                        gameContainer?.backgroundImage = shuffledBackgrounds[currentBackground]
+                    }
                 }
             }
             return true

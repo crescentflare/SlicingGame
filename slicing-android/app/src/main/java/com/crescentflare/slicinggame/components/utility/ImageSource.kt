@@ -20,7 +20,7 @@ import java.security.MessageDigest
 /**
  * Component utility: defines the source of an image
  */
-class ImageSource {
+class ImageSource: Comparable<ImageSource> {
 
     // --
     // Static: factory method
@@ -190,6 +190,15 @@ class ImageSource {
         } else {
             callback(null)
         }
+    }
+
+
+    // --
+    // Comparable implementation
+    // --
+
+    override fun compareTo(other: ImageSource): Int {
+        return uri.compareTo(other.uri)
     }
 
 
