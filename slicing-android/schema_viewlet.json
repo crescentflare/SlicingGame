@@ -156,7 +156,7 @@
         "properties": {
           "source": {
             "description": "The source to retrieve the image from",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "stretchType": {
             "description": "Determines how the image is stretched within its frame",
@@ -184,15 +184,15 @@
         "properties": {
           "source": {
             "description": "The source to retrieve the image from",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "highlightedSource": {
             "description": "An alternative image source for the highlighted state",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "disabledSource": {
             "description": "An alternative image source for the disabled state",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "colorize": {
             "description": "Colorize the image source with a single color",
@@ -320,7 +320,7 @@
           },
           "backgroundImage": {
             "description": "The image to reveal behind the level canvas",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "requireClearRate": {
             "description": "The clear rate required to complete the level",
@@ -422,7 +422,7 @@
           },
           "backgroundImage": {
             "description": "The image to reveal behind the level canvas",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "requireClearRate": {
             "description": "The clear rate required to complete the level",
@@ -521,7 +521,7 @@
           },
           "menuIcon": {
             "description": "Defines the icon for a menu button",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "menuEvent": {
             "description": "Sends event when the menu icon is tapped",
@@ -529,7 +529,7 @@
           },
           "actionIcon": {
             "description": "Defines the icon for an action button",
-            "$ref": "#/definitions/imageSource"
+            "$ref": "./schema_image_source.json"
           },
           "actionEvent": {
             "description": "Sends event when the action icon is tapped",
@@ -636,44 +636,6 @@
         },
         {
           "type": "number"
-        }
-      ]
-    },
-    "imageSource": {
-      "oneOf": [
-        {
-          "type": "string",
-          "pattern": "^(app|http|https):\/\/.+$"
-        },
-        {
-          "type": "object",
-          "properties": {
-            "type": {
-              "description": "The type of image source to load",
-              "type": "string",
-              "enum": [
-                "app",
-                "http",
-                "https"
-              ]
-            },
-            "name": {
-              "description": "The filename of the image",
-              "type": "string"
-            },
-            "forceWidth": {
-              "description": "Online images only: scale the image to this width",
-              "$ref": "#/definitions/dimension"
-            },
-            "forceHeight": {
-              "description": "Online images only: scale the image to this height",
-              "$ref": "#/definitions/dimension"
-            },
-            "density": {
-              "description": "Online images only: the image has this density, scale up/down for devices with another density",
-              "type": "number"
-            }
-          }
         }
       ]
     },

@@ -5,7 +5,12 @@
     },
     {
       "module": "game",
-      "gameContainer": "gameContainer"
+      "gameContainer": "gameContainer",
+      "randomBackgrounds": [
+        "app://background_level_starry_night",
+        "app://background_level_lightning_storm",
+        "app://background_level_morning_mist"
+      ]
     }
   ],
   "dataSets": {
@@ -41,8 +46,7 @@
           "levelWidth": 12,
           "levelHeight": 16,
           "requireClearRate": 75,
-          "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK",
-          "backgroundImage": "app://background_level_starry_night"
+          "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK"
         }
       ]
     }
