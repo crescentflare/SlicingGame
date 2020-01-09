@@ -38,8 +38,8 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // --
     
     override func loadView() {
-        view = FrameContainerView()
-        view.backgroundColor = .green
+        view = PageContainerView()
+        view.backgroundColor = .white
     }
     
     override func viewDidLoad() {
@@ -115,7 +115,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     
     func didUpdatePage(page: Page) {
         var inflateLayout = page.layout ?? [:]
-        if Inflators.viewlet.findInflatableNameInAttributes(inflateLayout) != "frameContainer" {
+        if Inflators.viewlet.findInflatableNameInAttributes(inflateLayout) != "pageContainer" {
             var wrappedLayout = page.layout ?? [:]
             if wrappedLayout["width"] == nil {
                 wrappedLayout["width"] = "stretchToParent"
@@ -124,9 +124,10 @@ class PageViewController: UIViewController, PageLoaderDelegate {
                 wrappedLayout["height"] = "stretchToParent"
             }
             inflateLayout = [
-                "viewlet": "frameContainer",
+                "viewlet": "pageContainer",
+                "backgroundColor": "#fff",
                 "recycling": true,
-                "items": [
+                "contentItems": [
                     wrappedLayout
                 ]
             ]
