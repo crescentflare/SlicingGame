@@ -162,9 +162,22 @@ class PageContainerView: UIView, UniLayoutView {
         let statusInset = statusBarHeight()
         var topInset = statusInset
         if let titleBarView = titleBarView {
+            // Prepare the bar
+            var isNavigationBar = false
+            if let navigationBar = titleBarView as? NavigationBarComponent {
+                let titleBarHeight = bounds.width > bounds.height ? AppDimensions.landscapeTitleBarHeight : AppDimensions.portraitTitleBarHeight
+                navigationBar.statusBarHeight = statusInset
+                navigationBar.barContentHeight = titleBarHeight
+                topInset += titleBarHeight
+                isNavigationBar = true
+            }
+            
+            // Measure and set frame
             let resultSize = UniLayout.measure(view: titleBarView, sizeSpec: CGSize(width: bounds.width, height: bounds.height), parentWidthSpec: .exactSize, parentHeightSpec: .exactSize, forceViewWidthSpec: .exactSize, forceViewHeightSpec: .unspecified)
             UniLayout.setFrame(view: titleBarView, frame: CGRect(x: 0, y: 0, width: resultSize.width, height: resultSize.height))
-            topInset = max(topInset, resultSize.height)
+            if !isNavigationBar {
+                topInset = max(topInset, resultSize.height)
+            }
         }
         
         // Position background view

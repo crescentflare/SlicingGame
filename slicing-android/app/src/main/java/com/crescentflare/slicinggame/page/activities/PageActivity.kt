@@ -14,6 +14,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
 import com.crescentflare.slicinggame.components.containers.PageContainerView
+import com.crescentflare.slicinggame.components.types.NavigationBarComponent
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
@@ -145,8 +146,9 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     // --
 
     private fun updateSystemBars() {
-        val checkStatusBarColor = viewBackgroundColor(activityView.titleBarView) ?: viewBackgroundColor(activityView) ?: 0
-        val lightStatusContent = checkStatusBarColor.colorIntensity() < 0.25f
+        val titleBarColor = (activityView.titleBarView as? NavigationBarComponent)?.averageColor ?: viewBackgroundColor(activityView.titleBarView)
+        val checkStatusBarColor = titleBarColor ?: viewBackgroundColor(activityView) ?: 0
+        val lightStatusContent = checkStatusBarColor.colorIntensity() < 0.25
         updateStatusBarColor(checkStatusBarColor and 0xffffff, lightStatusContent)
         updateNavigationBarColor(0x00ffffff, false)
     }

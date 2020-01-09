@@ -17,7 +17,10 @@ class AppDimensions {
         func getDimension(refId: String) -> CGFloat? {
             let dimensionTable: [String: CGFloat] = [
                 "text": text,
-                "titleText": titleText
+                "titleText": titleText,
+                
+                "portraitTitleBarHeight": portraitTitleBarHeight,
+                "landscapeTitleBarHeight": landscapeTitleBarHeight
             ]
             return dimensionTable[refId]
         }
@@ -31,5 +34,13 @@ class AppDimensions {
     
     class var text: CGFloat { get { return 17 } }
     class var titleText: CGFloat { get { return 20 } }
+    
+    
+    // --
+    // MARK: UIKit component sizes
+    // --
+
+    class var portraitTitleBarHeight: CGFloat { get { return 44 } }
+    class var landscapeTitleBarHeight: CGFloat { get { return 32 } }
 
 }

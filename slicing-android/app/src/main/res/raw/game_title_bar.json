@@ -4,16 +4,12 @@
     {
       "refId": "statusUnderlay",
       "viewlet": "view",
-      "width": "stretchToParent",
-      "height": 25,
-      "backgroundColor": "#fff"
+      "width": "stretchToParent"
     },
     {
       "refId": "content",
       "viewlet": "frameContainer",
       "width": "stretchToParent",
-      "height": 48,
-      "backgroundColor": "#fff",
       "items": [
         {
           "refId": "title",

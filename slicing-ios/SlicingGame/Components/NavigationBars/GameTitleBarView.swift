@@ -7,7 +7,7 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class GameTitleBarView: LinearContainerView {
+class GameTitleBarView: LinearContainerView, NavigationBarComponent {
 
     // --
     // MARK: Layout resource
@@ -21,7 +21,7 @@ class GameTitleBarView: LinearContainerView {
     // --
     
     private var statusUnderlayView: UniView?
-    private var contentView: UniView?
+    private var contentView: FrameContainerView?
     private var titleView: TextView?
     private var dividerView: UniView?
 
@@ -83,7 +83,7 @@ class GameTitleBarView: LinearContainerView {
 
         // Bind views
         statusUnderlayView = binder.findByReference("statusUnderlay") as? UniView
-        contentView = binder.findByReference("content") as? UniView
+        contentView = binder.findByReference("content") as? FrameContainerView
         titleView = binder.findByReference("title") as? TextView
         dividerView = binder.findByReference("divider") as? UniView
     }
@@ -92,6 +92,15 @@ class GameTitleBarView: LinearContainerView {
     // --
     // MARK: Configurable values
     // --
+    
+    override var backgroundColor: UIColor? {
+        set {
+            statusUnderlayView?.backgroundColor = newValue
+            contentView?.backgroundColor = newValue
+            titleView?.textColor = averageColor?.intensity() ?? 0 < 0.25 ? .white : .text
+        }
+        get { return statusUnderlayView?.backgroundColor }
+    }
     
     var title: String? {
         set {
@@ -103,6 +112,29 @@ class GameTitleBarView: LinearContainerView {
     var showDivider: Bool = false {
         didSet {
             dividerView?.visibility = showDivider ? .visible : .hidden
+        }
+    }
+    
+    
+    // --
+    // MARK: NavigationBarComponent implementation
+    // --
+    
+    var averageColor: UIColor? {
+        get {
+            return statusUnderlayView?.backgroundColor
+        }
+    }
+
+    var statusBarHeight: CGFloat = 0 {
+        didSet {
+            statusUnderlayView?.layoutProperties.height = statusBarHeight
+        }
+    }
+
+    var barContentHeight: CGFloat = 0 {
+        didSet {
+            contentView?.layoutProperties.height = barContentHeight
         }
     }
 

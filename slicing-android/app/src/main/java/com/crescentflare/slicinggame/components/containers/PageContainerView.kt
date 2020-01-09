@@ -5,12 +5,15 @@ import android.content.Context
 import android.content.res.Resources
 import android.os.Build
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ScrollView
 import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
+import com.crescentflare.slicinggame.R
+import com.crescentflare.slicinggame.components.types.NavigationBarComponent
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.unilayout.helpers.UniLayout
 import com.crescentflare.unilayout.helpers.UniLayoutParams
@@ -169,11 +172,25 @@ class PageContainerView: ViewGroup {
     // Handle insets
     // --
 
+    private var cachedActionBarHeight = 0
+    private var cachedActionBarHeightHash = 0
+
     private val transparentStatusBarHeight: Int
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) rootWindowInsets?.stableInsetTop ?: 0 else 0
 
     private val transparentBottomBarHeight: Int
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && Resources.getSystem().displayMetrics.widthPixels < Resources.getSystem().displayMetrics.heightPixels) rootWindowInsets?.stableInsetBottom ?: 0 else 0
+
+    private val actionBarHeight: Int
+        get() {
+            val newHash = width * 256 + height
+            if (cachedActionBarHeight == 0 || newHash != cachedActionBarHeightHash) {
+                val typedValue = TypedValue()
+                cachedActionBarHeight = if (context.theme.resolveAttribute(R.attr.actionBarSize, typedValue, true)) TypedValue.complexToDimensionPixelSize(typedValue.data, Resources.getSystem().displayMetrics) else 0
+                cachedActionBarHeightHash = newHash
+            }
+            return cachedActionBarHeight
+        }
 
 
     // --
@@ -186,14 +203,26 @@ class PageContainerView: ViewGroup {
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val heightMode = MeasureSpec.getMode(heightMeasureSpec)
         if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
-            val titleBarHeight = titleBarView?.layoutParams?.height ?: ViewGroup.LayoutParams.WRAP_CONTENT
+            // Update and measure title bar
+            var topInset = 0
+            (titleBarView as? NavigationBarComponent)?.let {
+                topInset = actionBarHeight
+                it.statusBarHeight = transparentStatusBarHeight
+                it.barContentHeight = actionBarHeight
+            }
+            val titleBarHeight = titleBarView?.layoutParams?.height ?: LayoutParams.WRAP_CONTENT
             if (titleBarHeight >= 0) {
                 titleBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(titleBarHeight, MeasureSpec.EXACTLY))
             } else {
                 titleBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED))
             }
             titleBarView?.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(titleBarView?.measuredHeight ?: 0, MeasureSpec.EXACTLY))
-            contentContainer.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY))
+            if (topInset == 0) {
+                topInset = titleBarView?.measuredHeight ?: 0
+            }
+
+            // Measure content and background
+            contentContainer.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height - topInset, MeasureSpec.EXACTLY))
             backgroundItemView?.let {
                 var limitWidth = width
                 var limitHeight = height + transparentStatusBarHeight + transparentBottomBarHeight
@@ -212,8 +241,9 @@ class PageContainerView: ViewGroup {
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        val topInset = if (titleBarView is NavigationBarComponent) actionBarHeight else titleBarView?.measuredHeight ?: 0
         titleBarView?.layout(0, -transparentStatusBarHeight, right - left, (titleBarView?.measuredHeight ?: 0) - transparentStatusBarHeight)
-        contentContainer.layout(0, 0, right - left, bottom - top)
+        contentContainer.layout(0, topInset, right - left, bottom - top)
         backgroundItemView?.let {
             var x = 0
             var y = -transparentStatusBarHeight

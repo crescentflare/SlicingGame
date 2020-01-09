@@ -2,9 +2,12 @@ package com.crescentflare.slicinggame.components.navigationbars
 
 import android.annotation.TargetApi
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.ContextCompat
 import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.JsonLoader
 import com.crescentflare.jsoninflator.binder.InflatableRef
@@ -14,14 +17,16 @@ import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.R
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
+import com.crescentflare.slicinggame.components.types.NavigationBarComponent
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.coreextensions.colorIntensity
 import com.crescentflare.slicinggame.infrastructure.coreextensions.localized
 
 
 /**
  * Navigation bar: the title bar for in-game
  */
-open class GameTitleBarView : LinearContainerView {
+open class GameTitleBarView : LinearContainerView, NavigationBarComponent {
 
     // --
     // Statics
@@ -112,6 +117,12 @@ open class GameTitleBarView : LinearContainerView {
     // Configurable values
     // --
 
+    override fun setBackgroundColor(color: Int) {
+        statusUnderlayView?.setBackgroundColor(color)
+        contentView?.setBackgroundColor(color)
+        titleView?.setTextColor(if (averageColor?.colorIntensity() ?: 0.0 < 0.25) Color.WHITE else ContextCompat.getColor(context, R.color.text))
+    }
+
     var title: String?
         get() = titleView?.text?.toString()
         set(title) {
@@ -122,6 +133,26 @@ open class GameTitleBarView : LinearContainerView {
         set(showDivider) {
             field = showDivider
             dividerView?.visibility = if (showDivider) VISIBLE else GONE
+        }
+
+
+    // --
+    // NavigationBarComponent implementation
+    // --
+
+    override val averageColor: Int?
+        get() = (contentView?.background as? ColorDrawable)?.color
+
+    override var statusBarHeight: Int = 0
+        set(statusBarHeight) {
+            field = statusBarHeight
+            statusUnderlayView?.layoutParams?.height = statusBarHeight
+        }
+
+    override var barContentHeight: Int = 0
+        set(barContentHeight) {
+            field = barContentHeight
+            contentView?.layoutParams?.height = barContentHeight
         }
 
 }

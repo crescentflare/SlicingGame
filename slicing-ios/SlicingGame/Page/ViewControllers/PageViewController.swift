@@ -84,7 +84,8 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // --
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        let checkColor = pageView.titleBarView?.backgroundColor ?? pageView.backgroundColor
+        let titleBarColor = (pageView.titleBarView as? NavigationBarComponent)?.averageColor ?? pageView.titleBarView?.backgroundColor
+        let checkColor = titleBarColor ?? pageView.backgroundColor
         return checkColor?.intensity() ?? 0 < 0.25 ? .lightContent : .default
     }
     
