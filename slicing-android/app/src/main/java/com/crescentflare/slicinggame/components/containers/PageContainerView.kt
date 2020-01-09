@@ -9,6 +9,9 @@ import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ScrollView
+import androidx.appcompat.app.AppCompatActivity
+import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
+import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
 import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
@@ -83,6 +86,8 @@ class PageContainerView: ViewGroup {
     // --
 
     private var contentContainer: FrameContainerView
+    private var debugMenuView: View? = null
+    private val debugViewInset: Int
 
 
     // --
@@ -114,6 +119,19 @@ class PageContainerView: ViewGroup {
         addView(contentContainer)
         contentContainer.clipToPadding = false
         contentContainer.clipChildren = false
+
+        // Add debug view with long click listener to bring up the app config menu (if enabled)
+        debugViewInset = (Resources.getSystem().displayMetrics.density * 64).toInt()
+        if (AppConfigStorage.instance.isInitialized) {
+            debugMenuView = View(context)
+            addView(debugMenuView)
+            debugMenuView?.setOnLongClickListener {
+                (context as? AppCompatActivity)?.let {
+                    ManageAppConfigActivity.startWithResult(it, 0)
+                }
+                true
+            }
+        }
     }
 
 
@@ -220,6 +238,7 @@ class PageContainerView: ViewGroup {
             if (topInset == 0) {
                 topInset = titleBarView?.measuredHeight ?: 0
             }
+            debugMenuView?.measure(MeasureSpec.makeMeasureSpec(width - debugViewInset * 2, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(actionBarHeight, MeasureSpec.EXACTLY))
 
             // Measure content and background
             contentContainer.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(height - topInset, MeasureSpec.EXACTLY))
@@ -243,6 +262,7 @@ class PageContainerView: ViewGroup {
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         val topInset = if (titleBarView is NavigationBarComponent) actionBarHeight else titleBarView?.measuredHeight ?: 0
         titleBarView?.layout(0, -transparentStatusBarHeight, right - left, (titleBarView?.measuredHeight ?: 0) - transparentStatusBarHeight)
+        debugMenuView?.layout(debugViewInset, 0, right - left - debugViewInset, actionBarHeight)
         contentContainer.layout(0, topInset, right - left, bottom - top)
         backgroundItemView?.let {
             var x = 0

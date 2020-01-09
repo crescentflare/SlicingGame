@@ -16,7 +16,7 @@ Inside the repository there is a NodeJS-based development server which can be us
 
 ### Enabling the development server in the app
 
-The app contains a debug menu which can be opened by shaking the device (iOS) or long-pressing on the screen (Android). The menu provides options to specify the URL of the server and where the app loads it pages from. The URL should match the address of the development server. Set the page loading mode to server or to the hotreload server to change pages without restarting the app.
+The app contains a debug menu which can be opened by shaking the device (iOS) or long-pressing on the center of the action bar (Android). The menu provides options to specify the URL of the server and where the app loads it pages from. The URL should match the address of the development server. Set the page loading mode to server or to the hotreload server to change pages without restarting the app.
 
 ### Hot reloading pages
 
