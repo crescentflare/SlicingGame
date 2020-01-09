@@ -30,7 +30,9 @@ open class ImageView : UniImageView {
 
             override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
                 if (obj is ImageView) {
-                    // Apply image source
+                    // Apply image
+                    val stretchType = StretchType.fromString(mapUtil.optionalString(attributes, "stretchType", ""))
+                    obj.scaleType = stretchType.toScaleType()
                     obj.source = ImageSource.fromValue(attributes["source"])
 
                     // Generic view properties
@@ -80,5 +82,41 @@ open class ImageView : UniImageView {
             field = source
             setImageDrawable(source?.getDrawable(context))
         }
+
+
+    // --
+    // Scale type enum
+    // --
+
+    enum class StretchType(val value: String) {
+
+        None("none"),
+        Fill("fill"),
+        AspectFit("aspectFit"),
+        AspectCrop("aspectCrop");
+
+        fun toScaleType(): ScaleType {
+            return when(this) {
+                Fill -> ScaleType.FIT_XY
+                AspectFit -> ScaleType.FIT_CENTER
+                AspectCrop -> ScaleType.CENTER_CROP
+                else -> ScaleType.CENTER
+            }
+        }
+
+        companion object {
+
+            fun fromString(string: String?): StretchType {
+                for (enum in values()) {
+                    if (enum.value == string) {
+                        return enum
+                    }
+                }
+                return None
+            }
+
+        }
+
+    }
 
 }

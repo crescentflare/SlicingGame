@@ -7,6 +7,28 @@ import UIKit
 import UniLayout
 import JsonInflator
 
+enum ImageStretchType: String {
+    
+    case none = "none"
+    case fill = "fill"
+    case aspectFit = "aspectFit"
+    case aspectCrop = "aspectCrop"
+    
+    func toContentMode() -> UIView.ContentMode {
+        switch self {
+        case .fill:
+            return .scaleToFill
+        case .aspectFit:
+            return .scaleAspectFit
+        case .aspectCrop:
+            return .scaleAspectFill
+        case .none:
+            return .center
+        }
+    }
+
+}
+
 class ImageView: UniImageView {
     
     // --
@@ -25,7 +47,9 @@ class ImageView: UniImageView {
         
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let imageView = object as? ImageView {
-                // Apply image source
+                // Apply image
+                let stretchType = ImageStretchType(rawValue: convUtil.asString(value: attributes["stretchType"]) ?? "") ?? .none
+                imageView.internalImageView.contentMode = stretchType.toContentMode()
                 imageView.source = ImageSource.fromValue(value: attributes["source"])
                 
                 // Generic view properties
@@ -40,6 +64,7 @@ class ImageView: UniImageView {
         }
         
     }
+    
     
     // --
     // MARK: Initialization
@@ -56,7 +81,8 @@ class ImageView: UniImageView {
     }
     
     private func setup() {
-        // No implementation
+        clipsToBounds = true
+        internalImageView.contentMode = .center
     }
     
     

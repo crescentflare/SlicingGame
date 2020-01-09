@@ -153,6 +153,17 @@
           "source": {
             "description": "The source to retrieve the image from",
             "$ref": "#/definitions/imageSource"
+          },
+          "stretchType": {
+            "description": "Determines how the image is stretched within its frame",
+            "type": "string",
+            "enum": [
+              "none",
+              "fill",
+              "aspectFit",
+              "aspectCrop"
+            ],
+            "default": "none"
           }
         }
       }

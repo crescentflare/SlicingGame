@@ -38,7 +38,8 @@
               "width": "stretchToParent",
               "height": "stretchToParent",
               "backgroundColor": "#fff",
-              "source": "app://background_level_starry_night"
+              "source": "app://background_level_starry_night",
+              "stretchType": "aspectCrop"
             }
           ]
         }
