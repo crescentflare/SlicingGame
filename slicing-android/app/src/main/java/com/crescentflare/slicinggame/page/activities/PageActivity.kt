@@ -1,5 +1,6 @@
 package com.crescentflare.slicinggame.page.activities
 
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
@@ -18,6 +19,8 @@ import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.coreextensions.colorIntensity
+import com.crescentflare.slicinggame.infrastructure.events.AppEvent
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
@@ -27,7 +30,7 @@ import com.crescentflare.slicinggame.page.storage.PageLoaderListener
 /**
  * Activity: a generic activity for loading pages
  */
-class PageActivity : AppCompatActivity(), PageLoaderListener {
+class PageActivity : AppCompatActivity(), PageLoaderListener, AppEventObserver {
 
     // --
     // Statics: new instance
@@ -131,6 +134,24 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
         super.onPause()
         isResumed = false
         stopPageLoad()
+    }
+
+
+    // --
+    // Interaction
+    // --
+
+    override fun observedEvent(event: AppEvent, sender: Any?) {
+        if (event.type == "alert" && event.name == "simple") {
+            val title = event.parameters["title"] as? String ?: "Alert"
+            val text = event.parameters["text"] as? String ?: "No text specified"
+            val actionText = event.parameters["actionText"] as? String ?: "OK"
+            val builder = AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(text)
+                .setPositiveButton(actionText, null)
+            builder.show()
+        }
     }
 
 
@@ -251,6 +272,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
             )
         }
         ViewletUtil.assertInflateOn(activityView, inflateLayout)
+        activityView.eventObserver = this
         currentPageHash = page.hash
         updateSystemBars()
     }

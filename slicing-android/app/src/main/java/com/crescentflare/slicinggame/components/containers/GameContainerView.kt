@@ -19,6 +19,8 @@ import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
 import com.crescentflare.slicinggame.components.game.LevelView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.events.AppEvent
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 
@@ -49,6 +51,7 @@ open class GameContainerView : FrameContainerView {
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
                     // Apply clear goal
+                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
                     obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
 
                     // Apply slices
@@ -62,6 +65,11 @@ open class GameContainerView : FrameContainerView {
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+
+                    // Chain event observer
+                    if (parent is AppEventObserver) {
+                        obj.eventObserver = parent
+                    }
                     return true
                 }
                 return false
@@ -128,6 +136,11 @@ open class GameContainerView : FrameContainerView {
 
     fun slice(vector: Vector) {
         levelView.slice(vector)
+        if (levelView.cleared()) {
+            clearEvent?.let {
+                eventObserver?.observedEvent(it, this)
+            }
+        }
     }
 
     fun resetSlices() {
@@ -138,6 +151,8 @@ open class GameContainerView : FrameContainerView {
     // --
     // Configurable values
     // --
+
+    var clearEvent: AppEvent? = null
 
     var levelWidth: Float = 1f
         set(levelWidth) {

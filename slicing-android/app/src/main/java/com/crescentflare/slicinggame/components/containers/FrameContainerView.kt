@@ -8,13 +8,16 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.events.AppEvent
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.unilayout.containers.UniFrameContainer
+import java.lang.ref.WeakReference
 
 
 /**
  * Container view: basic layout container for overlapping views
  */
-open class FrameContainerView : UniFrameContainer {
+open class FrameContainerView : UniFrameContainer, AppEventObserver {
 
     // --
     // Static: viewlet integration
@@ -34,6 +37,11 @@ open class FrameContainerView : UniFrameContainer {
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+
+                    // Chain event observer
+                    if (parent is AppEventObserver) {
+                        obj.eventObserver = parent
+                    }
                     return true
                 }
                 return false
@@ -44,6 +52,13 @@ open class FrameContainerView : UniFrameContainer {
             }
         }
     }
+
+
+    // --
+    // Members
+    // --
+
+    private var eventObserverReference : WeakReference<AppEventObserver>? = null
 
 
     // --
@@ -67,6 +82,30 @@ open class FrameContainerView : UniFrameContainer {
 
     init {
         // No implementation
+    }
+
+
+    // --
+    // Configurable values
+    // --
+
+    var eventObserver: AppEventObserver?
+        get() = eventObserverReference?.get()
+        set(newValue) {
+            eventObserverReference = if (newValue != null) {
+                WeakReference(newValue)
+            } else {
+                null
+            }
+        }
+
+
+    // --
+    // Interaction
+    // --
+
+    override fun observedEvent(event: AppEvent, sender: Any?) {
+        eventObserver?.observedEvent(event, sender)
     }
 
 }

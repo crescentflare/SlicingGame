@@ -18,13 +18,16 @@ import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.R
 import com.crescentflare.slicinggame.components.types.NavigationBarComponent
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.events.AppEvent
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.unilayout.helpers.UniLayout
 import com.crescentflare.unilayout.helpers.UniLayoutParams
+import java.lang.ref.WeakReference
 
 /**
  * Container view: layout for the entire page, makes it easier to handle safe areas
  */
-class PageContainerView: ViewGroup {
+class PageContainerView: ViewGroup, AppEventObserver {
 
     // --
     // Static: viewlet integration
@@ -75,6 +78,11 @@ class PageContainerView: ViewGroup {
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+
+                    // Chain event observer
+                    if (parent is AppEventObserver) {
+                        obj.eventObserver = parent
+                    }
                     return true
                 }
                 return false
@@ -91,6 +99,7 @@ class PageContainerView: ViewGroup {
     // Members
     // --
 
+    private var eventObserverReference : WeakReference<AppEventObserver>? = null
     private var contentContainer: FrameContainerView
     private var debugMenuView: View? = null
     private val debugViewInset: Int
@@ -200,6 +209,30 @@ class PageContainerView: ViewGroup {
 
     fun removeAllContentViews() {
         contentContainer.removeAllViews()
+    }
+
+
+    // --
+    // Configurable values
+    // --
+
+    var eventObserver: AppEventObserver?
+        get() = eventObserverReference?.get()
+        set(newValue) {
+            eventObserverReference = if (newValue != null) {
+                WeakReference(newValue)
+            } else {
+                null
+            }
+        }
+
+
+    // --
+    // Interaction
+    // --
+
+    override fun observedEvent(event: AppEvent, sender: Any?) {
+        eventObserver?.observedEvent(event, sender)
     }
 
 

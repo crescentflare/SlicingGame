@@ -50,6 +50,7 @@ class GameContainerView: FrameContainerView {
                 gameContainer.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
 
                 // Apply clear goal
+                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
                 gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
 
                 // Apply slices
@@ -63,6 +64,11 @@ class GameContainerView: FrameContainerView {
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: gameContainer, attributes: attributes)
+
+                // Chain event observer
+                if let eventObserver = parent as? AppEventObserver {
+                    gameContainer.eventObserver = eventObserver
+                }
                 return true
             }
             return false
@@ -112,6 +118,11 @@ class GameContainerView: FrameContainerView {
     
     func slice(vector: Vector) {
         levelView.slice(vector: vector)
+        if levelView.cleared() {
+            if let clearEvent = clearEvent {
+                eventObserver?.observedEvent(clearEvent, sender: self)
+            }
+        }
     }
 
     func resetSlices() {
@@ -122,6 +133,8 @@ class GameContainerView: FrameContainerView {
     // --
     // MARK: Configurable values
     // --
+    
+    var clearEvent: AppEvent?
     
     var levelWidth: Float = 1 {
         didSet {
