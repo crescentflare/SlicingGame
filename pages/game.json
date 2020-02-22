@@ -27,7 +27,8 @@
           "height": "stretchToParent",
           "backgroundColor": "#ddd",
           "levelWidth": 12,
-          "levelHeight": 16
+          "levelHeight": 16,
+          "backgroundImage": "app://background_level_starry_night"
         }
       ]
     }

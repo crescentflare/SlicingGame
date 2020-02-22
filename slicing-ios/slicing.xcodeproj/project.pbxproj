@@ -26,6 +26,7 @@
 		04AC541223A0079100111C91 /* LevelCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AC541123A0079100111C91 /* LevelCanvasView.swift */; };
 		04CC779B23A3B9F3003D1BB0 /* GameContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CC779A23A3B9F3003D1BB0 /* GameContainerView.swift */; };
 		04CC779D23A3BEFD003D1BB0 /* LevelSlicePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CC779C23A3BEFC003D1BB0 /* LevelSlicePreviewView.swift */; };
+		04CC779F23A3E37F003D1BB0 /* LevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CC779E23A3E37F003D1BB0 /* LevelView.swift */; };
 		04E19154239D50CB00466143 /* PageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E19152239D50CB00466143 /* PageLoader.swift */; };
 		04E19155239D50CB00466143 /* PageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E19153239D50CB00466143 /* PageCache.swift */; };
 		04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB575239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift */; };
@@ -69,6 +70,7 @@
 		04AC541123A0079100111C91 /* LevelCanvasView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelCanvasView.swift; sourceTree = "<group>"; };
 		04CC779A23A3B9F3003D1BB0 /* GameContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameContainerView.swift; sourceTree = "<group>"; };
 		04CC779C23A3BEFC003D1BB0 /* LevelSlicePreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSlicePreviewView.swift; sourceTree = "<group>"; };
+		04CC779E23A3E37F003D1BB0 /* LevelView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelView.swift; sourceTree = "<group>"; };
 		04E19152239D50CB00466143 /* PageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageLoader.swift; sourceTree = "<group>"; };
 		04E19153239D50CB00466143 /* PageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageCache.swift; sourceTree = "<group>"; };
 		04ECB575239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigPageLoadingMode.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 			children = (
 				04AC541123A0079100111C91 /* LevelCanvasView.swift */,
 				04CC779C23A3BEFC003D1BB0 /* LevelSlicePreviewView.swift */,
+				04CC779E23A3E37F003D1BB0 /* LevelView.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -487,6 +490,7 @@
 				04F2AA7C239EDD1F00126CD1 /* AppFonts.swift in Sources */,
 				04F2AA89239EE43600126CD1 /* GameTitleBarView.swift in Sources */,
 				0487D2EC239C518500515520 /* Page.swift in Sources */,
+				04CC779F23A3E37F003D1BB0 /* LevelView.swift in Sources */,
 				04E19155239D50CB00466143 /* PageCache.swift in Sources */,
 				04E19154239D50CB00466143 /* PageLoader.swift in Sources */,
 			);
