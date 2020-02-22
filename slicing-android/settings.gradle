@@ -1,0 +1,6 @@
+// --
+// Define main module
+// --
+
+include ':app'
+rootProject.name='Slicing game'
