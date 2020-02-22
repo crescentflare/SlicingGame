@@ -85,6 +85,23 @@ class ImageSource {
 
     
     // --
+    // MARK: Extract values
+    // --
+
+    private var density: CGFloat? {
+        return parameters["density"] != nil ? CGFloat(Inflators.viewlet.convUtil.asFloat(value: parameters["density"]) ?? 1.0) : nil
+    }
+
+    private var forceWidth: CGFloat? {
+        return Inflators.viewlet.convUtil.asDimension(value: parameters["forceWidth"])
+    }
+
+    private var forceHeight: CGFloat? {
+        return Inflators.viewlet.convUtil.asDimension(value: parameters["forceHeight"])
+    }
+
+    
+    // --
     // MARK: Conversion
     // --
 
@@ -119,7 +136,7 @@ class ImageSource {
             completion(UIImage(named: name, in: bundle, compatibleWith: nil))
         } else if type == .online || type == .secureOnline {
             if let imageUrl = URL(string: uri) {
-                UIImageView.af_sharedImageDownloader.download(URLRequest(url: imageUrl), completion: { response in
+                UIImageView.af_sharedImageDownloader.download(URLRequest(url: imageUrl), filter: ImageSourceImageScaler(forceWidth: forceWidth, forceHeight: forceHeight, density: density), completion: { response in
                     completion(response.result.value)
                 })
             } else {
@@ -160,4 +177,39 @@ class ImageSource {
         return nil
     }
 
+}
+
+fileprivate struct ImageSourceImageScaler: ImageFilter {
+    
+    private let forceWidth: CGFloat?
+    private let forceHeight: CGFloat?
+    private let density: CGFloat?
+    
+    public init(forceWidth: CGFloat? = nil, forceHeight: CGFloat? = nil, density: CGFloat? = nil) {
+        self.forceWidth = forceWidth
+        self.forceHeight = forceHeight
+        self.density = density
+    }
+    
+    public var filter: (Image) -> Image {
+        return { image in
+            var newWidth = image.size.width
+            var newHeight = image.size.height
+            if let forceWidth = self.forceWidth {
+                newWidth = forceWidth
+                newHeight = self.forceHeight ?? image.size.height * newWidth / image.size.width
+            } else if let forceHeight = self.forceHeight {
+                newHeight = forceHeight
+                newWidth = image.size.width * newHeight / image.size.height
+            } else if let density = self.density, density != 0 {
+                newWidth = image.size.width * UIScreen.main.scale / density
+                newHeight = image.size.height * UIScreen.main.scale / density
+            }
+            if newWidth > 0 && newHeight > 0 && (newWidth != image.size.width || newHeight != image.size.height) {
+                return image.af_imageScaled(to: CGSize(width: newWidth, height: newHeight))
+            }
+            return image
+        }
+    }
+    
 }

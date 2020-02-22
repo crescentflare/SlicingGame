@@ -1,14 +1,21 @@
 package com.crescentflare.slicinggame.components.utility
 
 import android.content.Context
+import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.bitmap_recycle.BitmapPool
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.bumptech.glide.util.Util
 import com.crescentflare.slicinggame.infrastructure.coreextensions.urlDecode
 import com.crescentflare.slicinggame.infrastructure.coreextensions.urlEncode
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
+import java.security.MessageDigest
+
 
 /**
  * Component utility: defines the source of an image
@@ -99,6 +106,37 @@ class ImageSource {
 
 
     // --
+    // Extract values
+    // --
+
+    private val density: Float?
+        get() {
+            if (parameters.containsKey("density")) {
+                return Inflators.viewlet.mapUtil.optionalFloat(parameters, "density", 1f)
+            }
+            return null
+        }
+
+    private val forceWidth: Int?
+        get() {
+            val width = Inflators.viewlet.mapUtil.optionalDimension(parameters, "forceWidth", 0)
+            if (width > 0) {
+                return width
+            }
+            return null
+        }
+
+    private val forceHeight: Int?
+        get() {
+            val height = Inflators.viewlet.mapUtil.optionalDimension(parameters, "forceHeight", 0)
+            if (height > 0) {
+                return height
+            }
+            return null
+        }
+
+
+    // --
     // Conversion
     // --
 
@@ -135,6 +173,7 @@ class ImageSource {
             Glide.with(context)
                 .`as`(Drawable::class.java)
                 .load(uri)
+                .transform(BitmapScaler(forceWidth, forceHeight, density))
                 .into(object : CustomTarget<Drawable>() {
                     override fun onLoadCleared(placeholder: Drawable?) {
                         // No implementation
@@ -207,6 +246,69 @@ class ImageSource {
                 return Unknown
             }
 
+        }
+
+    }
+
+
+    // --
+    // Image transformer class
+    // --
+
+    private class BitmapScaler(val forceWidth: Int? = null, val forceHeight: Int? = null, val density: Float? = null) : BitmapTransformation() {
+
+        private val objectName = "ImageSource.BitmapScaler"
+
+        override fun transform(pool: BitmapPool, toTransform: Bitmap, outWidth: Int, outHeight: Int): Bitmap {
+            var newWidth = toTransform.width
+            var newHeight = toTransform.height
+            if (forceWidth != null) {
+                newWidth = forceWidth
+                newHeight = forceHeight ?: toTransform.height * newWidth / toTransform.width
+            } else if (forceHeight != null) {
+                newHeight = forceHeight
+                newWidth = toTransform.width * newHeight / toTransform.height
+            } else if (density != null && density != 0f) {
+                newWidth = (toTransform.width.toFloat() * Resources.getSystem().displayMetrics.density / density).toInt()
+                newHeight = (toTransform.height.toFloat() * Resources.getSystem().displayMetrics.density / density).toInt()
+            }
+            if (newWidth > 0 && newHeight > 0 && (newWidth != toTransform.width || newHeight != toTransform.height)) {
+                return Bitmap.createScaledBitmap(toTransform, newWidth, newHeight, true)
+            }
+            return toTransform
+        }
+
+        override fun updateDiskCacheKey(messageDigest: MessageDigest) {
+            messageDigest.update(objectName.toByteArray())
+            if (forceWidth != null) {
+                messageDigest.update(forceWidth.toString().toByteArray())
+            }
+            if (forceHeight != null) {
+                messageDigest.update(forceHeight.toString().toByteArray())
+            }
+            if (density != null) {
+                messageDigest.update(density.toString().toByteArray())
+            }
+        }
+
+        override fun equals(other: Any?): Boolean {
+            if (other is BitmapScaler) {
+                return other.forceWidth == forceWidth && other.forceHeight == forceHeight && other.density == density
+            }
+            return false
+        }
+
+        override fun hashCode(): Int {
+            val hashCodes = listOf(
+                Util.hashCode(forceWidth ?: 0),
+                Util.hashCode(forceHeight ?: 0),
+                Util.hashCode(density ?: 0f)
+            )
+            var result = objectName.hashCode()
+            for (hashCode in hashCodes) {
+                result = Util.hashCode(result, hashCode)
+            }
+            return result
         }
 
     }
