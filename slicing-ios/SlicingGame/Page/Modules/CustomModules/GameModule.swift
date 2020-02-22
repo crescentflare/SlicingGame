@@ -13,6 +13,8 @@ class GameModule: PageModule {
     // --
     
     let handleEventTypes = ["game"]
+    private var currentBackground = 0
+    private var shuffledBackgrounds = [ImageSource]()
 
     
     // --
@@ -31,9 +33,19 @@ class GameModule: PageModule {
         
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let gameModule = object as? GameModule {
+                // Apply component reference
                 let layoutBinder = (parent as? PageViewController)?.binder
                 let component = layoutBinder?.findByReference(convUtil.asString(value: attributes["gameContainer"]) ?? "")
                 gameModule.gameContainer = component as? GameContainerView
+                
+                // Apply random backgrounds
+                var randomBackgrounds = [ImageSource]()
+                for randomBackground in attributes["randomBackgrounds"] as? [Any] ?? [] {
+                    if let image = ImageSource.fromValue(value: randomBackground) {
+                        randomBackgrounds.append(image)
+                    }
+                }
+                gameModule.randomBackgrounds = randomBackgrounds
                 return true
             }
             return false
@@ -59,7 +71,23 @@ class GameModule: PageModule {
     // MARK: Configurable values
     // --
     
-    var gameContainer: GameContainerView?
+    var gameContainer: GameContainerView? {
+        didSet {
+            if gameContainer != oldValue && currentBackground < shuffledBackgrounds.count {
+                gameContainer?.backgroundImage = shuffledBackgrounds[currentBackground]
+            }
+        }
+    }
+    
+    var randomBackgrounds = [ImageSource]() {
+        didSet {
+            if randomBackgrounds != oldValue && randomBackgrounds.count > 0 {
+                currentBackground = 0
+                shuffledBackgrounds = randomBackgrounds.shuffled()
+                gameContainer?.backgroundImage = shuffledBackgrounds[currentBackground]
+            }
+        }
+    }
 
 
     // --
@@ -92,6 +120,10 @@ class GameModule: PageModule {
             switch event.name {
             case "reset":
                 gameContainer?.resetSlices()
+                if shuffledBackgrounds.count > 0 {
+                    currentBackground = (currentBackground + 1) % shuffledBackgrounds.count
+                    gameContainer?.backgroundImage = shuffledBackgrounds[currentBackground]
+                }
             default:
                 break
             }

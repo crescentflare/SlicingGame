@@ -1,0 +1,58 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON app: image source schema",
+  "description": "Defines an image source to be used in components",
+  "oneOf": [
+    {
+      "type": "string",
+      "pattern": "^(app|http|https):\/\/.+$"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "description": "The type of image source to load",
+          "type": "string",
+          "enum": [
+            "app",
+            "http",
+            "https"
+          ]
+        },
+        "name": {
+          "description": "The filename of the image",
+          "type": "string"
+        },
+        "forceWidth": {
+          "description": "Online images only: scale the image to this width",
+          "$ref": "#/definitions/dimension"
+        },
+        "forceHeight": {
+          "description": "Online images only: scale the image to this height",
+          "$ref": "#/definitions/dimension"
+        },
+        "density": {
+          "description": "Online images only: the image has this density, scale up/down for devices with another density",
+          "type": "number"
+        }
+      }
+    }
+  ],
+  "definitions": {
+    "dimension": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string",
+          "pattern": "^-?\\d*\\.?\\d+(dp|sp|px|wp|hp|vw|vh|maxp|minp|vmin|vmax)$"
+        }
+      ]
+    }
+  }
+}

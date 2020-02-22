@@ -16,7 +16,7 @@ enum ImageSourceType: String {
     
 }
 
-class ImageSource {
+class ImageSource: Equatable {
     
     // --
     // MARK: Members
@@ -145,6 +145,15 @@ class ImageSource {
         } else {
             completion(nil)
         }
+    }
+    
+
+    // --
+    // MARK: Equatable implementation
+    // --
+
+    static func == (lhs: ImageSource, rhs: ImageSource) -> Bool {
+        return lhs.uri == rhs.uri
     }
     
     
