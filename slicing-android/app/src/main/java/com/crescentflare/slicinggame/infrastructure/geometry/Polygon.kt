@@ -1,5 +1,6 @@
 package com.crescentflare.slicinggame.infrastructure.geometry
 
+import android.graphics.Path
 import android.graphics.PointF
 
 /**
@@ -52,6 +53,23 @@ class Polygon {
             result.add(Vector(points[index], points[(index + 1) % points.size]))
         }
         return result
+    }
+
+    fun asPath(scaleX: Float = 1f, scaleY: Float = 1f): Path? {
+        if (isValid()) {
+            val path = Path()
+            for (index in points.indices) {
+                val coordPoint = PointF(points[index].x * scaleX, points[index].y * scaleY)
+                if (index == 0) {
+                    path.moveTo(coordPoint.x, coordPoint.y)
+                } else {
+                    path.lineTo(coordPoint.x, coordPoint.y)
+                }
+            }
+            path.close()
+            return path
+        }
+        return null
     }
 
     fun sliced(vector: Vector): Polygon? {
