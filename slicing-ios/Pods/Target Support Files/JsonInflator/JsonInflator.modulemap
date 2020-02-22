@@ -1,0 +1,6 @@
+framework module JsonInflator {
+  umbrella header "JsonInflator-umbrella.h"
+
+  export *
+  module * { export * }
+}

@@ -1,0 +1,512 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0335411C5F848BDBF791E97F /* Pods_SlicingGame.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */; };
+		043D7263239C285C00A79415 /* Pages in Resources */ = {isa = PBXBuildFile; fileRef = 043D7262239C285C00A79415 /* Pages */; };
+		043D726C239C2C0E00A79415 /* Inflators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043D726B239C2C0D00A79415 /* Inflators.swift */; };
+		043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043D726F239C2D2300A79415 /* ViewletUtil.swift */; };
+		04875384239BDACB002FC386 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875383239BDACB002FC386 /* AppDelegate.swift */; };
+		0487538D239BDACC002FC386 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0487538C239BDACC002FC386 /* Assets.xcassets */; };
+		04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0487538E239BDACC002FC386 /* LaunchScreen.storyboard */; };
+		0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875399239BDC0D002FC386 /* PageViewController.swift */; };
+		0487D2EC239C518500515520 /* Page.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0487D2EB239C518400515520 /* Page.swift */; };
+		0487D2F0239C519600515520 /* String+SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0487D2EE239C519600515520 /* String+SHA256.swift */; };
+		0487D2F1239C519600515520 /* Data+SHA256.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0487D2EF239C519600515520 /* Data+SHA256.swift */; };
+		04E19154239D50CB00466143 /* PageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E19152239D50CB00466143 /* PageLoader.swift */; };
+		04E19155239D50CB00466143 /* PageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E19153239D50CB00466143 /* PageCache.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		043D7262239C285C00A79415 /* Pages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pages; sourceTree = "<group>"; };
+		043D726B239C2C0D00A79415 /* Inflators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inflators.swift; sourceTree = "<group>"; };
+		043D726F239C2D2300A79415 /* ViewletUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewletUtil.swift; sourceTree = "<group>"; };
+		04875380239BDACB002FC386 /* Slicing game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Slicing game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		04875383239BDACB002FC386 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		0487538C239BDACC002FC386 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		0487538F239BDACC002FC386 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		04875391239BDACC002FC386 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		04875399239BDC0D002FC386 /* PageViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
+		0487D2EB239C518400515520 /* Page.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Page.swift; sourceTree = "<group>"; };
+		0487D2EE239C519600515520 /* String+SHA256.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+SHA256.swift"; sourceTree = "<group>"; };
+		0487D2EF239C519600515520 /* Data+SHA256.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Data+SHA256.swift"; sourceTree = "<group>"; };
+		04E19152239D50CB00466143 /* PageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageLoader.swift; sourceTree = "<group>"; };
+		04E19153239D50CB00466143 /* PageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageCache.swift; sourceTree = "<group>"; };
+		27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.release.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.release.xcconfig"; sourceTree = "<group>"; };
+		502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_SlicingGame.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SlicingGame.debug.xcconfig"; path = "Target Support Files/Pods-SlicingGame/Pods-SlicingGame.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0487537D239BDACB002FC386 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0335411C5F848BDBF791E97F /* Pods_SlicingGame.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		043D7269239C2C0D00A79415 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				0487D2ED239C519600515520 /* CoreExtensions */,
+				043D726A239C2C0D00A79415 /* Inflator */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		043D726A239C2C0D00A79415 /* Inflator */ = {
+			isa = PBXGroup;
+			children = (
+				043D726B239C2C0D00A79415 /* Inflators.swift */,
+			);
+			path = Inflator;
+			sourceTree = "<group>";
+		};
+		043D726D239C2D2300A79415 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				043D726E239C2D2300A79415 /* Utility */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		043D726E239C2D2300A79415 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				043D726F239C2D2300A79415 /* ViewletUtil.swift */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		04875377239BDACB002FC386 = {
+			isa = PBXGroup;
+			children = (
+				043D7262239C285C00A79415 /* Pages */,
+				04875382239BDACB002FC386 /* SlicingGame */,
+				04875381239BDACB002FC386 /* Products */,
+				CA8C46B5451C591706C8054D /* Pods */,
+				529EC35F47AE04B3AC9A0B49 /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		04875381239BDACB002FC386 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				04875380239BDACB002FC386 /* Slicing game.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		04875382239BDACB002FC386 /* SlicingGame */ = {
+			isa = PBXGroup;
+			children = (
+				043D726D239C2D2300A79415 /* Components */,
+				043D7269239C2C0D00A79415 /* Infrastructure */,
+				04875397239BDBBB002FC386 /* Page */,
+				0487539B239BDED5002FC386 /* Resources */,
+				04875383239BDACB002FC386 /* AppDelegate.swift */,
+				04875391239BDACC002FC386 /* Info.plist */,
+			);
+			path = SlicingGame;
+			sourceTree = "<group>";
+		};
+		04875397239BDBBB002FC386 /* Page */ = {
+			isa = PBXGroup;
+			children = (
+				0487D2EA239C518400515520 /* Storage */,
+				04875398239BDBC5002FC386 /* ViewControllers */,
+			);
+			path = Page;
+			sourceTree = "<group>";
+		};
+		04875398239BDBC5002FC386 /* ViewControllers */ = {
+			isa = PBXGroup;
+			children = (
+				04875399239BDC0D002FC386 /* PageViewController.swift */,
+			);
+			path = ViewControllers;
+			sourceTree = "<group>";
+		};
+		0487539B239BDED5002FC386 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0487539C239BDEF5002FC386 /* Localization */,
+				0487538C239BDACC002FC386 /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		0487539C239BDEF5002FC386 /* Localization */ = {
+			isa = PBXGroup;
+			children = (
+				0487538E239BDACC002FC386 /* LaunchScreen.storyboard */,
+			);
+			path = Localization;
+			sourceTree = "<group>";
+		};
+		0487D2EA239C518400515520 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				0487D2EB239C518400515520 /* Page.swift */,
+				04E19153239D50CB00466143 /* PageCache.swift */,
+				04E19152239D50CB00466143 /* PageLoader.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		0487D2ED239C519600515520 /* CoreExtensions */ = {
+			isa = PBXGroup;
+			children = (
+				0487D2EE239C519600515520 /* String+SHA256.swift */,
+				0487D2EF239C519600515520 /* Data+SHA256.swift */,
+			);
+			path = CoreExtensions;
+			sourceTree = "<group>";
+		};
+		529EC35F47AE04B3AC9A0B49 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CA8C46B5451C591706C8054D /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */,
+				27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0487537F239BDACB002FC386 /* SlicingGame */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 04875394239BDACC002FC386 /* Build configuration list for PBXNativeTarget "SlicingGame" */;
+			buildPhases = (
+				1D93CAB1DDF1DBC6435BBE95 /* [CP] Check Pods Manifest.lock */,
+				0487537C239BDACB002FC386 /* Sources */,
+				0487537D239BDACB002FC386 /* Frameworks */,
+				0487537E239BDACB002FC386 /* Resources */,
+				2723482E0A804AF38A411851 /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SlicingGame;
+			productName = SlicingGame;
+			productReference = 04875380239BDACB002FC386 /* Slicing game.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		04875378239BDACB002FC386 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1120;
+				LastUpgradeCheck = 1120;
+				ORGANIZATIONNAME = crescentflare;
+				TargetAttributes = {
+					0487537F239BDACB002FC386 = {
+						CreatedOnToolsVersion = 11.2.1;
+					};
+				};
+			};
+			buildConfigurationList = 0487537B239BDACB002FC386 /* Build configuration list for PBXProject "slicing" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 04875377239BDACB002FC386;
+			productRefGroup = 04875381239BDACB002FC386 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0487537F239BDACB002FC386 /* SlicingGame */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0487537E239BDACB002FC386 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				043D7263239C285C00A79415 /* Pages in Resources */,
+				04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */,
+				0487538D239BDACC002FC386 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1D93CAB1DDF1DBC6435BBE95 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-SlicingGame-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2723482E0A804AF38A411851 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SlicingGame/Pods-SlicingGame-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-SlicingGame/Pods-SlicingGame-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-SlicingGame/Pods-SlicingGame-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0487537C239BDACB002FC386 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */,
+				0487D2F1239C519600515520 /* Data+SHA256.swift in Sources */,
+				043D726C239C2C0E00A79415 /* Inflators.swift in Sources */,
+				043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */,
+				0487D2F0239C519600515520 /* String+SHA256.swift in Sources */,
+				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
+				0487D2EC239C518500515520 /* Page.swift in Sources */,
+				04E19155239D50CB00466143 /* PageCache.swift in Sources */,
+				04E19154239D50CB00466143 /* PageLoader.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		0487538E239BDACC002FC386 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				0487538F239BDACC002FC386 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		04875392239BDACC002FC386 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		04875393239BDACC002FC386 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		04875395239BDACC002FC386 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = D42666C90314466082BDA15D /* Pods-SlicingGame.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = SlicingGame/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.crescentflare.slicinggame;
+				PRODUCT_NAME = "Slicing game";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		04875396239BDACC002FC386 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 27311422EEFAACEEF5591602 /* Pods-SlicingGame.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = SlicingGame/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.crescentflare.slicinggame;
+				PRODUCT_NAME = "Slicing game";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = RELEASE;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0487537B239BDACB002FC386 /* Build configuration list for PBXProject "slicing" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04875392239BDACC002FC386 /* Debug */,
+				04875393239BDACC002FC386 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		04875394239BDACC002FC386 /* Build configuration list for PBXNativeTarget "SlicingGame" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				04875395239BDACC002FC386 /* Debug */,
+				04875396239BDACC002FC386 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 04875378239BDACB002FC386 /* Project object */;
+}
