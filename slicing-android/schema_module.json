@@ -30,6 +30,13 @@
           "gameContainer": {
             "description": "A reference to the game container component",
             "type": "string"
+          },
+          "randomBackgrounds": {
+            "description": "Randomly pick one of these backgrounds to be revealed",
+            "type": "array",
+            "items": {
+              "$ref": "./schema_image_source.json"
+            }
           }
         }
       }

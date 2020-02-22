@@ -8,15 +8,32 @@
     },
     {
       "refId": "content",
-      "viewlet": "frameContainer",
+      "viewlet": "linearContainer",
+      "orientation": "horizontal",
       "width": "stretchToParent",
       "items": [
         {
+          "refId": "menuButton",
+          "viewlet": "imageButton",
+          "height": "stretchToParent",
+          "visibility": "hidden"
+        },
+        {
           "refId": "title",
           "viewlet": "text",
+          "weight": 1,
+          "paddingLeft": 16,
+          "paddingRight": 16,
           "gravity": "center",
           "maxLines": 1,
+          "textAlignment": "center",
           "textSize": "$titleText"
+        },
+        {
+          "refId": "actionButton",
+          "viewlet": "imageButton",
+          "height": "stretchToParent",
+          "visibility": "hidden"
         }
       ]
     },
