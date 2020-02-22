@@ -16,6 +16,7 @@
         "gameContainer",
         "linearContainer",
         "pageContainer",
+        "spriteContainer",
         "level",
         "levelCanvas",
         "levelSlicePreview",
