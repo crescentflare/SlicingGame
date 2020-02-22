@@ -11,7 +11,10 @@
         "text",
         "view",
         "frameContainer",
-        "linearContainer"
+        "linearContainer",
+        "pageContainer",
+        "gameTitleBar",
+        "simpleBottomBar"
       ]
     },
     "refId": {
@@ -236,6 +239,64 @@
               "$ref": "#"
             },
             "default": []
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "pageContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "titleBar": {
+            "description": "The title bar view at the top of the screen",
+            "$ref": "#"
+          },
+          "bottomBar": {
+            "description": "Takes up the space of the bottom navigation bar on Android or the bottom safe area on iOS",
+            "$ref": "#"
+          },
+          "contentItems": {
+            "description": "A list of viewlets within the safe area",
+            "type": "array",
+            "items": {
+              "$ref": "#"
+            },
+            "default": []
+          },
+          "backgroundItem": {
+            "description": "A background view that's behind the content items and ignores the safe area",
+            "$ref": "#"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "gameTitleBar"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "localizedTitle": {
+            "description": "The localized string key of the title",
+            "type": "string"
+          },
+          "title": {
+            "description": "The bar title",
+            "type": "string"
+          },
+          "showDivider": {
+            "description": "Set visibility of the divider between the bar and the rest of the content",
+            "type": "boolean"
           }
         }
       }

@@ -12,6 +12,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // MARK: Members
     // --
     
+    private let pageView = PageContainerView()
     private let pageJson: String
     private var pageLoader: PageLoader?
     private var pageLoadingServer = ""
@@ -38,8 +39,8 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // --
     
     override func loadView() {
-        view = FrameContainerView()
-        view.backgroundColor = .green
+        pageView.backgroundColor = .white
+        view = pageView
     }
     
     override func viewDidLoad() {
@@ -75,6 +76,17 @@ class PageViewController: UIViewController, PageLoaderDelegate {
         super.viewWillDisappear(animated)
         isResumed = false
         stopPageLoad()
+    }
+    
+    
+    // --
+    // MARK: Handle status bar
+    // --
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let titleBarColor = (pageView.titleBarView as? NavigationBarComponent)?.averageColor ?? pageView.titleBarView?.backgroundColor
+        let checkColor = titleBarColor ?? pageView.backgroundColor
+        return checkColor?.intensity() ?? 0 < 0.25 ? .lightContent : .default
     }
     
     
@@ -115,7 +127,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     
     func didUpdatePage(page: Page) {
         var inflateLayout = page.layout ?? [:]
-        if Inflators.viewlet.findInflatableNameInAttributes(inflateLayout) != "frameContainer" {
+        if Inflators.viewlet.findInflatableNameInAttributes(inflateLayout) != "pageContainer" {
             var wrappedLayout = page.layout ?? [:]
             if wrappedLayout["width"] == nil {
                 wrappedLayout["width"] = "stretchToParent"
@@ -124,20 +136,22 @@ class PageViewController: UIViewController, PageLoaderDelegate {
                 wrappedLayout["height"] = "stretchToParent"
             }
             inflateLayout = [
-                "viewlet": "frameContainer",
+                "viewlet": "pageContainer",
+                "backgroundColor": "#fff",
                 "recycling": true,
-                "items": [
+                "contentItems": [
                     wrappedLayout
                 ]
             ]
         }
-        ViewletUtil.assertInflateOn(view: self.view, attributes: inflateLayout)
+        ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout)
         currentPageHash = page.hash
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     func didReceivePageLoadingEvent(event: PageLoaderEvent) {
         if event == .loadingFailed {
-            view.backgroundColor = .red
+            pageView.backgroundColor = .red
         }
     }
 

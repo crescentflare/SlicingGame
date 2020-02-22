@@ -1,21 +1,31 @@
 {
   "dataSets": {
     "layout": {
-      "viewlet": "linearContainer",
-      "backgroundColor": "#fff",
-      "recycling": true,
-      "items": [
+      "viewlet": "pageContainer",
+      "titleBar": {
+        "viewlet": "gameTitleBar",
+        "width": "stretchToParent",
+        "backgroundColor": "#0fff",
+        "localizedTitle": "GLOBAL_APP_NAME",
+        "showDivider": true
+      },
+      "bottomBar": {
+        "viewlet": "simpleBottomBar",
+        "width": "stretchToParent",
+        "backgroundColor": "#ddd"
+      },
+      "backgroundItem": {
+        "viewlet": "view",
+        "width": "stretchToParent",
+        "height": "stretchToParent",
+        "backgroundColor": "#fff"
+      },
+      "contentItems": [
         {
           "viewlet": "view",
           "width": "stretchToParent",
-          "weight": 1,
-          "backgroundColor": "#fff"
-        },
-        {
-          "viewlet": "view",
-          "width": "stretchToParent",
-          "weight": 2,
-          "backgroundColor": "#eee"
+          "height": "stretchToParent",
+          "backgroundColor": "#ddd"
         }
       ]
     }
