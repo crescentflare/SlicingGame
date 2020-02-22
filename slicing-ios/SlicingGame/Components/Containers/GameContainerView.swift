@@ -49,6 +49,9 @@ class GameContainerView: FrameContainerView {
                 // Apply background
                 gameContainer.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
 
+                // Apply clear goal
+                gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
+
                 // Apply slices
                 let sliceArray = convUtil.asFloatArray(value: attributes["slices"])
                 gameContainer.resetSlices()
@@ -139,6 +142,13 @@ class GameContainerView: FrameContainerView {
         get { return levelView.backgroundImage }
     }
 
+    var requireClearRate: Int {
+        set {
+            levelView.requireClearRate = newValue
+        }
+        get { return levelView.requireClearRate }
+    }
+
     
     // --
     // MARK: Interaction
@@ -146,10 +156,12 @@ class GameContainerView: FrameContainerView {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
-        if let touch = touches.first {
-            dragStart = touch.location(in: self)
-            dragEnd = dragStart
-            slicePreviewView.start = dragStart
+        if !levelView.cleared() {
+            if let touch = touches.first {
+                dragStart = touch.location(in: self)
+                dragEnd = dragStart
+                slicePreviewView.start = dragStart
+            }
         }
     }
     
@@ -180,8 +192,7 @@ class GameContainerView: FrameContainerView {
         if let dragStart = dragStart, let dragEnd = dragEnd, levelView.frame.width > 0 && levelView.frame.height > 0 {
             let viewVector = Vector(start: dragStart, end: dragEnd)
             if viewVector.distance() >= minimumDragDistance {
-                let levelVector = viewVector.translated(translateX: -levelView.frame.origin.x, translateY: -levelView.frame.origin.y)
-                let sliceVector = levelVector.scaled(scaleX: CGFloat(levelWidth) / levelView.frame.width, scaleY: CGFloat(levelHeight) / levelView.frame.height)
+                let sliceVector = levelView.transformedSliceVector(vector: viewVector)
                 if sliceVector.isValid() {
                     slice(vector: sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))))
                 }

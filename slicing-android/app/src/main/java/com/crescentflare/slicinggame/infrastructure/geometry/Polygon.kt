@@ -146,6 +146,16 @@ class Polygon {
         return false
     }
 
+    fun calculateSurfaceArea(): Float {
+        var first = 0f
+        var second = 0f
+        for (index in points.indices) {
+            first += points[index].x * points[(index + 1) % points.size].y
+            second += points[index].y * points[(index + 1) % points.size].x
+        }
+        return (first - second) / 2
+    }
+
 
     // --
     // Helper

@@ -113,6 +113,30 @@ open class LevelCanvasView : UniFrameContainer {
         updateClipPath()
     }
 
+    fun clearRateForSlice(vector: Vector): Float {
+        clipPolygon.sliced(vector)?.let {
+            val canvasSurface = canvasWidth * canvasHeight
+            if (canvasSurface > 0) {
+                val newClearRate = 100 - it.calculateSurfaceArea() * 100 / canvasSurface
+                return newClearRate - clearRate()
+            }
+        }
+        return 0f
+    }
+
+
+    // --
+    // Obtain state
+    // --
+
+    fun clearRate(): Float {
+        val canvasSurface = canvasWidth * canvasHeight
+        if (canvasSurface > 0) {
+            return 100 - clipPolygon.calculateSurfaceArea() * 100 / canvasSurface
+        }
+        return 0f
+    }
+
 
     // --
     // Configurable values
