@@ -4,6 +4,7 @@ import android.app.Application
 import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
 import com.crescentflare.jsoninflator.utility.InflatorResourceColorLookup
 import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
+import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
@@ -64,6 +65,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
         Inflators.viewlet.setDimensionLookup(InflatorResourceDimensionLookup(this))
 
         // Basic views
+        Inflators.viewlet.register("image", ImageView.viewlet)
         Inflators.viewlet.register("text", TextView.viewlet)
         Inflators.viewlet.register("view", ViewletUtil.basicViewViewlet)
 

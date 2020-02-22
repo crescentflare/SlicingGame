@@ -11,6 +11,9 @@
 		043D7263239C285C00A79415 /* Pages in Resources */ = {isa = PBXBuildFile; fileRef = 043D7262239C285C00A79415 /* Pages */; };
 		043D726C239C2C0E00A79415 /* Inflators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043D726B239C2C0D00A79415 /* Inflators.swift */; };
 		043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 043D726F239C2D2300A79415 /* ViewletUtil.swift */; };
+		0473BA0F23A16DFA0020FC93 /* ImageSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0473BA0E23A16DFA0020FC93 /* ImageSource.swift */; };
+		0473BA1123A16F700020FC93 /* ImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0473BA1023A16F700020FC93 /* ImageView.swift */; };
+		0473BA1323A175470020FC93 /* String+URLCoding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0473BA1223A175470020FC93 /* String+URLCoding.swift */; };
 		04875384239BDACB002FC386 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04875383239BDACB002FC386 /* AppDelegate.swift */; };
 		0487538D239BDACC002FC386 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0487538C239BDACC002FC386 /* Assets.xcassets */; };
 		04875390239BDACC002FC386 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0487538E239BDACC002FC386 /* LaunchScreen.storyboard */; };
@@ -47,6 +50,9 @@
 		043D7262239C285C00A79415 /* Pages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pages; sourceTree = "<group>"; };
 		043D726B239C2C0D00A79415 /* Inflators.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inflators.swift; sourceTree = "<group>"; };
 		043D726F239C2D2300A79415 /* ViewletUtil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewletUtil.swift; sourceTree = "<group>"; };
+		0473BA0E23A16DFA0020FC93 /* ImageSource.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSource.swift; sourceTree = "<group>"; };
+		0473BA1023A16F700020FC93 /* ImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageView.swift; sourceTree = "<group>"; };
+		0473BA1223A175470020FC93 /* String+URLCoding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+URLCoding.swift"; sourceTree = "<group>"; };
 		04875380239BDACB002FC386 /* Slicing game.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Slicing game.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04875383239BDACB002FC386 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0487538C239BDACC002FC386 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -132,6 +138,7 @@
 		043D726E239C2D2300A79415 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				0473BA0E23A16DFA0020FC93 /* ImageSource.swift */,
 				043D726F239C2D2300A79415 /* ViewletUtil.swift */,
 			);
 			path = Utility;
@@ -221,6 +228,7 @@
 				0487D2EF239C519600515520 /* Data+SHA256.swift */,
 				04F2AA6F239ED8FF00126CD1 /* String+Localization.swift */,
 				0487D2EE239C519600515520 /* String+SHA256.swift */,
+				0473BA1223A175470020FC93 /* String+URLCoding.swift */,
 				04F2AA74239EDA8700126CD1 /* UIColor+HexValue.swift */,
 				04F2AA82239EE2F100126CD1 /* UIColor+Intensity.swift */,
 			);
@@ -277,6 +285,7 @@
 		04F2AA7D239EDDE400126CD1 /* BasicViews */ = {
 			isa = PBXGroup;
 			children = (
+				0473BA1023A16F700020FC93 /* ImageView.swift */,
 				04F2AA7E239EDDE400126CD1 /* TextView.swift */,
 			);
 			path = BasicViews;
@@ -441,10 +450,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0473BA1123A16F700020FC93 /* ImageView.swift in Sources */,
 				0487539A239BDC0D002FC386 /* PageViewController.swift in Sources */,
 				04F2AA81239EDF8A00126CD1 /* PageContainerView.swift in Sources */,
 				0487D2F1239C519600515520 /* Data+SHA256.swift in Sources */,
 				043D726C239C2C0E00A79415 /* Inflators.swift in Sources */,
+				0473BA1323A175470020FC93 /* String+URLCoding.swift in Sources */,
 				04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */,
 				04F2AA79239EDAE000126CD1 /* AppDimensions.swift in Sources */,
 				04F2AA7A239EDAE000126CD1 /* UIColor+AppColors.swift in Sources */,
@@ -456,6 +467,7 @@
 				04F2AA83239EE2F100126CD1 /* UIColor+Intensity.swift in Sources */,
 				04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */,
 				04F2AA7F239EDDE400126CD1 /* TextView.swift in Sources */,
+				0473BA0F23A16DFA0020FC93 /* ImageSource.swift in Sources */,
 				04AC540F23A0020400111C91 /* Polygon.swift in Sources */,
 				04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */,
 				0487D2F0239C519600515520 /* String+SHA256.swift in Sources */,

@@ -34,55 +34,12 @@
           "gravity": "center",
           "items": [
             {
-              "viewlet": "levelCanvas",
+              "viewlet": "image",
               "width": "stretchToParent",
               "height": "stretchToParent",
-              "backgroundColor": "$white",
-              "slices": [
-                0.16, 0, 0, 0.12
-              ]
-            },
-            {
-              "viewlet": "levelCanvas",
-              "width": "stretchToParent",
-              "height": "stretchToParent",
-              "backgroundColor": "$white",
-              "slices": [
-                0, 0.8, 1, 0.7,
-                0.45, 0, 0.5, 1
-              ]
-            },
-            {
-              "viewlet": "levelCanvas",
-              "width": "stretchToParent",
-              "height": "stretchToParent",
-              "backgroundColor": "$white",
-              "slices": [
-                0, 0.8, 1, 0.7,
-                0.525, 1, 0.475, 0
-              ]
-            },
-            {
-              "viewlet": "levelCanvas",
-              "width": "stretchToParent",
-              "height": "stretchToParent",
-              "backgroundColor": "$white",
-              "slices": [
-                0, 0.15, 0.2, 0,
-                1, 0.675, 0, 0.775,
-                0, 0, 1, 1
-              ]
-            },
-            {
-              "viewlet": "levelCanvas",
-              "width": "stretchToParent",
-              "height": "stretchToParent",
-              "backgroundColor": "$white",
-              "slices": [
-                0, 0.15, 0.2, 0,
-                1, 0.675, 0, 0.775,
-                1.035, 1, 0.035, 0
-              ]
+              "backgroundColor": "#fff",
+              "source": "app://background_level_starry_night",
+              "stretchType": "aspectCrop"
             }
           ]
         }

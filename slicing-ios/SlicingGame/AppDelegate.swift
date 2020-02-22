@@ -63,6 +63,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.dimensionLookup = AppDimensions.AppDimensionLookup()
 
         // Basic views
+        Inflators.viewlet.register(name: "image", inflatable: ImageView.viewlet())
         Inflators.viewlet.register(name: "text", inflatable: TextView.viewlet())
         Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
 
