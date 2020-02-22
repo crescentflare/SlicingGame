@@ -12,6 +12,7 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     // MARK: Members
     // --
     
+    private var modules = [PageModule]()
     private let pageView = PageContainerView()
     private let pageJson: String
     private var pageLoader: PageLoader?
@@ -33,7 +34,16 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
         fatalError("init(coder:) has not been implemented")
     }
 
+    deinit {
+        for module in modules {
+            if isResumed {
+                module.didPause()
+            }
+            module.willDestroy()
+        }
+    }
 
+    
     // --
     // MARK: Lifecycle
     // --
@@ -68,13 +78,24 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
             }
         }
 
+        // Resume modules
+        for module in modules {
+            module.didResume()
+        }
+
         // Check for page updates
         checkPageLoad()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        // Pause modules
         super.viewWillDisappear(animated)
         isResumed = false
+        for module in modules {
+            module.didPause()
+        }
+
+        // Abort page loading
         stopPageLoad()
     }
     
@@ -84,14 +105,12 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     // --
 
     func observedEvent(_ event: AppEvent, sender: Any?) {
-        if event.type == "alert" && event.name == "simple" {
-            let title = (event.parameters["title"] as? String) ?? "Alert"
-            let text = (event.parameters["text"] as? String) ?? "No text specified"
-            let actionText = (event.parameters["actionText"] as? String) ?? "OK"
-            let alertController = UIAlertController(title: title, message: text, preferredStyle: .alert)
-            let okAction = UIAlertAction(title: actionText, style: .default)
-            alertController.addAction(okAction)
-            present(alertController, animated: true, completion: nil)
+        for module in modules {
+            if module.handleEventTypes.contains(event.type) {
+                if module.handleEvent(event, sender: sender) {
+                    break
+                }
+            }
         }
     }
     
@@ -162,6 +181,7 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
             ]
         }
         ViewletUtil.assertInflateOn(view: pageView, attributes: inflateLayout)
+        inflateModules(moduleItems: page.modules)
         pageView.eventObserver = self
         currentPageHash = page.hash
         setNeedsStatusBarAppearanceUpdate()
@@ -170,6 +190,37 @@ class PageViewController: UIViewController, PageLoaderDelegate, AppEventObserver
     func didReceivePageLoadingEvent(event: PageLoaderEvent) {
         if event == .loadingFailed {
             pageView.backgroundColor = .red
+        }
+    }
+
+    private func inflateModules(moduleItems: Any?) {
+        // Inflate
+        let result = Inflators.module.inflateNestedItemList(currentItems: modules, newItems: moduleItems, enableRecycling: true, parent: self, binder: nil)
+        modules.removeAll()
+        for item in result.items {
+            if let module = item as? PageModule {
+                modules.append(module)
+            }
+        }
+        
+        // Destroy removed modules
+        for removedItem in result.removedItems {
+            if let removedModule = removedItem as? PageModule {
+                if isResumed {
+                    removedModule.didPause()
+                }
+                removedModule.willDestroy()
+            }
+        }
+        
+        // Update new modules if needed
+        for index in result.items.indices {
+            if let module = result.items[index] as? PageModule, !result.isRecycled(index: index) {
+                module.didCreate(viewController: self)
+                if isResumed {
+                    module.didResume()
+                }
+            }
         }
     }
 

@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         #endif
 
         // Configure framework
+        registerModules()
         registerViewlets()
         
         // Launch view controller
@@ -53,6 +54,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: Inflatable registration
     // --
     
+    func registerModules() {
+        // Enable platform specific attributes
+        Inflators.viewlet.setMergeSubAttributes(["ios"])
+        Inflators.viewlet.setExcludeAttributes(["android"])
+
+        // Basic modules
+        Inflators.module.register(name: "alert", inflatable: AlertModule.inflatable())
+    }
+
     func registerViewlets() {
         // Enable platform specific attributes
         Inflators.viewlet.setMergeSubAttributes(["ios"])
