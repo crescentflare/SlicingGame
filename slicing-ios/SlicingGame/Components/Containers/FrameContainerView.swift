@@ -7,7 +7,7 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class FrameContainerView: UniFrameContainer {
+class FrameContainerView: UniFrameContainer, AppEventObserver {
     
     // --
     // MARK: Viewlet integration
@@ -30,6 +30,11 @@ class FrameContainerView: UniFrameContainer {
                 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: frameContainer, attributes: attributes)
+
+                // Chain event observer
+                if let eventObserver = parent as? AppEventObserver {
+                    frameContainer.eventObserver = eventObserver
+                }
                 return true
             }
             return false
@@ -60,4 +65,20 @@ class FrameContainerView: UniFrameContainer {
         // No implementation
     }
     
+
+    // --
+    // MARK: Configurable values
+    // --
+
+    weak var eventObserver: AppEventObserver?
+
+
+    // --
+    // MARK: Interaction
+    // --
+    
+    func observedEvent(_ event: AppEvent, sender: Any?) {
+        eventObserver?.observedEvent(event, sender: sender)
+    }
+
 }

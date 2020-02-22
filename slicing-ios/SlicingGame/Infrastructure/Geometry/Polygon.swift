@@ -142,6 +142,16 @@ class Polygon {
         return false
     }
     
+    func calculateSurfaceArea() -> CGFloat {
+        var first: CGFloat = 0
+        var second: CGFloat = 0
+        for index in points.indices {
+            first += points[index].x * points[(index + 1) % points.count].y
+            second += points[index].y * points[(index + 1) % points.count].x
+        }
+        return (first - second) / 2
+    }
+
     
     // --
     // MARK: Helper

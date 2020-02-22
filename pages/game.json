@@ -28,6 +28,14 @@
           "backgroundColor": "#ddd",
           "levelWidth": 12,
           "levelHeight": 16,
+          "requireClearRate": 75,
+          "clearEvent": {
+            "type": "alert",
+            "name": "simple",
+            "title": "Congratulations!",
+            "text": "You've reached the clear target to reveal the background",
+            "actionText": "OK"
+          },
           "backgroundImage": "app://background_level_starry_night"
         }
       ]

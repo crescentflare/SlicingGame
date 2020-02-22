@@ -15,6 +15,8 @@ class LevelView: FrameContainerView {
     
     private var backgroundView = ImageView()
     private var canvasView = LevelCanvasView()
+    private var progressView = TextView()
+    private let progressViewMargin = AppDimensions.text + 8
 
 
     // --
@@ -39,6 +41,9 @@ class LevelView: FrameContainerView {
                 
                 // Apply background
                 level.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
+                
+                // Apply clear goal
+                level.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
                 
                 // Apply slices
                 let sliceArray = convUtil.asFloatArray(value: attributes["slices"])
@@ -81,14 +86,24 @@ class LevelView: FrameContainerView {
         // Add background
         backgroundView.layoutProperties.width = UniLayoutProperties.stretchToParent
         backgroundView.layoutProperties.height = UniLayoutProperties.stretchToParent
+        backgroundView.layoutProperties.margin.bottom = progressViewMargin
         backgroundView.internalImageView.contentMode = .scaleAspectFill
         addSubview(backgroundView)
 
         // Add level canvas
         canvasView.layoutProperties.width = UniLayoutProperties.stretchToParent
         canvasView.layoutProperties.height = UniLayoutProperties.stretchToParent
+        canvasView.layoutProperties.margin.bottom = progressViewMargin
         canvasView.backgroundColor = .white
         addSubview(canvasView)
+
+        // Add progress view
+        progressView.layoutProperties.width = UniLayoutProperties.stretchToParent
+        progressView.layoutProperties.verticalGravity = 1
+        progressView.numberOfLines = 1
+        progressView.textAlignment = .center
+        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+        addSubview(progressView)
     }
     
     
@@ -97,11 +112,35 @@ class LevelView: FrameContainerView {
     // --
     
     func slice(vector: Vector) {
-        canvasView.slice(vector: vector)
+        let normalClearRate = canvasView.clearRateForSlice(vector: vector)
+        let reversedClearRate = canvasView.clearRateForSlice(vector: vector.reversed())
+        if reversedClearRate < normalClearRate {
+            canvasView.slice(vector: vector.reversed())
+        } else {
+            canvasView.slice(vector: vector)
+        }
+        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+        canvasView.visibility = cleared() ? .invisible : .visible
     }
 
     func resetSlices() {
         canvasView.resetSlices()
+        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+        canvasView.visibility = cleared() ? .invisible : .visible
+    }
+    
+    func transformedSliceVector(vector: Vector) -> Vector {
+        let translatedVector = vector.translated(translateX: -frame.origin.x, translateY: -frame.origin.y)
+        return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+    }
+    
+
+    // --
+    // MARK: Obtain state
+    // --
+    
+    func cleared() -> Bool {
+        return Int(canvasView.clearRate()) >= requireClearRate
     }
     
 
@@ -127,6 +166,13 @@ class LevelView: FrameContainerView {
         }
         get { return backgroundView.source }
     }
+    
+    var requireClearRate: Int = 100 {
+        didSet {
+            progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+            canvasView.visibility = cleared() ? .invisible : .visible
+        }
+    }
 
     
     // --
@@ -134,7 +180,9 @@ class LevelView: FrameContainerView {
     // --
     
     override func measuredSize(sizeSpec: CGSize, widthSpec: UniMeasureSpec, heightSpec: UniMeasureSpec) -> CGSize {
-        return canvasView.measuredSize(sizeSpec: sizeSpec, widthSpec: widthSpec, heightSpec: heightSpec)
+        var result = canvasView.measuredSize(sizeSpec: sizeSpec, widthSpec: widthSpec, heightSpec: heightSpec)
+        result.height += progressViewMargin
+        return result
     }
 
 }

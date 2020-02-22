@@ -19,6 +19,8 @@ import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
 import com.crescentflare.slicinggame.components.game.LevelView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.events.AppEvent
+import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 
@@ -48,6 +50,10 @@ open class GameContainerView : FrameContainerView {
                     // Apply background
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
+                    // Apply clear goal
+                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
+                    obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
+
                     // Apply slices
                     val sliceList = mapUtil.optionalFloatList(attributes, "slices")
                     obj.resetSlices()
@@ -59,6 +65,11 @@ open class GameContainerView : FrameContainerView {
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
+
+                    // Chain event observer
+                    if (parent is AppEventObserver) {
+                        obj.eventObserver = parent
+                    }
                     return true
                 }
                 return false
@@ -125,6 +136,11 @@ open class GameContainerView : FrameContainerView {
 
     fun slice(vector: Vector) {
         levelView.slice(vector)
+        if (levelView.cleared()) {
+            clearEvent?.let {
+                eventObserver?.observedEvent(it, this)
+            }
+        }
     }
 
     fun resetSlices() {
@@ -135,6 +151,8 @@ open class GameContainerView : FrameContainerView {
     // --
     // Configurable values
     // --
+
+    var clearEvent: AppEvent? = null
 
     var levelWidth: Float = 1f
         set(levelWidth) {
@@ -154,6 +172,12 @@ open class GameContainerView : FrameContainerView {
             levelView.backgroundImage = backgroundImage
         }
 
+    var requireClearRate: Int
+        get() = levelView.requireClearRate
+        set(requireClearRate) {
+            levelView.requireClearRate = requireClearRate
+        }
+
 
     // --
     // Interaction
@@ -164,7 +188,7 @@ open class GameContainerView : FrameContainerView {
         if (event != null) {
             when (event.action) {
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
-                    if (dragStart == null && event.pointerCount > 0) {
+                    if (!levelView.cleared() && dragStart == null && event.pointerCount > 0) {
                         dragStart = PointF(event.getX(0), event.getY(0))
                         dragEnd = dragStart
                         dragPointerId = event.getPointerId(0)
@@ -208,8 +232,7 @@ open class GameContainerView : FrameContainerView {
                                 if (vectorStart != null && vectorEnd != null && levelView.width > 0 && levelView.height > 0) {
                                     val viewVector = Vector(vectorStart, vectorEnd)
                                     if (viewVector.distance() >= minimumDragDistance) {
-                                        val levelVector = viewVector.translated(-levelView.left.toFloat(), -levelView.top.toFloat())
-                                        val sliceVector = levelVector.scaled(levelWidth / levelView.width.toFloat(), levelHeight / levelView.height.toFloat())
+                                        val sliceVector = levelView.transformedSliceVector(viewVector)
                                         if (sliceVector.isValid()) {
                                             slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
                                         }
