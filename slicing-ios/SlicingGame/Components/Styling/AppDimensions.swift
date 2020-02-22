@@ -16,8 +16,15 @@ class AppDimensions {
         
         func getDimension(refId: String) -> CGFloat? {
             let dimensionTable: [String: CGFloat] = [
+                "pagePadding": pagePadding,
+
                 "text": text,
                 "titleText": titleText,
+                
+                "slicePreviewDot": slicePreviewDot,
+                "slicePreviewWidth": slicePreviewWidth,
+                "slicePreviewStretchedWidth": slicePreviewStretchedWidth,
+                "slicePreviewDash": slicePreviewDash,
                 
                 "portraitTitleBarHeight": portraitTitleBarHeight,
                 "landscapeTitleBarHeight": landscapeTitleBarHeight
@@ -29,6 +36,13 @@ class AppDimensions {
     
     
     // --
+    // MARK: Margins
+    // --
+    
+    class var pagePadding: CGFloat { get { return 8 }}
+
+
+    // --
     // MARK: Text
     // --
     
@@ -36,6 +50,16 @@ class AppDimensions {
     class var titleText: CGFloat { get { return 20 } }
     
     
+    // --
+    // MARK: Game
+    // --
+    
+    class var slicePreviewDot: CGFloat { get { return 10 } }
+    class var slicePreviewWidth: CGFloat { get { return 2 } }
+    class var slicePreviewStretchedWidth: CGFloat { get { return 1 } }
+    class var slicePreviewDash: CGFloat { get { return 8 } }
+
+
     // --
     // MARK: UIKit component sizes
     // --

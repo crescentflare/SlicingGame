@@ -12,9 +12,12 @@
         "text",
         "view",
         "frameContainer",
+        "gameContainer",
         "linearContainer",
         "pageContainer",
+        "level",
         "levelCanvas",
+        "levelSlicePreview",
         "gameTitleBar",
         "simpleBottomBar"
       ]
@@ -248,6 +251,38 @@
       "if": {
         "properties": {
           "viewlet": {
+            "const": "gameContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "levelWidth": {
+            "description": "The width of the level in pixel independent units",
+            "type": "number"
+          },
+          "levelHeight": {
+            "description": "The height of the level in pixel independent units",
+            "type": "number"
+          },
+          "backgroundImage": {
+            "description": "The image to reveal behind the level canvas",
+            "$ref": "#/definitions/imageSource"
+          },
+          "slices": {
+            "description": "A flattened list of slice vector coordinates",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
             "const": "linearContainer"
           }
         }
@@ -310,6 +345,38 @@
       "if": {
         "properties": {
           "viewlet": {
+            "const": "level"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "levelWidth": {
+            "description": "The width of the level in pixel independent units",
+            "type": "number"
+          },
+          "levelHeight": {
+            "description": "The height of the level in pixel independent units",
+            "type": "number"
+          },
+          "backgroundImage": {
+            "description": "The image to reveal behind the level canvas",
+            "$ref": "#/definitions/imageSource"
+          },
+          "slices": {
+            "description": "A flattened list of slice vector coordinates",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
             "const": "levelCanvas"
           }
         }
@@ -330,6 +397,41 @@
             "items": {
               "type": "number"
             }
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "levelSlicePreview"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "start": {
+            "description": "A list with an x and y coordinate starting the slice",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/dimension"
+            }
+          },
+          "end": {
+            "description": "A list with an x and y coordinate ending the slice",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/dimension"
+            }
+          },
+          "color": {
+            "description": "The color of the slice preview",
+            "$ref": "#/definitions/color"
+          },
+          "stretchedColor": {
+            "description": "The color of the stretched slice extending to the component edges",
+            "$ref": "#/definitions/color"
           }
         }
       }
