@@ -1,9 +1,10 @@
 //
 //  PageLoader.swift
-//  Page storage: handles loading of pages
+//  Page storage: handles loading of pages from several sources
 //
 
 import Foundation
+import Alamofire
 
 class PageLoader {
     
@@ -19,6 +20,8 @@ class PageLoader {
     // --
     
     private let location: String
+    private let entry: String
+    private let loadInternal: Bool
     private var loading = false
 
 
@@ -26,8 +29,10 @@ class PageLoader {
     // MARK: Initialization
     // --
     
-    init(location: String) {
-        self.location = location
+    init(location: String, serverPrefix: String = "") {
+        self.location = serverPrefix + location
+        loadInternal = !self.location.contains("://")
+        entry = location
     }
     
 
@@ -36,15 +41,38 @@ class PageLoader {
     // --
     
     func load(completion: @escaping (_ page: Page?, _ error: Error?) -> Void) {
-        if let page = PageCache.shared.getEntry(cacheKey: location) {
+        if let page = PageCache.shared.getEntry(cacheKey: entry) {
             completion(page, nil)
-        } else {
+        } else if loadInternal {
             loadInternal(completion: { page, error in
                 if let page = page {
-                    PageCache.shared.storeEntry(cacheKey: self.location, page: page)
+                    PageCache.shared.storeEntry(cacheKey: self.entry, page: page)
                 }
                 completion(page, error)
             })
+        } else {
+            loadOnline(completion: { page, error in
+                if let page = page {
+                    PageCache.shared.storeEntry(cacheKey: self.entry, page: page)
+                }
+                completion(page, error)
+            })
+        }
+    }
+    
+    private func loadOnline(completion: @escaping (_ page: Page?, _ error: Error?) -> Void) {
+        if !loadInternal {
+            loading = true
+            Alamofire.request(location).responseString { response in
+                self.loading = false
+                if let string = response.value {
+                    completion(Page(jsonString: string), nil)
+                } else {
+                    completion(nil, response.error)
+                }
+            }
+        } else {
+            completion(nil, NSError(domain: "Loading mismatch", code: -1))
         }
     }
     
@@ -65,9 +93,11 @@ class PageLoader {
     }
     
     func loadInternalSync() -> Page? {
-        if let path = Bundle.main.path(forResource: "Pages/" + fileName(file: location), ofType: fileExtension(file: location)) {
-            if let jsonData = try? NSData(contentsOfFile: path, options: .mappedIfSafe) as Data {
-                return Page(jsonData: jsonData)
+        if loadInternal {
+            if let path = Bundle.main.path(forResource: "Pages/" + fileName(file: location), ofType: fileExtension(file: location)) {
+                if let jsonData = try? NSData(contentsOfFile: path, options: .mappedIfSafe) as Data {
+                    return Page(jsonData: jsonData)
+                }
             }
         }
         return nil

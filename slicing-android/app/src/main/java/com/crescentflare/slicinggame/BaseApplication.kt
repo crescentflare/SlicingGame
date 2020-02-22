@@ -1,22 +1,41 @@
 package com.crescentflare.slicinggame
 
 import android.app.Application
+import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 
 
 /**
  * The main application singleton
  */
-class BaseApplication : Application() {
+class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
     // --
     // Initialization
     // --
 
     override fun onCreate() {
+        // Enable app config utility for non-release builds
         super.onCreate()
+        if (BuildConfig.BUILD_TYPE != "release") {
+            AppConfigStorage.instance.init(this, CustomAppConfigManager.instance)
+            AppConfigStorage.instance.addChangedConfigListener(this)
+            onChangedConfig()
+        }
+
+        // Configure framework
         registerViewlets()
+    }
+
+
+    // --
+    // App config integration
+    // --
+
+    override fun onChangedConfig() {
+        // No implementation needed (for now)
     }
 
 

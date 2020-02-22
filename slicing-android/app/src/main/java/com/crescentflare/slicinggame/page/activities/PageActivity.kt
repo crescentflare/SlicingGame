@@ -6,11 +6,16 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
+import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
+import com.crescentflare.slicinggame.page.storage.Page
+import com.crescentflare.slicinggame.page.storage.PageCache
 import com.crescentflare.slicinggame.page.storage.PageLoader
 
 /**
- * Activity: a generic activity
+ * Activity: a generic activity for loading pages
  */
 class PageActivity : AppCompatActivity() {
 
@@ -33,25 +38,127 @@ class PageActivity : AppCompatActivity() {
 
 
     // --
+    // Members
+    // --
+
+    private val activityView by lazy { View(this) }
+    private var pageJson = ""
+    private var pageLoader: PageLoader? = null
+    private var pageLoadingServer = ""
+    private var currentPageHash = "notset"
+    private var isResumed = false
+
+
+    // --
     // Initialization
     // --
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Set initial content view
         super.onCreate(savedInstanceState)
-        val view = View(this)
-        view.setBackgroundColor(Color.GREEN)
-        setContentView(view)
+        activityView.setBackgroundColor(Color.GREEN)
+        setContentView(activityView)
 
-        // Load page
-        val pageLoader = PageLoader(this, intent.getStringExtra(pageParam) ?: defaultPage)
-        pageLoader.load { page, _ ->
-            page?.layout?.let { layout ->
-                ViewletUtil.assertInflateOn(view, layout)
-            }?:run {
-                view.setBackgroundColor(Color.RED)
+        // Add long click listener to open app config menu
+        activityView.setOnLongClickListener {
+            ManageAppConfigActivity.startWithResult(this, 0)
+            true
+        }
+
+        // Determine page to load
+        pageJson = intent.getStringExtra(pageParam) ?: defaultPage
+
+        // Pre-load page if possible
+        val cachedPage = PageCache.getEntry(pageJson)
+        if (cachedPage != null) {
+            onPageUpdated(cachedPage)
+        } else if ((CustomAppConfigManager.currentConfig().devServerUrl.isNotEmpty() && CustomAppConfigManager.currentConfig().pageLoadingMode != AppConfigPageLoadingMode.Local) || pageJson.contains("://")) {
+            // Do nothing, wait until onResume starts the online loading process
+        } else {
+            val localPageLoader = PageLoader(this, pageJson)
+            val page = localPageLoader.loadInternalSync()
+            if (page != null) {
+                PageCache.storeEntry(pageJson, page)
+                onPageUpdated(page)
             }
         }
+    }
+
+
+    // --
+    // Lifecycle
+    // --
+
+    override fun onResume() {
+        // Update the page if it was changed in the background
+        super.onResume()
+        isResumed = true
+        val cachedPage = PageCache.getEntry(pageJson)
+        if (cachedPage != null) {
+            if (cachedPage.hash != currentPageHash) {
+                onPageUpdated(cachedPage)
+            }
+        }
+
+        // Check for page updates
+        checkPageLoad()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        isResumed = false
+    }
+
+
+    // --
+    // Page loader integration
+    // --
+
+    private fun checkPageLoad() {
+        // Refresh page loader instance when the loading mode has changed (which will also drop the cache entry)
+        var dropCache = false
+        var needsLoad = false
+        if (!pageJson.contains("://")) {
+            val currentPageLoadingServer = pageLoadingServer
+            if (CustomAppConfigManager.currentConfig().devServerUrl.isNotEmpty() && CustomAppConfigManager.currentConfig().pageLoadingMode != AppConfigPageLoadingMode.Local) {
+                pageLoadingServer = CustomAppConfigManager.currentConfig().devServerUrl
+                if (!pageLoadingServer.startsWith("http")) {
+                    pageLoadingServer = "http://$pageLoadingServer"
+                }
+                pageLoadingServer = "$pageLoadingServer/pages/"
+                needsLoad = true
+            } else {
+                pageLoadingServer = ""
+            }
+            dropCache = pageLoadingServer != currentPageLoadingServer && pageLoader != null
+            if (dropCache) {
+                PageCache.removeEntry(pageJson)
+            }
+        } else {
+            needsLoad = true
+        }
+        if (pageLoader == null || dropCache) {
+            pageLoader = PageLoader(this, pageJson, pageLoadingServer)
+            needsLoad = true
+        }
+
+        // Load page if needed
+        if (needsLoad) {
+            pageLoader?.load { page, _ ->
+                page?.let {
+                    if (page.hash != currentPageHash) {
+                        ViewletUtil.assertInflateOn(activityView, page.layout)
+                    }
+                }?:run {
+                    activityView.setBackgroundColor(Color.RED)
+                }
+            }
+        }
+    }
+
+    private fun onPageUpdated(page: Page) {
+        ViewletUtil.assertInflateOn(activityView, page.layout)
+        currentPageHash = page.hash
     }
 
 }
