@@ -407,6 +407,27 @@
       "if": {
         "properties": {
           "viewlet": {
+            "const": "spriteContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gridWidth": {
+            "description": "The width of the coordinate system for placing sprites, they are pixel independent",
+            "type": "number"
+          },
+          "gridHeight": {
+            "description": "The height of the coordinate system for placing sprites, they are pixel independent",
+            "type": "number"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
             "const": "level"
           }
         }

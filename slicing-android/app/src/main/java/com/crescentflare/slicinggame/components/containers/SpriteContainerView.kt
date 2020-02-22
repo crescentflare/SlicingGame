@@ -31,6 +31,11 @@ open class SpriteContainerView : FrameContainerView {
 
             override fun update(mapUtil: InflatorMapUtil, obj: Any, attributes: Map<String, Any>, parent: Any?, binder: InflatorBinder?): Boolean {
                 if (obj is SpriteContainerView) {
+                    // Apply grid size
+                    obj.gridWidth = mapUtil.optionalFloat(attributes, "gridWidth", 1f)
+                    obj.gridHeight = mapUtil.optionalFloat(attributes, "gridHeight", 1f)
+
+                    // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
                     return true
                 }
@@ -77,6 +82,29 @@ open class SpriteContainerView : FrameContainerView {
 
 
     // --
+    // Configurable values
+    // --
+
+    var gridWidth: Float = 1f
+        set(gridWidth) {
+            val changed = field != gridWidth
+            field = gridWidth
+            if (changed) {
+                requestLayout()
+            }
+        }
+
+    var gridHeight: Float = 1f
+        set(gridHeight) {
+            val changed = field != gridHeight
+            field = gridHeight
+            if (changed) {
+                requestLayout()
+            }
+        }
+
+
+    // --
     // Drawing
     // --
 
@@ -84,6 +112,33 @@ open class SpriteContainerView : FrameContainerView {
         canvas?.let {
             it.clipRect(0, 0, width, height)
             sprite.draw(it, paint)
+        }
+    }
+
+
+    // --
+    // Custom layout
+    // --
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+        if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) {
+            if (width * gridHeight / gridWidth <= height) {
+                setMeasuredDimension(width, (width * gridHeight / gridWidth).toInt())
+            } else {
+                setMeasuredDimension((height * gridWidth / gridHeight).toInt(), height)
+            }
+        } else if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension(width, height)
+        } else if (widthMode == MeasureSpec.AT_MOST || widthMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension(width, (width * gridHeight / gridWidth).toInt())
+        } else if (heightMode == MeasureSpec.AT_MOST || heightMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension((height * gridWidth / gridHeight).toInt(), height)
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         }
     }
 

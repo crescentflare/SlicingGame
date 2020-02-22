@@ -30,8 +30,9 @@
       "contentItems": [
         {
           "viewlet": "spriteContainer",
-          "width": "90vw",
-          "height": "90vw",
+          "gridWidth": 12,
+          "gridHeight": 16,
+          "margin": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
           "gravity": "center",
           "backgroundColor": "#ddd"
         }

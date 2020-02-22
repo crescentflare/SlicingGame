@@ -32,6 +32,11 @@ class SpriteContainerView: FrameContainerView {
         
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let spriteContainer = object as? SpriteContainerView {
+                // Apply canvas size
+                spriteContainer.gridWidth = convUtil.asFloat(value: attributes["gridWidth"]) ?? 1
+                spriteContainer.gridHeight = convUtil.asFloat(value: attributes["gridHeight"]) ?? 1
+
+                // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: spriteContainer, attributes: attributes)
                 return true
             }
@@ -65,6 +70,27 @@ class SpriteContainerView: FrameContainerView {
     
     
     // --
+    // MARK: Configurable values
+    // --
+    
+    var gridWidth: Float = 1 {
+        didSet {
+            if gridWidth != oldValue {
+                UniLayout.setNeedsLayout(view: self)
+            }
+        }
+    }
+
+    var gridHeight: Float = 1 {
+        didSet {
+            if gridHeight != oldValue {
+                UniLayout.setNeedsLayout(view: self)
+            }
+        }
+    }
+
+
+    // --
     // MARK: Drawing
     // --
     
@@ -72,6 +98,27 @@ class SpriteContainerView: FrameContainerView {
         if let context = UIGraphicsGetCurrentContext() {
             sprite.draw(context: context)
         }
+    }
+
+    
+    // --
+    // MARK: Custom layout
+    // --
+    
+    override func measuredSize(sizeSpec: CGSize, widthSpec: UniMeasureSpec, heightSpec: UniMeasureSpec) -> CGSize {
+        if widthSpec == .limitSize && heightSpec == .limitSize {
+            if sizeSpec.width * CGFloat(gridHeight) / CGFloat(gridWidth) <= sizeSpec.height {
+                return CGSize(width: sizeSpec.width, height: sizeSpec.width * CGFloat(gridHeight) / CGFloat(gridWidth))
+            }
+            return CGSize(width: sizeSpec.height * CGFloat(gridWidth) / CGFloat(gridHeight), height: sizeSpec.height)
+        } else if widthSpec == .exactSize && heightSpec == .exactSize {
+            return CGSize(width: sizeSpec.width, height: sizeSpec.height)
+        } else if widthSpec == .limitSize || widthSpec == .exactSize {
+            return CGSize(width: sizeSpec.width, height: sizeSpec.width * CGFloat(gridHeight) / CGFloat(gridWidth))
+        } else if heightSpec == .limitSize || heightSpec == .exactSize {
+            return CGSize(width: sizeSpec.height * CGFloat(gridWidth) / CGFloat(gridHeight), height: sizeSpec.height)
+        }
+        return super.measuredSize(sizeSpec: sizeSpec, widthSpec: widthSpec, heightSpec: heightSpec)
     }
 
 }
