@@ -132,7 +132,13 @@ open class LevelView : FrameContainerView {
     // --
 
     fun slice(vector: Vector) {
-        canvasView.slice(vector)
+        val normalClearRate = canvasView.clearRateForSlice(vector)
+        val reversedClearRate = canvasView.clearRateForSlice(vector.reversed())
+        if (reversedClearRate < normalClearRate) {
+            canvasView.slice(vector.reversed())
+        } else {
+            canvasView.slice(vector)
+        }
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
     }
 
