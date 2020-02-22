@@ -5,7 +5,7 @@
 
 import UIKit
 
-class PageViewController: UIViewController {
+class PageViewController: UIViewController, PageLoaderDelegate {
 
     // --
     // MARK: Members
@@ -73,6 +73,7 @@ class PageViewController: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         isResumed = false
+        stopPageLoad()
     }
     
     
@@ -83,7 +84,6 @@ class PageViewController: UIViewController {
     private func checkPageLoad() {
         // Refresh page loader instance when the loading mode has changed (which will also drop the cache entry)
         var dropCache = false
-        var needsLoad = false
         if !pageJson.contains("://") {
             let currentPageLoadingServer = pageLoadingServer
             if !CustomAppConfigManager.currentConfig().devServerUrl.isEmpty && CustomAppConfigManager.currentConfig().pageLoadingMode != .local {
@@ -92,7 +92,6 @@ class PageViewController: UIViewController {
                     pageLoadingServer = "http://\(pageLoadingServer)"
                 }
                 pageLoadingServer = "\(pageLoadingServer)/pages/"
-                needsLoad = true
             } else {
                 pageLoadingServer = ""
             }
@@ -100,31 +99,32 @@ class PageViewController: UIViewController {
             if dropCache {
                 PageCache.shared.removeEntry(cacheKey: pageJson)
             }
-        } else {
-            needsLoad = true
         }
         if pageLoader == nil || dropCache {
             pageLoader = PageLoader(location: pageJson, serverPrefix: pageLoadingServer)
-            needsLoad = true
         }
 
-        // Load page if needed
-        if needsLoad {
-            pageLoader?.load(completion: { page, _ in
-                if let page = page {
-                    if page.hash != self.currentPageHash {
-                        self.didUpdatePage(page: page)
-                    }
-                } else {
-                    self.view.backgroundColor = .red
-                }
-            })
-        }
+        // Start the page loader (which may load if needed)
+        pageLoader?.startLoading(completion: self, hotReload: CustomAppConfigManager.currentConfig().pageLoadingMode == .hotReloadServer)
+    }
+    
+    private func stopPageLoad() {
+        pageLoader?.stopLoading()
     }
     
     func didUpdatePage(page: Page) {
-        ViewletUtil.assertInflateOn(view: self.view, attributes: page.layout)
+        if Inflators.viewlet.findInflatableNameInAttributes(page.layout ?? [:]) == "view" {
+            ViewletUtil.assertInflateOn(view: self.view, attributes: page.layout)
+        } else {
+            view.backgroundColor = .red
+        }
         currentPageHash = page.hash
+    }
+    
+    func didReceivePageLoadingEvent(event: PageLoaderEvent) {
+        if event == .loadingFailed {
+            view.backgroundColor = .red
+        }
     }
 
 }

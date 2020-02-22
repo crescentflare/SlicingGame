@@ -6,7 +6,8 @@ package com.crescentflare.slicinggame.infrastructure.appconfig
 enum class AppConfigPageLoadingMode(val value: String) {
 
     Local("local"),
-    Server("server");
+    Server("server"),
+    HotReloadServer("hotReloadServer");
 
     companion object {
 
