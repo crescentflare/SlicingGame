@@ -8,17 +8,47 @@
     },
     {
       "refId": "content",
-      "viewlet": "frameContainer",
+      "viewlet": "linearContainer",
+      "orientation": "horizontal",
       "width": "stretchToParent",
       "items": [
         {
+          "refId": "menuIconContainer",
+          "viewlet": "frameContainer",
+          "height": "stretchToParent",
+          "visibility": "hidden",
+          "items": [
+            {
+              "refId": "menuIcon",
+              "viewlet": "imageButton",
+              "width": "stretchToParent",
+              "height": "stretchToParent"
+            }
+          ]
+        },
+        {
           "refId": "title",
           "viewlet": "text",
+          "weight": 1,
           "paddingLeft": 16,
           "paddingRight": 16,
           "gravity": "centerVertical",
           "maxLines": 1,
           "textSize": "$titleText"
+        },
+        {
+          "refId": "actionIconContainer",
+          "viewlet": "frameContainer",
+          "height": "stretchToParent",
+          "visibility": "hidden",
+          "items": [
+            {
+              "refId": "actionIcon",
+              "viewlet": "imageButton",
+              "width": "stretchToParent",
+              "height": "stretchToParent"
+            }
+          ]
         }
       ]
     },
