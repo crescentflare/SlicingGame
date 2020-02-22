@@ -7,6 +7,7 @@ import com.crescentflare.jsoninflator.JsonInflator
  */
 object Inflators {
 
+    val module = JsonInflator("module")
     val viewlet = JsonInflator("viewlet", "viewletStyle")
 
 }

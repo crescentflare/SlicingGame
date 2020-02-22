@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON app: module schema",
+  "description": "Defines the available modules for the JSON framework",
+  "type": "object",
+  "properties": {
+    "module": {
+      "description": "The module type, a small piece of controller logic for the page",
+      "type": "string",
+      "enum": [
+        "alert",
+        "game"
+      ]
+    }
+  },
+  "required": [
+    "module"
+  ],
+  "anyOf": [
+    {
+      "if": {
+        "properties": {
+          "module": {
+            "const": "game"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gameContainer": {
+            "description": "A reference to the game container component",
+            "type": "string"
+          }
+        }
+      }
+    }
+  ]
+}

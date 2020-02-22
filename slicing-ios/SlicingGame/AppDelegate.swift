@@ -29,6 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         #endif
 
         // Configure framework
+        registerModules()
         registerViewlets()
         
         // Launch view controller
@@ -53,6 +54,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: Inflatable registration
     // --
     
+    func registerModules() {
+        // Enable platform specific attributes
+        Inflators.viewlet.setMergeSubAttributes(["ios"])
+        Inflators.viewlet.setExcludeAttributes(["android"])
+
+        // Basic modules
+        Inflators.module.register(name: "alert", inflatable: AlertModule.inflatable())
+        
+        // Custom modules
+        Inflators.module.register(name: "game", inflatable: GameModule.inflatable())
+    }
+
     func registerViewlets() {
         // Enable platform specific attributes
         Inflators.viewlet.setMergeSubAttributes(["ios"])
@@ -64,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Basic views
         Inflators.viewlet.register(name: "image", inflatable: ImageView.viewlet())
+        Inflators.viewlet.register(name: "imageButton", inflatable: ImageButtonView.viewlet())
         Inflators.viewlet.register(name: "text", inflatable: TextView.viewlet())
         Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
 
