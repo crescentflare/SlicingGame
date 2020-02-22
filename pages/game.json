@@ -1,8 +1,23 @@
 {
   "dataSets": {
     "layout": {
-      "viewlet": "view",
-      "backgroundColor": "#fff"
+      "viewlet": "linearContainer",
+      "backgroundColor": "#fff",
+      "recycling": true,
+      "items": [
+        {
+          "viewlet": "view",
+          "width": "stretchToParent",
+          "weight": 1,
+          "backgroundColor": "#fff"
+        },
+        {
+          "viewlet": "view",
+          "width": "stretchToParent",
+          "weight": 2,
+          "backgroundColor": "#eee"
+        }
+      ]
     }
   }
 }

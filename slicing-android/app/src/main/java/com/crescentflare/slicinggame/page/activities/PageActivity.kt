@@ -4,9 +4,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
+import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
@@ -43,7 +43,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     // Members
     // --
 
-    private val activityView by lazy { View(this) }
+    private val activityView by lazy { FrameContainerView(this) }
     private var pageJson = ""
     private var pageLoader: PageLoader? = null
     private var pageLoadingServer = ""
@@ -149,11 +149,22 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     }
 
     override fun onPageUpdated(page: Page) {
-        if (Inflators.viewlet.findInflatableNameInAttributes(page.layout) == "view") {
-            ViewletUtil.assertInflateOn(activityView, page.layout)
-        } else {
-            activityView.setBackgroundColor(Color.RED)
+        var inflateLayout = (page.layout ?: emptyMap()).toMutableMap()
+        if (Inflators.viewlet.findInflatableNameInAttributes(page.layout) != "frameContainer") {
+            val wrappedLayout = (page.layout ?: emptyMap()).toMutableMap()
+            if (wrappedLayout["width"] == null) {
+                wrappedLayout["width"] = "stretchToParent"
+            }
+            if (wrappedLayout["height"] == null) {
+                wrappedLayout["height"] = "stretchToParent"
+            }
+            inflateLayout = mutableMapOf(
+                Pair("viewlet", "frameContainer"),
+                Pair("recycling", true),
+                Pair("items", listOf(wrappedLayout))
+            )
         }
+        ViewletUtil.assertInflateOn(activityView, inflateLayout)
         currentPageHash = page.hash
     }
 

@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import UniLayout
 
 class PageViewController: UIViewController, PageLoaderDelegate {
 
@@ -37,7 +38,7 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     // --
     
     override func loadView() {
-        view = UIView()
+        view = FrameContainerView()
         view.backgroundColor = .green
     }
     
@@ -113,11 +114,24 @@ class PageViewController: UIViewController, PageLoaderDelegate {
     }
     
     func didUpdatePage(page: Page) {
-        if Inflators.viewlet.findInflatableNameInAttributes(page.layout ?? [:]) == "view" {
-            ViewletUtil.assertInflateOn(view: self.view, attributes: page.layout)
-        } else {
-            view.backgroundColor = .red
+        var inflateLayout = page.layout ?? [:]
+        if Inflators.viewlet.findInflatableNameInAttributes(inflateLayout) != "frameContainer" {
+            var wrappedLayout = page.layout ?? [:]
+            if wrappedLayout["width"] == nil {
+                wrappedLayout["width"] = "stretchToParent"
+            }
+            if wrappedLayout["height"] == nil {
+                wrappedLayout["height"] = "stretchToParent"
+            }
+            inflateLayout = [
+                "viewlet": "frameContainer",
+                "recycling": true,
+                "items": [
+                    wrappedLayout
+                ]
+            ]
         }
+        ViewletUtil.assertInflateOn(view: self.view, attributes: inflateLayout)
         currentPageHash = page.hash
     }
     
