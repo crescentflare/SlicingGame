@@ -1,0 +1,36 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON app: viewlet component schema",
+  "description": "Defines the available viewlet components for the JSON framework",
+  "type": "object",
+  "properties": {
+    "viewlet": {
+      "description": "The viewlet type, a view component",
+      "type": "string",
+      "enum": [
+        "view"
+      ]
+    },
+    "backgroundColor": {
+      "description": "The color behind the content of the view",
+      "$ref": "#/definitions/color"
+    }
+  },
+  "required": [
+    "viewlet"
+  ],
+  "definitions": {
+    "color": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
+        },
+        {
+          "type": "string",
+          "pattern": "^([hH])\\d+\\s*(([sS])\\d+)?\\s*(([vV])\\d+)?\\s*(([lL])\\d+)?\\s*(([aA])\\d+)?\\s*$"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JSON app: page schema",
+  "description": "Defines the format of a page for the JSON framework",
+  "type": "object",
+  "properties": {
+    "metaData": {
+      "description": "An object defining a free-form format for additional properties on the page",
+      "type": "object"
+    },
+    "dataSets": {
+      "description": "A number of data sets in the page, including the layout",
+      "type": "object",
+      "properties": {
+        "layout": {
+          "description": "The layout of the page which is inflated on the view",
+          "$ref": "./schema_viewlet.json"
+        }
+      },
+      "required": [
+        "layout"
+      ]
+    }
+  },
+  "required": [
+    "dataSets"
+  ]
+}
