@@ -7,10 +7,7 @@ import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
 import com.crescentflare.slicinggame.components.basicviews.ImageButtonView
 import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
-import com.crescentflare.slicinggame.components.containers.FrameContainerView
-import com.crescentflare.slicinggame.components.containers.GameContainerView
-import com.crescentflare.slicinggame.components.containers.LinearContainerView
-import com.crescentflare.slicinggame.components.containers.PageContainerView
+import com.crescentflare.slicinggame.components.containers.*
 import com.crescentflare.slicinggame.components.game.LevelCanvasView
 import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
 import com.crescentflare.slicinggame.components.game.LevelView
@@ -94,6 +91,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
         Inflators.viewlet.register("gameContainer", GameContainerView.viewlet)
         Inflators.viewlet.register("linearContainer", LinearContainerView.viewlet)
         Inflators.viewlet.register("pageContainer", PageContainerView.viewlet)
+        Inflators.viewlet.register("spriteContainer", SpriteContainerView.viewlet)
 
         // Game
         Inflators.viewlet.register("level", LevelView.viewlet)
