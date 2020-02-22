@@ -3,6 +3,7 @@
 
     <!-- Application -->
     <application
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:label="@string/global_app_name"
         android:icon="@mipmap/ic_launcher"

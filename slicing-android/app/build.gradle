@@ -40,6 +40,16 @@ dependencies {
 
     // Kotlin and app compat
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.core:core-ktx:1.1.0'
+
+    // App framework
+    implementation 'com.crescentflare.jsoninflator:JsonInflatorLib:0.6.2'
+
+    // Other libraries
+    implementation 'com.google.code.gson:gson:2.8.5'
+
+    // Testing framework
+    implementation 'junit:junit:4.12'
 }
