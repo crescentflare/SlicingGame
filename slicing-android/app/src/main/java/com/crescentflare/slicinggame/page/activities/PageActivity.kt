@@ -2,14 +2,22 @@ package com.crescentflare.slicinggame.page.activities
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Build
 import android.os.Bundle
+import android.view.View
+import android.view.ViewGroup
+import android.view.ViewParent
+import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.crescentflare.dynamicappconfig.activity.ManageAppConfigActivity
-import com.crescentflare.slicinggame.components.containers.FrameContainerView
+import com.crescentflare.slicinggame.components.containers.PageContainerView
+import com.crescentflare.slicinggame.components.types.NavigationBarComponent
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.AppConfigPageLoadingMode
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
+import com.crescentflare.slicinggame.infrastructure.coreextensions.colorIntensity
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.storage.Page
 import com.crescentflare.slicinggame.page.storage.PageCache
@@ -43,7 +51,9 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     // Members
     // --
 
-    private val activityView by lazy { FrameContainerView(this) }
+    private val activityView by lazy { PageContainerView(this) }
+    private var statusBarColor = Color.BLACK
+    private var navigationBarColor = Color.BLACK
     private var pageJson = ""
     private var pageLoader: PageLoader? = null
     private var pageLoadingServer = ""
@@ -58,14 +68,25 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         // Set initial content view
         super.onCreate(savedInstanceState)
-        activityView.setBackgroundColor(Color.GREEN)
+        activityView.setBackgroundColor(Color.WHITE)
         setContentView(activityView)
 
-        // Add long click listener to open app config menu
-        activityView.setOnLongClickListener {
-            ManageAppConfigActivity.startWithResult(this, 0)
-            true
+        // Set up properties to allow transparency in the status and navigation bars
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Set flags to allow control over the colors, fetch defaults
+            window.setFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS, WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+            statusBarColor = window.statusBarColor
+            navigationBarColor = window.navigationBarColor
+
+            // Disable clipping in the window view stack, allow some views to draw under the system bars
+            var recursiveView: ViewParent? = activityView
+            while (recursiveView is ViewGroup) {
+                recursiveView.clipChildren = false
+                recursiveView.clipToPadding = false
+                recursiveView = recursiveView.parent
+            }
         }
+        updateSystemBars()
 
         // Determine page to load
         pageJson = intent.getStringExtra(pageParam) ?: defaultPage
@@ -114,6 +135,70 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
 
 
     // --
+    // System bar color and transparency customization
+    // --
+
+    private fun updateSystemBars() {
+        val titleBarColor = (activityView.titleBarView as? NavigationBarComponent)?.averageColor ?: viewBackgroundColor(activityView.titleBarView)
+        val bottomBarColor = (activityView.bottomBarView as? NavigationBarComponent)?.averageColor ?: viewBackgroundColor(activityView.bottomBarView)
+        val checkStatusBarColor = titleBarColor ?: viewBackgroundColor(activityView) ?: 0
+        val checkBottomBarColor = bottomBarColor ?: viewBackgroundColor(activityView) ?: 0
+        val lightStatusContent = checkStatusBarColor.colorIntensity() < 0.25
+        val lightBottomContent = checkBottomBarColor.colorIntensity() < 0.25
+        updateStatusBarColor(checkStatusBarColor and 0xffffff, lightStatusContent)
+        updateNavigationBarColor(checkBottomBarColor, lightBottomContent)
+    }
+
+    private fun updateStatusBarColor(color: Int, lightContent: Boolean) {
+        if (statusBarColor == color) {
+            return
+        }
+        statusBarColor = color
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val decor = window.decorView
+            window.statusBarColor = statusBarColor
+            if (!lightContent) {
+                decor.systemUiVisibility = decor.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            } else {
+                decor.systemUiVisibility -= decor.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            }
+        }
+    }
+
+    private fun updateNavigationBarColor(color: Int, lightContent: Boolean) {
+        if (navigationBarColor == color) {
+            return
+        }
+        navigationBarColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O || lightContent) color else 0xff000000.toInt()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            var setColor = navigationBarColor
+            val displayMetrics = Resources.getSystem().displayMetrics
+            val disableTransparency = displayMetrics.widthPixels > displayMetrics.heightPixels
+            if (disableTransparency) {
+                val baseColor = setColor and 0xffffff
+                setColor = (0xff000000 or baseColor.toLong()).toInt()
+            }
+            window.navigationBarColor = setColor
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val decor = window.decorView
+                if (!lightContent) {
+                    decor.systemUiVisibility = decor.systemUiVisibility or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                } else {
+                    decor.systemUiVisibility -= decor.systemUiVisibility and View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+                }
+            }
+        }
+    }
+
+    private fun viewBackgroundColor(view: View?): Int? {
+        (view?.background as? ColorDrawable)?.let {
+            return it.color
+        }
+        return null
+    }
+
+
+    // --
     // Page loader integration
     // --
 
@@ -150,7 +235,7 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
 
     override fun onPageUpdated(page: Page) {
         var inflateLayout = (page.layout ?: emptyMap()).toMutableMap()
-        if (Inflators.viewlet.findInflatableNameInAttributes(page.layout) != "frameContainer") {
+        if (Inflators.viewlet.findInflatableNameInAttributes(page.layout) != "pageContainer") {
             val wrappedLayout = (page.layout ?: emptyMap()).toMutableMap()
             if (wrappedLayout["width"] == null) {
                 wrappedLayout["width"] = "stretchToParent"
@@ -159,13 +244,15 @@ class PageActivity : AppCompatActivity(), PageLoaderListener {
                 wrappedLayout["height"] = "stretchToParent"
             }
             inflateLayout = mutableMapOf(
-                Pair("viewlet", "frameContainer"),
+                Pair("viewlet", "pageContainer"),
+                Pair("backgroundColor", "#fff"),
                 Pair("recycling", true),
-                Pair("items", listOf(wrappedLayout))
+                Pair("contentItems", listOf(wrappedLayout))
             )
         }
         ViewletUtil.assertInflateOn(activityView, inflateLayout)
         currentPageHash = page.hash
+        updateSystemBars()
     }
 
     override fun onPageLoadingEvent(event: PageLoader.Event) {

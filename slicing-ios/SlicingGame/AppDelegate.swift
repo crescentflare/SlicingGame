@@ -58,12 +58,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.setMergeSubAttributes(["ios"])
         Inflators.viewlet.setExcludeAttributes(["android"])
 
+        // Lookups
+        Inflators.viewlet.colorLookup = UIColor.AppColorLookup()
+        Inflators.viewlet.dimensionLookup = AppDimensions.AppDimensionLookup()
+
+        // Basic views
+        Inflators.viewlet.register(name: "text", inflatable: TextView.viewlet())
+        Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
+
         // Containers
         Inflators.viewlet.register(name: "frameContainer", inflatable: FrameContainerView.viewlet())
         Inflators.viewlet.register(name: "linearContainer", inflatable: LinearContainerView.viewlet())
-
-        // Simple viewlets
-        Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
+        Inflators.viewlet.register(name: "pageContainer", inflatable: PageContainerView.viewlet())
+        
+        // Navigation bars
+        Inflators.viewlet.register(name: "gameTitleBar", inflatable: GameTitleBarView.viewlet())
+        Inflators.viewlet.register(name: "simpleBottomBar", inflatable: SimpleBottomBarView.viewlet())
     }
     
 }

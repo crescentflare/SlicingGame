@@ -68,6 +68,19 @@ class ViewletUtil {
     // MARK: Subview creation
     // --
     
+    class func createSubviewItem(convUtil: InflatorConvUtil, currentItem: Any?, parent: UIView?, attributes: [String: Any], subviewItem: Any?, binder: InflatorBinder?) -> InflatorNestedResult {
+        let recycling = convUtil.asBool(value: attributes["recycling"]) ?? false
+        let result = Inflators.viewlet.inflateNestedItem(currentItem: currentItem, newItem: subviewItem, enableRecycling: recycling, parent: parent, binder: binder)
+        if let view = result.items.first as? UIView {
+            let attributes = result.getAttributes(index: 0)
+            applyLayoutAttributes(convUtil: convUtil, view: view, attributes: attributes)
+            if let refId = convUtil.asString(value: attributes["refId"]) {
+                binder?.onBind(refId: refId, object: view)
+            }
+        }
+        return result
+    }
+    
     class func createSubviews(convUtil: InflatorConvUtil, container: UIView, parent: UIView?, attributes: [String: Any], subviewItems: Any?, binder: InflatorBinder?) {
         // Inflate with optional recycling
         let recycling = convUtil.asBool(value: attributes["recycling"]) ?? false

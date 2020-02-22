@@ -1,0 +1,34 @@
+{
+  "viewlet": "linearContainer",
+  "items": [
+    {
+      "refId": "statusUnderlay",
+      "viewlet": "view",
+      "width": "stretchToParent"
+    },
+    {
+      "refId": "content",
+      "viewlet": "frameContainer",
+      "width": "stretchToParent",
+      "items": [
+        {
+          "refId": "title",
+          "viewlet": "text",
+          "paddingLeft": 16,
+          "paddingRight": 16,
+          "gravity": "centerVertical",
+          "maxLines": 1,
+          "textSize": "$titleText"
+        }
+      ]
+    },
+    {
+      "refId": "divider",
+      "viewlet": "view",
+      "width": "stretchToParent",
+      "height": 2,
+      "backgroundColor": "#4000",
+      "visibility": "hidden"
+    }
+  ]
+}

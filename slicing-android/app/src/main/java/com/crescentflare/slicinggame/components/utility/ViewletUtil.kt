@@ -8,6 +8,7 @@ import com.crescentflare.jsoninflator.binder.InflatableRef
 import com.crescentflare.jsoninflator.binder.InflatorAnnotationBinder
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
+import com.crescentflare.jsoninflator.utility.InflatorNestedResult
 import com.crescentflare.slicinggame.BuildConfig
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.unilayout.helpers.UniLayoutParams
@@ -96,6 +97,21 @@ object ViewletUtil {
     // --
     // Child view creation
     // --
+
+    fun createChildViewItem(mapUtil: InflatorMapUtil, currentItem: Any?, parent: ViewGroup, attributes: Map<String, Any>?, childViewItem: Any?, binder: InflatorBinder?): InflatorNestedResult {
+        val recycling = mapUtil.optionalBoolean(attributes, "recycling", false)
+        val result = Inflators.viewlet.inflateNestedItem(parent.context, currentItem, childViewItem, recycling, parent, binder)
+        val view = result.items.firstOrNull()
+        if (view is View) {
+            val viewAttributes = result.getAttributes(0)
+            applyLayoutAttributes(mapUtil, view, viewAttributes)
+            val refId = mapUtil.optionalString(viewAttributes, "refId", null)
+            if (refId != null) {
+                binder?.onBind(refId, view)
+            }
+        }
+        return result
+    }
 
     fun createChildViews(mapUtil: InflatorMapUtil, container: ViewGroup, parent: ViewGroup, attributes: Map<String, Any>?, childViewItems: Any?, binder: InflatorBinder?) {
         // Inflate with optional recycling

@@ -2,8 +2,15 @@ package com.crescentflare.slicinggame
 
 import android.app.Application
 import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
+import com.crescentflare.jsoninflator.utility.InflatorResourceColorLookup
+import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
+import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
+import com.crescentflare.slicinggame.components.containers.PageContainerView
+import com.crescentflare.slicinggame.components.navigationbars.GameTitleBarView
+import com.crescentflare.slicinggame.components.navigationbars.SimpleBottomBarView
+import com.crescentflare.slicinggame.components.styling.AppFonts
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
@@ -28,6 +35,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
         }
 
         // Configure framework
+        AppFonts.setContext(this)
         registerViewlets()
     }
 
@@ -50,12 +58,22 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
         Inflators.viewlet.setMergeSubAttributes(listOf("android"))
         Inflators.viewlet.setExcludeAttributes(listOf("ios"))
 
+        // Lookups
+        Inflators.viewlet.setColorLookup(InflatorResourceColorLookup(this))
+        Inflators.viewlet.setDimensionLookup(InflatorResourceDimensionLookup(this))
+
+        // Basic views
+        Inflators.viewlet.register("text", TextView.viewlet)
+        Inflators.viewlet.register("view", ViewletUtil.basicViewViewlet)
+
         // Containers
         Inflators.viewlet.register("frameContainer", FrameContainerView.viewlet)
         Inflators.viewlet.register("linearContainer", LinearContainerView.viewlet)
+        Inflators.viewlet.register("pageContainer", PageContainerView.viewlet)
 
-        // Simple viewlets
-        Inflators.viewlet.register("view", ViewletUtil.basicViewViewlet)
+        // Navigation bars
+        Inflators.viewlet.register("gameTitleBar", GameTitleBarView.viewlet)
+        Inflators.viewlet.register("simpleBottomBar", SimpleBottomBarView.viewlet)
     }
 
 }

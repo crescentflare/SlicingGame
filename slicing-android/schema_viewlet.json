@@ -8,9 +8,13 @@
       "description": "The viewlet type, a view component",
       "type": "string",
       "enum": [
+        "text",
         "view",
         "frameContainer",
-        "linearContainer"
+        "linearContainer",
+        "pageContainer",
+        "gameTitleBar",
+        "simpleBottomBar"
       ]
     },
     "refId": {
@@ -138,6 +142,61 @@
       "if": {
         "properties": {
           "viewlet": {
+            "const": "text"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "localizedText": {
+            "description": "The localized string key of the text",
+            "type": "string"
+          },
+          "text": {
+            "description": "The text",
+            "type": "string"
+          },
+          "textColor": {
+            "description": "The color of the text",
+            "$ref": "#/definitions/color"
+          },
+          "textSize": {
+            "description": "The size of the text",
+            "$ref": "#/definitions/dimension"
+          },
+          "font": {
+            "description": "The font of the text",
+            "type": "string",
+            "enum": [
+              "normal",
+              "italics",
+              "bold",
+              "boldItalics"
+            ],
+            "default": "normal"
+          },
+          "maxLines": {
+            "description": "The maximum amount of lines of the text, 0 = no limitation",
+            "type": "integer",
+            "default": 0
+          },
+          "textAlignment": {
+            "description": "The horizontal alignment of the text within its frame",
+            "type": "string",
+            "enum": [
+              "left",
+              "right",
+              "center"
+            ],
+            "default": "left"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
             "const": "frameContainer"
           }
         }
@@ -183,6 +242,64 @@
           }
         }
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "pageContainer"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "titleBar": {
+            "description": "The title bar view at the top of the screen",
+            "$ref": "#"
+          },
+          "bottomBar": {
+            "description": "Takes up the space of the bottom navigation bar on Android or the bottom safe area on iOS",
+            "$ref": "#"
+          },
+          "contentItems": {
+            "description": "A list of viewlets within the safe area",
+            "type": "array",
+            "items": {
+              "$ref": "#"
+            },
+            "default": []
+          },
+          "backgroundItem": {
+            "description": "A background view that's behind the content items and ignores the safe area",
+            "$ref": "#"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "gameTitleBar"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "localizedTitle": {
+            "description": "The localized string key of the title",
+            "type": "string"
+          },
+          "title": {
+            "description": "The bar title",
+            "type": "string"
+          },
+          "showDivider": {
+            "description": "Set visibility of the divider between the bar and the rest of the content",
+            "type": "boolean"
+          }
+        }
+      }
     }
   ],
   "definitions": {
@@ -196,6 +313,10 @@
           ]
         },
         {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
+        {
           "type": "number"
         },
         {
@@ -207,6 +328,10 @@
     "dimension": {
       "oneOf": [
         {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
+        {
           "type": "number"
         },
         {
@@ -217,6 +342,10 @@
     },
     "color": {
       "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\$.+$"
+        },
         {
           "type": "string",
           "pattern": "^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
