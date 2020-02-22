@@ -96,7 +96,8 @@ class SpriteContainerView: FrameContainerView {
     
     override func draw(_ rect: CGRect) {
         if let context = UIGraphicsGetCurrentContext() {
-            sprite.draw(context: context)
+            let spriteCanvas = SpriteCanvas(context: context, canvasWidth: bounds.width, canvasHeight: bounds.height, gridWidth: CGFloat(gridWidth), gridHeight: CGFloat(gridHeight))
+            sprite.draw(canvas: spriteCanvas)
         }
     }
 

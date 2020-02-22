@@ -1,9 +1,6 @@
 package com.crescentflare.slicinggame.sprites.core
 
-import android.content.res.Resources
-import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Paint
 
 /**
  * Sprite core: a single sprite within a sprite container
@@ -16,8 +13,8 @@ class Sprite {
 
     var x = 0f
     var y = 0f
-    var width = 32f
-    var height = 32f
+    var width = 1f
+    var height = 1f
 
 
     // --
@@ -33,11 +30,8 @@ class Sprite {
     // Drawing
     // --
 
-    fun draw(canvas: Canvas, paint: Paint) {
-        val density = Resources.getSystem().displayMetrics.density
-        paint.color = Color.BLACK
-        paint.style = Paint.Style.FILL
-        canvas.drawRect(x * density, y * density, (x + width) * density, (y + height) * density, paint)
+    fun draw(canvas: SpriteCanvas) {
+        canvas.fillRect(x, y, width, height, Color.BLACK)
     }
 
 }

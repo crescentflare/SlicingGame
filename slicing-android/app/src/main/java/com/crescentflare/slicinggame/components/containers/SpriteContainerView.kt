@@ -11,6 +11,7 @@ import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.sprites.core.Sprite
+import com.crescentflare.slicinggame.sprites.core.SpriteCanvas
 
 
 /**
@@ -55,6 +56,7 @@ open class SpriteContainerView : FrameContainerView {
 
     private var sprite = Sprite()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private val spriteCanvas = SpriteCanvas(paint)
 
 
     // --
@@ -111,7 +113,8 @@ open class SpriteContainerView : FrameContainerView {
     override fun onDraw(canvas: Canvas?) {
         canvas?.let {
             it.clipRect(0, 0, width, height)
-            sprite.draw(it, paint)
+            spriteCanvas.prepare(it, width.toFloat(), height.toFloat(), gridWidth, gridHeight)
+            sprite.draw(spriteCanvas)
         }
     }
 

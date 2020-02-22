@@ -13,8 +13,8 @@ class Sprite {
     
     var x: Float = 0
     var y: Float = 0
-    var width: Float = 32
-    var height: Float = 32
+    var width: Float = 1
+    var height: Float = 1
 
     
     // --
@@ -30,9 +30,8 @@ class Sprite {
     // MARK: Drawing
     // --
 
-    func draw(context: CGContext) {
-        context.setFillColor(UIColor.black.cgColor)
-        context.fill(CGRect(x: CGFloat(x), y: CGFloat(y), width: CGFloat(width), height: CGFloat(height)))
+    func draw(canvas: SpriteCanvas) {
+        canvas.fillRect(x: CGFloat(x), y: CGFloat(y), width: CGFloat(width), height: CGFloat(height), color: .black)
     }
 
 }
