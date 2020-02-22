@@ -420,6 +420,13 @@
           "gridHeight": {
             "description": "The height of the coordinate system for placing sprites, they are pixel independent",
             "type": "number"
+          },
+          "sprites": {
+            "description": "A list of sprites to place within the container",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/sprite"
+            }
           }
         }
       }
@@ -684,6 +691,27 @@
           }
         }
       ]
+    },
+    "sprite": {
+      "type": "object",
+      "properties": {
+        "x": {
+          "description": "The x-position of the sprite",
+          "type": "number"
+        },
+        "y": {
+          "description": "The y-position of the sprite",
+          "type": "number"
+        },
+        "width": {
+          "description": "The width of the sprite",
+          "type": "number"
+        },
+        "height": {
+          "description": "The height of the sprite",
+          "type": "number"
+        }
+      }
     }
   }
 }

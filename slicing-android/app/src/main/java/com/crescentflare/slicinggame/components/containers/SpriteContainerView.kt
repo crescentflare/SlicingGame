@@ -36,6 +36,20 @@ open class SpriteContainerView : FrameContainerView {
                     obj.gridWidth = mapUtil.optionalFloat(attributes, "gridWidth", 1f)
                     obj.gridHeight = mapUtil.optionalFloat(attributes, "gridHeight", 1f)
 
+                    // Apply sprites
+                    val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
+                    obj.clearSprites()
+                    for (spriteItem in spriteList) {
+                        mapUtil.asStringObjectMap(spriteItem)?.let {
+                            val sprite = Sprite()
+                            sprite.x = mapUtil.optionalFloat(it, "x", 0f)
+                            sprite.y = mapUtil.optionalFloat(it, "y", 0f)
+                            sprite.width = mapUtil.optionalFloat(it, "width", 1f)
+                            sprite.height = mapUtil.optionalFloat(it, "height", 1f)
+                            obj.addSprite(sprite)
+                        }
+                    }
+
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
                     return true
@@ -54,7 +68,7 @@ open class SpriteContainerView : FrameContainerView {
     // Members
     // --
 
-    private var sprite = Sprite()
+    private val sprites = mutableListOf<Sprite>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
 
@@ -80,6 +94,19 @@ open class SpriteContainerView : FrameContainerView {
 
     init {
         // No implementation
+    }
+
+
+    // --
+    // Sprites
+    // --
+
+    fun addSprite(sprite: Sprite) {
+        sprites.add(sprite)
+    }
+
+    fun clearSprites() {
+        sprites.clear()
     }
 
 
@@ -114,7 +141,9 @@ open class SpriteContainerView : FrameContainerView {
         canvas?.let {
             it.clipRect(0, 0, width, height)
             spriteCanvas.prepare(it, width.toFloat(), height.toFloat(), gridWidth, gridHeight)
-            sprite.draw(spriteCanvas)
+            sprites.forEach { sprite ->
+                sprite.draw(spriteCanvas)
+            }
         }
     }
 

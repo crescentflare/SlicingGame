@@ -34,7 +34,21 @@
           "gridHeight": 16,
           "margin": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
           "gravity": "center",
-          "backgroundColor": "#ddd"
+          "backgroundColor": "#ddd",
+          "sprites": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1,
+              "height": 1
+            },
+            {
+              "x": 4,
+              "y": 2,
+              "width": 2,
+              "height": 2
+            }
+          ]
         }
       ]
     }

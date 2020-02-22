@@ -13,7 +13,7 @@ class SpriteContainerView: FrameContainerView {
     // MARK: Members
     // --
     
-    private var sprite = Sprite()
+    private var sprites = [Sprite]()
 
 
     // --
@@ -35,6 +35,19 @@ class SpriteContainerView: FrameContainerView {
                 // Apply canvas size
                 spriteContainer.gridWidth = convUtil.asFloat(value: attributes["gridWidth"]) ?? 1
                 spriteContainer.gridHeight = convUtil.asFloat(value: attributes["gridHeight"]) ?? 1
+
+                // Apply sprites
+                spriteContainer.clearSprites()
+                if let spriteList = attributes["sprites"] as? [[String: Any]] {
+                    for spriteItem in spriteList {
+                        let sprite = Sprite()
+                        sprite.x = convUtil.asFloat(value: spriteItem["x"]) ?? 0
+                        sprite.y = convUtil.asFloat(value: spriteItem["y"]) ?? 0
+                        sprite.width = convUtil.asFloat(value: spriteItem["width"]) ?? 1
+                        sprite.height = convUtil.asFloat(value: spriteItem["height"]) ?? 1
+                        spriteContainer.addSprite(sprite)
+                    }
+                }
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: spriteContainer, attributes: attributes)
@@ -70,6 +83,19 @@ class SpriteContainerView: FrameContainerView {
     
     
     // --
+    // MARK: Sprites
+    // --
+    
+    func addSprite(_ sprite: Sprite) {
+        sprites.append(sprite)
+    }
+    
+    func clearSprites() {
+        sprites.removeAll()
+    }
+
+
+    // --
     // MARK: Configurable values
     // --
     
@@ -97,7 +123,9 @@ class SpriteContainerView: FrameContainerView {
     override func draw(_ rect: CGRect) {
         if let context = UIGraphicsGetCurrentContext() {
             let spriteCanvas = SpriteCanvas(context: context, canvasWidth: bounds.width, canvasHeight: bounds.height, gridWidth: CGFloat(gridWidth), gridHeight: CGFloat(gridHeight))
-            sprite.draw(canvas: spriteCanvas)
+            sprites.forEach {
+                $0.draw(canvas: spriteCanvas)
+            }
         }
     }
 
