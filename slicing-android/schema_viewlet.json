@@ -9,6 +9,7 @@
       "type": "string",
       "enum": [
         "image",
+        "imageButton",
         "text",
         "view",
         "frameContainer",
@@ -167,6 +168,58 @@
               "aspectCrop"
             ],
             "default": "none"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "viewlet": {
+            "const": "imageButton"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "source": {
+            "description": "The source to retrieve the image from",
+            "$ref": "#/definitions/imageSource"
+          },
+          "highlightedSource": {
+            "description": "An alternative image source for the highlighted state",
+            "$ref": "#/definitions/imageSource"
+          },
+          "disabledSource": {
+            "description": "An alternative image source for the disabled state",
+            "$ref": "#/definitions/imageSource"
+          },
+          "colorize": {
+            "description": "Colorize the image source with a single color",
+            "$ref": "#/definitions/color"
+          },
+          "highlightedColorize": {
+            "description": "Colorize the highlighted state",
+            "$ref": "#/definitions/color"
+          },
+          "disabledColorize": {
+            "description": "Colorize the disabled state",
+            "$ref": "#/definitions/color"
+          },
+          "stretchType": {
+            "description": "Determines how the image is stretched within its frame",
+            "type": "string",
+            "enum": [
+              "none",
+              "fill",
+              "aspectFit",
+              "aspectCrop"
+            ],
+            "default": "none"
+          },
+          "tapEvent": {
+            "description": "Sends event when the button is tapped",
+            "$ref": "#/definitions/appEvent"
           }
         }
       }

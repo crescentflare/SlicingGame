@@ -2,6 +2,10 @@
   "modules": [
     {
       "module": "alert"
+    },
+    {
+      "module": "game",
+      "gameContainer": "gameContainer"
     }
   ],
   "dataSets": {
@@ -27,6 +31,7 @@
       },
       "contentItems": [
         {
+          "refId": "gameContainer",
           "viewlet": "gameContainer",
           "width": "stretchToParent",
           "height": "stretchToParent",
@@ -36,6 +41,18 @@
           "requireClearRate": 75,
           "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK",
           "backgroundImage": "app://background_level_starry_night"
+        },
+        {
+          "viewlet": "imageButton",
+          "horizontalGravity": "right",
+          "marginTop": "$pagePadding",
+          "marginRight": "$pagePadding",
+          "padding": [ 16, 16, 16, 16 ],
+          "backgroundColor": "#8000",
+          "source": "app://icon_game_restart",
+          "highlightedColorize": "#8fff",
+          "disabledColorize": "#4fff",
+          "tapEvent": "game://reset"
         }
       ]
     }

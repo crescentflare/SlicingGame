@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		0335411C5F848BDBF791E97F /* Pods_SlicingGame.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 502B3A41C1ACC0B07AB015F3 /* Pods_SlicingGame.framework */; };
+		040D1B9423AF9C4A00337A95 /* ControlComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040D1B9323AF9C4A00337A95 /* ControlComponent.swift */; };
+		040D1B9623AFAA0F00337A95 /* ComponentStateImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040D1B9523AFAA0F00337A95 /* ComponentStateImage.swift */; };
+		040D1B9923AFE93D00337A95 /* GameModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040D1B9823AFE93D00337A95 /* GameModule.swift */; };
+		042C7A0423AD4AE800C8B524 /* ImageButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042C7A0323AD4AE800C8B524 /* ImageButtonView.swift */; };
 		0433D56D23ABB98B00706CC6 /* PageModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0433D56C23ABB98B00706CC6 /* PageModule.swift */; };
 		0433D57023ABBBE800706CC6 /* AlertModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0433D56F23ABBBE800706CC6 /* AlertModule.swift */; };
 		043D7263239C285C00A79415 /* Pages in Resources */ = {isa = PBXBuildFile; fileRef = 043D7262239C285C00A79415 /* Pages */; };
@@ -54,6 +58,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		040D1B9323AF9C4A00337A95 /* ControlComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlComponent.swift; sourceTree = "<group>"; };
+		040D1B9523AFAA0F00337A95 /* ComponentStateImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentStateImage.swift; sourceTree = "<group>"; };
+		040D1B9823AFE93D00337A95 /* GameModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameModule.swift; sourceTree = "<group>"; };
+		042C7A0323AD4AE800C8B524 /* ImageButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageButtonView.swift; sourceTree = "<group>"; };
 		0433D56C23ABB98B00706CC6 /* PageModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageModule.swift; sourceTree = "<group>"; };
 		0433D56F23ABBBE800706CC6 /* AlertModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertModule.swift; sourceTree = "<group>"; };
 		043D7262239C285C00A79415 /* Pages */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Pages; sourceTree = "<group>"; };
@@ -116,10 +124,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		040D1B9723AFE93D00337A95 /* CustomModules */ = {
+			isa = PBXGroup;
+			children = (
+				040D1B9823AFE93D00337A95 /* GameModule.swift */,
+			);
+			path = CustomModules;
+			sourceTree = "<group>";
+		};
 		0433D56923ABB85800706CC6 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
 				0433D56E23ABBBE800706CC6 /* BasicModules */,
+				040D1B9723AFE93D00337A95 /* CustomModules */,
 				0433D56C23ABB98B00706CC6 /* PageModule.swift */,
 			);
 			path = Modules;
@@ -170,6 +187,7 @@
 		043D726E239C2D2300A79415 /* Utility */ = {
 			isa = PBXGroup;
 			children = (
+				040D1B9523AFAA0F00337A95 /* ComponentStateImage.swift */,
 				0473BA0E23A16DFA0020FC93 /* ImageSource.swift */,
 				043D726F239C2D2300A79415 /* ViewletUtil.swift */,
 			);
@@ -330,6 +348,7 @@
 		04F2AA7D239EDDE400126CD1 /* BasicViews */ = {
 			isa = PBXGroup;
 			children = (
+				042C7A0323AD4AE800C8B524 /* ImageButtonView.swift */,
 				0473BA1023A16F700020FC93 /* ImageView.swift */,
 				04F2AA7E239EDDE400126CD1 /* TextView.swift */,
 			);
@@ -356,6 +375,7 @@
 		04F2AA8A239EE54400126CD1 /* Types */ = {
 			isa = PBXGroup;
 			children = (
+				040D1B9323AF9C4A00337A95 /* ControlComponent.swift */,
 				04F2AA8B239EE54400126CD1 /* NavigationBarComponent.swift */,
 			);
 			path = Types;
@@ -516,6 +536,8 @@
 				04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */,
 				04F2AA7F239EDDE400126CD1 /* TextView.swift in Sources */,
 				0433D57023ABBBE800706CC6 /* AlertModule.swift in Sources */,
+				040D1B9923AFE93D00337A95 /* GameModule.swift in Sources */,
+				040D1B9623AFAA0F00337A95 /* ComponentStateImage.swift in Sources */,
 				0473BA0F23A16DFA0020FC93 /* ImageSource.swift in Sources */,
 				04AC540F23A0020400111C91 /* Polygon.swift in Sources */,
 				04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */,
@@ -524,12 +546,14 @@
 				04F2AA8C239EE54500126CD1 /* NavigationBarComponent.swift in Sources */,
 				04F2AA6C239EB36E00126CD1 /* FrameContainerView.swift in Sources */,
 				04F2AA75239EDA8700126CD1 /* UIColor+HexValue.swift in Sources */,
+				040D1B9423AF9C4A00337A95 /* ControlComponent.swift in Sources */,
 				04CC779D23A3BEFD003D1BB0 /* LevelSlicePreviewView.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
 				0475353023A9657E00F3C216 /* AppEvent.swift in Sources */,
 				04F2AA7C239EDD1F00126CD1 /* AppFonts.swift in Sources */,
 				04F2AA89239EE43600126CD1 /* GameTitleBarView.swift in Sources */,
 				0487D2EC239C518500515520 /* Page.swift in Sources */,
+				042C7A0423AD4AE800C8B524 /* ImageButtonView.swift in Sources */,
 				04CC779F23A3E37F003D1BB0 /* LevelView.swift in Sources */,
 				04E19155239D50CB00466143 /* PageCache.swift in Sources */,
 				04E19154239D50CB00466143 /* PageLoader.swift in Sources */,

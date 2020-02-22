@@ -4,6 +4,7 @@ import android.app.Application
 import com.crescentflare.dynamicappconfig.manager.AppConfigStorage
 import com.crescentflare.jsoninflator.utility.InflatorResourceColorLookup
 import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
+import com.crescentflare.slicinggame.components.basicviews.ImageButtonView
 import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
@@ -20,6 +21,7 @@ import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.appconfig.CustomAppConfigManager
 import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 import com.crescentflare.slicinggame.page.modules.basicmodules.AlertModule
+import com.crescentflare.slicinggame.page.modules.custommodules.GameModule
 
 
 /**
@@ -67,6 +69,9 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Basic modules
         Inflators.module.register("alert", AlertModule.inflatable)
+
+        // Custom modules
+        Inflators.module.register("game", GameModule.inflatable)
     }
 
     private fun registerViewlets() {
@@ -80,6 +85,7 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Basic views
         Inflators.viewlet.register("image", ImageView.viewlet)
+        Inflators.viewlet.register("imageButton", ImageButtonView.viewlet)
         Inflators.viewlet.register("text", TextView.viewlet)
         Inflators.viewlet.register("view", ViewletUtil.basicViewViewlet)
 

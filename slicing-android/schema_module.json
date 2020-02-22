@@ -8,11 +8,31 @@
       "description": "The module type, a small piece of controller logic for the page",
       "type": "string",
       "enum": [
-        "alert"
+        "alert",
+        "game"
       ]
     }
   },
   "required": [
     "module"
+  ],
+  "anyOf": [
+    {
+      "if": {
+        "properties": {
+          "module": {
+            "const": "game"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "gameContainer": {
+            "description": "A reference to the game container component",
+            "type": "string"
+          }
+        }
+      }
+    }
   ]
 }

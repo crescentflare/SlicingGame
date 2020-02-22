@@ -61,6 +61,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Basic modules
         Inflators.module.register(name: "alert", inflatable: AlertModule.inflatable())
+        
+        // Custom modules
+        Inflators.module.register(name: "game", inflatable: GameModule.inflatable())
     }
 
     func registerViewlets() {
@@ -74,6 +77,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Basic views
         Inflators.viewlet.register(name: "image", inflatable: ImageView.viewlet())
+        Inflators.viewlet.register(name: "imageButton", inflatable: ImageButtonView.viewlet())
         Inflators.viewlet.register(name: "text", inflatable: TextView.viewlet())
         Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
 
