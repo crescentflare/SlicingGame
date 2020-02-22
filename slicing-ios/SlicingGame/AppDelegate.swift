@@ -58,6 +58,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         Inflators.viewlet.setMergeSubAttributes(["ios"])
         Inflators.viewlet.setExcludeAttributes(["android"])
 
+        // Containers
+        Inflators.viewlet.register(name: "frameContainer", inflatable: FrameContainerView.viewlet())
+        Inflators.viewlet.register(name: "linearContainer", inflatable: LinearContainerView.viewlet())
+
         // Simple viewlets
         Inflators.viewlet.register(name: "view", inflatable: ViewletUtil.basicViewViewlet())
     }
