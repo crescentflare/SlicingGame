@@ -96,6 +96,19 @@ class LevelCanvasView: UniView {
     
 
     // --
+    // MARK: Obtain state
+    // --
+    
+    func clearRate() -> Float {
+        let canvasSurface = canvasWidth * canvasHeight
+        if canvasSurface > 0 {
+            return 100 - Float(clipPolygon.calculateSurfaceArea()) * 100 / canvasSurface
+        }
+        return 0
+    }
+    
+
+    // --
     // MARK: Configurable values
     // --
     

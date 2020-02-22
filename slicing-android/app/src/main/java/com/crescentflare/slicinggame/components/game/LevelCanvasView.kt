@@ -115,6 +115,19 @@ open class LevelCanvasView : UniFrameContainer {
 
 
     // --
+    // Obtain state
+    // --
+
+    fun clearRate(): Float {
+        val canvasSurface = canvasWidth * canvasHeight
+        if (canvasSurface > 0) {
+            return 100 - clipPolygon.calculateSurfaceArea() * 100 / canvasSurface
+        }
+        return 0f
+    }
+
+
+    // --
     // Configurable values
     // --
 

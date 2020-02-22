@@ -133,10 +133,12 @@ open class LevelView : FrameContainerView {
 
     fun slice(vector: Vector) {
         canvasView.slice(vector)
+        progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
     }
 
     fun resetSlices() {
         canvasView.resetSlices()
+        progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
     }
 
     fun transformedSliceVector(vector: Vector): Vector {
@@ -170,7 +172,7 @@ open class LevelView : FrameContainerView {
     var requireClearRate: Int = 100
         set(requireClearRate) {
             field = requireClearRate
-            progressView.text = "0 / $requireClearRate%"
+            progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
         }
 
 

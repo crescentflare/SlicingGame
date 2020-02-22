@@ -102,7 +102,7 @@ class LevelView: FrameContainerView {
         progressView.layoutProperties.verticalGravity = 1
         progressView.numberOfLines = 1
         progressView.textAlignment = .center
-        progressView.text = "0 / \(requireClearRate)%"
+        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         addSubview(progressView)
     }
     
@@ -113,10 +113,12 @@ class LevelView: FrameContainerView {
     
     func slice(vector: Vector) {
         canvasView.slice(vector: vector)
+        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
     }
 
     func resetSlices() {
         canvasView.resetSlices()
+        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
     }
     
     func transformedSliceVector(vector: Vector) -> Vector {
@@ -150,7 +152,7 @@ class LevelView: FrameContainerView {
     
     var requireClearRate: Int = 100 {
         didSet {
-            progressView.text = "0 / \(requireClearRate)%"
+            progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         }
     }
 
