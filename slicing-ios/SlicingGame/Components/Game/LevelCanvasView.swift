@@ -132,6 +132,27 @@ class LevelCanvasView: UniView {
         }
     }
     
+
+    // --
+    // MARK: Custom layout
+    // --
+    
+    override func measuredSize(sizeSpec: CGSize, widthSpec: UniMeasureSpec, heightSpec: UniMeasureSpec) -> CGSize {
+        if widthSpec == .limitSize && heightSpec == .limitSize {
+            if sizeSpec.width * CGFloat(canvasHeight) / CGFloat(canvasWidth) <= sizeSpec.height {
+                return CGSize(width: sizeSpec.width, height: sizeSpec.width * CGFloat(canvasHeight) / CGFloat(canvasWidth))
+            }
+            return CGSize(width: sizeSpec.height * CGFloat(canvasWidth) / CGFloat(canvasHeight), height: sizeSpec.height)
+        } else if widthSpec == .exactSize && heightSpec == .exactSize {
+            return CGSize(width: sizeSpec.width, height: sizeSpec.height)
+        } else if widthSpec == .limitSize || widthSpec == .exactSize {
+            return CGSize(width: sizeSpec.width, height: sizeSpec.width * CGFloat(canvasHeight) / CGFloat(canvasWidth))
+        } else if heightSpec == .limitSize || heightSpec == .exactSize {
+            return CGSize(width: sizeSpec.height * CGFloat(canvasWidth) / CGFloat(canvasHeight), height: sizeSpec.height)
+        }
+        return super.measuredSize(sizeSpec: sizeSpec, widthSpec: widthSpec, heightSpec: heightSpec)
+    }
+
     override func layoutSubviews() {
         super.layoutSubviews()
         updateMask()

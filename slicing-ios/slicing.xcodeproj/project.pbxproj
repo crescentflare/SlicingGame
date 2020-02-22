@@ -24,6 +24,8 @@
 		04AC540E23A0020400111C91 /* Vector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AC540C23A0020400111C91 /* Vector.swift */; };
 		04AC540F23A0020400111C91 /* Polygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AC540D23A0020400111C91 /* Polygon.swift */; };
 		04AC541223A0079100111C91 /* LevelCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04AC541123A0079100111C91 /* LevelCanvasView.swift */; };
+		04CC779B23A3B9F3003D1BB0 /* GameContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CC779A23A3B9F3003D1BB0 /* GameContainerView.swift */; };
+		04CC779D23A3BEFD003D1BB0 /* LevelSlicePreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CC779C23A3BEFC003D1BB0 /* LevelSlicePreviewView.swift */; };
 		04E19154239D50CB00466143 /* PageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E19152239D50CB00466143 /* PageLoader.swift */; };
 		04E19155239D50CB00466143 /* PageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E19153239D50CB00466143 /* PageCache.swift */; };
 		04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB575239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift */; };
@@ -65,6 +67,8 @@
 		04AC540C23A0020400111C91 /* Vector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector.swift; sourceTree = "<group>"; };
 		04AC540D23A0020400111C91 /* Polygon.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Polygon.swift; sourceTree = "<group>"; };
 		04AC541123A0079100111C91 /* LevelCanvasView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelCanvasView.swift; sourceTree = "<group>"; };
+		04CC779A23A3B9F3003D1BB0 /* GameContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameContainerView.swift; sourceTree = "<group>"; };
+		04CC779C23A3BEFC003D1BB0 /* LevelSlicePreviewView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LevelSlicePreviewView.swift; sourceTree = "<group>"; };
 		04E19152239D50CB00466143 /* PageLoader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageLoader.swift; sourceTree = "<group>"; };
 		04E19153239D50CB00466143 /* PageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageCache.swift; sourceTree = "<group>"; };
 		04ECB575239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigPageLoadingMode.swift; sourceTree = "<group>"; };
@@ -248,6 +252,7 @@
 			isa = PBXGroup;
 			children = (
 				04AC541123A0079100111C91 /* LevelCanvasView.swift */,
+				04CC779C23A3BEFC003D1BB0 /* LevelSlicePreviewView.swift */,
 			);
 			path = Game;
 			sourceTree = "<group>";
@@ -266,6 +271,7 @@
 			isa = PBXGroup;
 			children = (
 				04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */,
+				04CC779A23A3B9F3003D1BB0 /* GameContainerView.swift */,
 				04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */,
 				04F2AA80239EDF8900126CD1 /* PageContainerView.swift */,
 			);
@@ -460,6 +466,7 @@
 				04F2AA79239EDAE000126CD1 /* AppDimensions.swift in Sources */,
 				04F2AA7A239EDAE000126CD1 /* UIColor+AppColors.swift in Sources */,
 				04F2AA8E239EE6FA00126CD1 /* SimpleBottomBarView.swift in Sources */,
+				04CC779B23A3B9F3003D1BB0 /* GameContainerView.swift in Sources */,
 				04AC540E23A0020400111C91 /* Vector.swift in Sources */,
 				043D7270239C2D2300A79415 /* ViewletUtil.swift in Sources */,
 				04ECB57A239D8AA4006CFC0D /* CustomAppConfigManager.swift in Sources */,
@@ -475,6 +482,7 @@
 				04F2AA8C239EE54500126CD1 /* NavigationBarComponent.swift in Sources */,
 				04F2AA6C239EB36E00126CD1 /* FrameContainerView.swift in Sources */,
 				04F2AA75239EDA8700126CD1 /* UIColor+HexValue.swift in Sources */,
+				04CC779D23A3BEFD003D1BB0 /* LevelSlicePreviewView.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
 				04F2AA7C239EDD1F00126CD1 /* AppFonts.swift in Sources */,
 				04F2AA89239EE43600126CD1 /* GameTitleBarView.swift in Sources */,

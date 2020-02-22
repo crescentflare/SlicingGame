@@ -98,7 +98,7 @@ open class LevelCanvasView : UniFrameContainer {
 
 
     // --
-    // Configurable values
+    // Slicing
     // --
 
     fun slice(vector: Vector) {
@@ -152,8 +152,8 @@ open class LevelCanvasView : UniFrameContainer {
         invalidate()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
+    override fun onSizeChanged(width: Int, height: Int, oldWidth: Int, oldHeight: Int) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight)
         updateClipPath()
     }
 
@@ -168,6 +168,33 @@ open class LevelCanvasView : UniFrameContainer {
             }
         } else {
             super.dispatchDraw(canvas)
+        }
+    }
+
+
+    // --
+    // Custom layout
+    // --
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = MeasureSpec.getSize(heightMeasureSpec)
+        if (widthMode == MeasureSpec.AT_MOST && heightMode == MeasureSpec.AT_MOST) {
+            if (width * canvasHeight / canvasWidth <= height) {
+                setMeasuredDimension(width, (width * canvasHeight / canvasWidth).toInt())
+            } else {
+                setMeasuredDimension((height * canvasWidth / canvasHeight).toInt(), height)
+            }
+        } else if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension(width, height)
+        } else if (widthMode == MeasureSpec.AT_MOST || widthMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension(width, (width * canvasHeight / canvasWidth).toInt())
+        } else if (heightMode == MeasureSpec.AT_MOST || heightMode == MeasureSpec.EXACTLY) {
+            setMeasuredDimension((height * canvasWidth / canvasHeight).toInt(), height)
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         }
     }
 

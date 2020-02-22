@@ -18,6 +18,9 @@ extension UIColor {
             let colorTable: [String: UIColor] = [
                 "text": .text,
                 
+                "slicePreviewLine": slicePreviewLine,
+                "stretchedSlicePreviewLine": stretchedSlicePreviewLine,
+                
                 "red": .red,
                 "yellow": .yellow,
                 "green": .green,
@@ -39,6 +42,14 @@ extension UIColor {
     // --
 
     class var text: UIColor { get { return UIColor(hexValue: 0xff303030) } }
+
+
+    // --
+    // MARK: Game
+    // --
+
+    class var slicePreviewLine: UIColor { get { return UIColor(hexValue: 0xffff0000) } }
+    class var stretchedSlicePreviewLine: UIColor { get { return UIColor(hexValue: 0x40ff0000) } }
 
 
     // --

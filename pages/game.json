@@ -22,26 +22,12 @@
       },
       "contentItems": [
         {
-          "viewlet": "view",
+          "viewlet": "gameContainer",
           "width": "stretchToParent",
           "height": "stretchToParent",
-          "backgroundColor": "#ddd"
-        },
-        {
-          "viewlet": "frameContainer",
-          "width": "92vw",
-          "height": "92vw",
-          "gravity": "center",
-          "items": [
-            {
-              "viewlet": "image",
-              "width": "stretchToParent",
-              "height": "stretchToParent",
-              "backgroundColor": "#fff",
-              "source": "app://background_level_starry_night",
-              "stretchType": "aspectCrop"
-            }
-          ]
+          "backgroundColor": "#ddd",
+          "levelWidth": 12,
+          "levelHeight": 16
         }
       ]
     }

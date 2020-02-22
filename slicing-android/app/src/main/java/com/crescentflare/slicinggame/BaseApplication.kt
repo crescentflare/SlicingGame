@@ -7,9 +7,11 @@ import com.crescentflare.jsoninflator.utility.InflatorResourceDimensionLookup
 import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
+import com.crescentflare.slicinggame.components.containers.GameContainerView
 import com.crescentflare.slicinggame.components.containers.LinearContainerView
 import com.crescentflare.slicinggame.components.containers.PageContainerView
 import com.crescentflare.slicinggame.components.game.LevelCanvasView
+import com.crescentflare.slicinggame.components.game.LevelSlicePreviewView
 import com.crescentflare.slicinggame.components.navigationbars.GameTitleBarView
 import com.crescentflare.slicinggame.components.navigationbars.SimpleBottomBarView
 import com.crescentflare.slicinggame.components.styling.AppFonts
@@ -71,11 +73,13 @@ class BaseApplication : Application(), AppConfigStorage.ChangedConfigListener {
 
         // Containers
         Inflators.viewlet.register("frameContainer", FrameContainerView.viewlet)
+        Inflators.viewlet.register("gameContainer", GameContainerView.viewlet)
         Inflators.viewlet.register("linearContainer", LinearContainerView.viewlet)
         Inflators.viewlet.register("pageContainer", PageContainerView.viewlet)
 
         // Game
         Inflators.viewlet.register("levelCanvas", LevelCanvasView.viewlet)
+        Inflators.viewlet.register("levelSlicePreview", LevelSlicePreviewView.viewlet)
 
         // Navigation bars
         Inflators.viewlet.register("gameTitleBar", GameTitleBarView.viewlet)
