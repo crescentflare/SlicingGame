@@ -1,6 +1,9 @@
 package com.crescentflare.slicinggame.infrastructure.physics
 
+import android.graphics.PointF
 import android.graphics.RectF
+import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
+import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -94,7 +97,13 @@ class Physics {
         bounds.offset(movingObject.x, movingObject.y)
         for (checkObject in objectList) {
             if (checkObject !== movingObject) {
-                checkObjectCollision(checkObject, moveX, moveY, bounds)?.let {
+                val collision: CollisionResult?
+                if (movingObject.collisionRotation == 0f && checkObject.collisionRotation == 0f) {
+                    collision = checkSimpleCollision(checkObject, moveX, moveY, bounds)
+                } else {
+                    collision = checkRotatedCollision(movingObject, checkObject, moveX, moveY)
+                }
+                collision?.let {
                     moveX = it.distanceX
                     moveY = it.distanceY
                     collisionObject = checkObject
@@ -109,8 +118,8 @@ class Physics {
 
         // Notify objects
         collisionSide?.let { side ->
-            var timeRemaining = (1f - if (distanceX > distanceY) abs(moveX) / abs(distanceX) else abs(moveY) / abs(distanceY)) * timeInterval
-            if (timeRemaining == 1f) {
+            var timeRemaining = 1f - if (distanceX > distanceY) abs(moveX) / abs(distanceX) else abs(moveY) / abs(distanceY)
+            if (timeRemaining == 1f || (moveX < 0.000001 && moveY < 0.000001)) {
                 movingObject.recursiveCheck++
                 if (movingObject.recursiveCheck >= 4) {
                     timeRemaining = 0f
@@ -119,7 +128,7 @@ class Physics {
                 movingObject.recursiveCheck = 0
             }
             collisionObject?.onCollision(movingObject, side.flipped(), 0f, this)
-            movingObject.onCollision(collisionObject, side, timeRemaining, this)
+            movingObject.onCollision(collisionObject, side, timeRemaining * timeInterval, this)
         }
     }
 
@@ -128,7 +137,7 @@ class Physics {
     // Collision
     // --
 
-    private fun checkObjectCollision(againstObject: PhysicsObject, distanceX: Float, distanceY: Float, bounds: RectF): CollisionResult? {
+    private fun checkSimpleCollision(againstObject: PhysicsObject, distanceX: Float, distanceY: Float, bounds: RectF): CollisionResult? {
         // Calculate collision distances for each axis separately
         val objectBounds = againstObject.collisionBounds
         objectBounds.offset(againstObject.x, againstObject.y)
@@ -158,6 +167,85 @@ class Physics {
             return CollisionResult(distanceX * entryTime, distanceY * entryTime, side)
         }
         return null
+    }
+
+    private fun checkRotatedCollision(movingObject: PhysicsObject, targetObject: PhysicsObject, distanceX: Float, distanceY: Float): CollisionResult? {
+        // Create collision polygon and cast vector
+        val collisionPolygon = createCollisionPolygon(movingObject, targetObject)
+        val collisionLines = collisionPolygon.asVectorList()
+        val castPoint = PointF(movingObject.x - targetObject.x, movingObject.y - targetObject.y)
+        val castVector = Vector(PointF(castPoint.x - distanceX, castPoint. y - distanceY), PointF(castPoint.x + distanceX, castPoint.y + distanceY))
+
+        // Determine time of collision
+        var entryTime = Float.POSITIVE_INFINITY
+        var collisionSide: CollisionSide? = null
+        for (line in collisionLines) {
+            if (line.directionOfPoint(castVector.start) <= 0 && line.directionOfPoint(castVector.end) >= 0) {
+                castVector.intersect(line)?.let { intersection ->
+                    val intersectDistanceX = intersection.x - castPoint.x
+                    val intersectDistanceY = intersection.y - castPoint.y
+                    val checkEntryTime: Float
+                    if (abs(intersectDistanceX) > abs(intersectDistanceY)) {
+                        checkEntryTime = if (distanceX != 0f) intersectDistanceX / distanceX else Float.POSITIVE_INFINITY
+                    } else {
+                        checkEntryTime = if (distanceY != 0f) intersectDistanceY / distanceY else Float.POSITIVE_INFINITY
+                    }
+                    if (checkEntryTime < entryTime) {
+                        entryTime = checkEntryTime
+                        if (abs(line.start.x - line.end.x) > abs(line.start.y - line.end.y)) {
+                            collisionSide = if (line.start.x < line.end.x) CollisionSide.Bottom else CollisionSide.Top
+                        } else {
+                            collisionSide = if (line.start.y < line.end.y) CollisionSide.Left else CollisionSide.Right
+                        }
+                    }
+                    entryTime = min(entryTime, checkEntryTime)
+                }
+            }
+        }
+
+        // Check collision time and return result
+        if (entryTime < 0 && abs(entryTime * distanceX) < 0.0001 && abs(entryTime * distanceY) < 0.0001) {
+            entryTime = 0f
+        }
+        collisionSide?.let { side ->
+            if (entryTime >= 0 && entryTime <= 1) {
+                return CollisionResult(distanceX * entryTime, distanceY * entryTime, side)
+            }
+        }
+        return null
+    }
+
+    private fun createCollisionPolygon(movingObject: PhysicsObject, targetObject: PhysicsObject): Polygon {
+        // Create polygons of rotated square shapes
+        val movingObjectPolygon = Polygon(movingObject.collisionBounds, movingObject.collisionPivot, movingObject.collisionRotation)
+        val targetObjectPolygon = Polygon(targetObject.collisionBounds, targetObject.collisionPivot, targetObject.collisionRotation)
+        var movingObjectIndex = (movingObjectPolygon.mostTopRightIndex() + 2) % 4
+        var targetObjectIndex = targetObjectPolygon.mostTopRightIndex()
+
+        // Determine how to follow the shape when overlapping the polygon on the target polygon's points
+        val movingObjectDistanceX = movingObjectPolygon.points[movingObjectIndex].x - movingObjectPolygon.points[(movingObjectIndex + 1) % 4].x
+        val movingObjectDistanceY = movingObjectPolygon.points[movingObjectIndex].y - movingObjectPolygon.points[(movingObjectIndex + 1) % 4].y
+        val targetObjectDistanceX = targetObjectPolygon.points[(targetObjectIndex + 1) % 4].x - targetObjectPolygon.points[targetObjectIndex].x
+        val targetObjectDistanceY = targetObjectPolygon.points[(targetObjectIndex + 1) % 4].y - targetObjectPolygon.points[targetObjectIndex].y
+        val movingObjectSlope = if (movingObjectDistanceY != 0f) movingObjectDistanceX / movingObjectDistanceY else Float.POSITIVE_INFINITY
+        val targetObjectSlope = if (targetObjectDistanceY != 0f) targetObjectDistanceX / targetObjectDistanceY else Float.POSITIVE_INFINITY
+        if (movingObjectSlope > targetObjectSlope) {
+            movingObjectIndex = (movingObjectIndex + 1) % 4
+        }
+
+        // Overlap object polygon on the points of the target polygon and trace their edges
+        val result = Polygon()
+        for (i in 0 until 8) {
+            val x = targetObjectPolygon.points[targetObjectIndex].x - movingObjectPolygon.points[movingObjectIndex].x
+            val y = targetObjectPolygon.points[targetObjectIndex].y - movingObjectPolygon.points[movingObjectIndex].y
+            result.addPoint(PointF(x, y))
+            if (i % 2 == 0) {
+                targetObjectIndex = (targetObjectIndex + 1) % 4
+            } else {
+                movingObjectIndex = (movingObjectIndex + 1) % 4
+            }
+        }
+        return result
     }
 
 

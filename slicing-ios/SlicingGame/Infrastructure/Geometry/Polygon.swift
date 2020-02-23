@@ -24,8 +24,30 @@ class Polygon {
     init(points: [CGPoint]) {
         self.points = points
     }
+    
+    init(rect: CGRect, pivot: CGPoint = CGPoint.zero, rotation: CGFloat = 0) {
+        // Set rectangle points
+        points = [
+            CGPoint(x: rect.minX, y: rect.minY),
+            CGPoint(x: rect.maxX, y: rect.minY),
+            CGPoint(x: rect.maxX, y: rect.maxY),
+            CGPoint(x: rect.minX, y: rect.maxY)
+        ]
+        
+        // Apply optional rotation
+        if rotation != 0 {
+            let radianRotation = CGFloat.pi * 2 * rotation / 360
+            let sine = sin(radianRotation)
+            let cosine = cos(radianRotation)
+            for index in points.indices {
+                let distanceX = points[index].x - pivot.x
+                let distanceY = points[index].y - pivot.y
+                points[index] = CGPoint(x: pivot.x + cosine * distanceX - sine * distanceY, y: pivot.y + sine * distanceX + cosine * distanceY)
+            }
+        }
+    }
 
-
+    
     // --
     // MARK: Apply changes
     // --
@@ -142,6 +164,11 @@ class Polygon {
         return false
     }
     
+    
+    // --
+    // MARK: Calculated values
+    // --
+
     func calculateSurfaceArea() -> CGFloat {
         var first: CGFloat = 0
         var second: CGFloat = 0
@@ -152,12 +179,7 @@ class Polygon {
         return (first - second) / 2
     }
 
-    
-    // --
-    // MARK: Helper
-    // --
-    
-    private func mostTopRightIndex() -> Int {
+    func mostTopRightIndex() -> Int {
         var result = 0
         for index in points.indices {
             if index > 0 {
