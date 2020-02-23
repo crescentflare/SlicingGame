@@ -101,16 +101,14 @@ class Physics {
         // Check collision against other objects
         var moveX = distanceX
         var moveY = distanceY
-        let startBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))
-        var movedBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x) + CGFloat(moveX), dy: CGFloat(object.y) + CGFloat(moveY))
+        let bounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))
         var collisionObject: PhysicsObject?
         var collisionSide: CollisionSide?
         for checkObject in objects {
             if checkObject !== object {
-                if let collision = checkObjectCollision(object: checkObject, distanceX: moveX, distanceY: moveY, startBounds: startBounds, endBounds: movedBounds) {
+                if let collision = checkObjectCollision(object: checkObject, distanceX: moveX, distanceY: moveY, bounds: bounds) {
                     moveX = collision.distanceX
                     moveY = collision.distanceY
-                    movedBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x) + CGFloat(moveX), dy: CGFloat(object.y) + CGFloat(moveY))
                     collisionObject = checkObject
                     collisionSide = collision.side
                 }
@@ -133,34 +131,31 @@ class Physics {
     // MARK: Collision
     // --
     
-    private func checkObjectCollision(object: PhysicsObject, distanceX: Float, distanceY: Float, startBounds: CGRect, endBounds: CGRect) -> CollisionResult? {
+    private func checkObjectCollision(object: PhysicsObject, distanceX: Float, distanceY: Float, bounds: CGRect) -> CollisionResult? {
+        // Calculate collision distances for each axis separately
         let objectBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))
-        if endBounds.intersects(objectBounds) {
-            // Handle collision with horizontal or vertical priority (depending if the start bounds were already intersecting with that axis)
-            let preferHorizontalCollision = distanceY == 0 || (distanceY > 0 && startBounds.maxY >= objectBounds.minY) || (distanceY < 0 && startBounds.minY <= objectBounds.maxY)
-            let preferVerticalCollision = distanceX == 0 || (distanceX > 0 && startBounds.maxX >= objectBounds.minX) || (distanceX < 0 && startBounds.minX <= objectBounds.maxX)
-            if preferHorizontalCollision && distanceX != 0 {
-                let side: CollisionSide = startBounds.minX < endBounds.minX ? .right : .left
-                let newDistanceX = side == .right ? Float(objectBounds.minX - startBounds.maxX) : Float(objectBounds.maxX - startBounds.minX)
-                return CollisionResult(distanceX: newDistanceX, distanceY: newDistanceX / distanceX * distanceY, side: side)
-            } else if preferVerticalCollision && distanceY != 0 {
-                let side: CollisionSide = startBounds.minY < endBounds.minY ? .bottom : .top
-                let newDistanceY = side == .bottom ? Float(objectBounds.minY - startBounds.maxY) : Float(objectBounds.maxY - startBounds.minY)
-                return CollisionResult(distanceX: newDistanceY / distanceY * distanceX, distanceY: newDistanceY, side: side)
+        let entryDistanceX = distanceX > 0 ? Float(objectBounds.minX - bounds.maxX) : Float(objectBounds.maxX - bounds.minX)
+        let entryDistanceY = distanceY > 0 ? Float(objectBounds.minY - bounds.maxY) : Float(objectBounds.maxY - bounds.minY)
+        let exitDistanceX = distanceX > 0 ? Float(objectBounds.maxX - bounds.minX) : Float(objectBounds.minX - bounds.maxX)
+        let exitDistanceY = distanceY > 0 ? Float(objectBounds.maxY - bounds.minY) : Float(objectBounds.minY - bounds.maxY)
+        
+        // Calculate collision time relative to the movement distance (ranging from 0 to 1)
+        let entryTimeX = distanceX == 0 ? Float.infinity : entryDistanceX / distanceX
+        let entryTimeY = distanceY == 0 ? Float.infinity : entryDistanceY / distanceY
+        let exitTimeX = distanceX == 0 ? Float.infinity : exitDistanceX / distanceX
+        let exitTimeY = distanceY == 0 ? Float.infinity : exitDistanceY / distanceY
+        
+        // Check for collision and return result
+        let entryTime = max(entryTimeX, entryTimeY)
+        let exitTime = min(exitTimeX, exitTimeY)
+        if entryTime < exitTime && entryTime >= 0 && entryTime <= 1 {
+            let side: CollisionSide
+            if entryTimeX > entryTimeY {
+                side = distanceX < 0 ? .left : .right
+            } else {
+                side = distanceY < 0 ? .top : .bottom
             }
-            
-            // Handle remaining cases, collision side depends on the biggest overlap of the intersection
-            let horizontalSide: CollisionSide = startBounds.minX < endBounds.minX ? .right : .left
-            let verticalSide: CollisionSide = startBounds.minY < endBounds.minY ? .bottom : .top
-            let intersectionWidth = horizontalSide == .right ? endBounds.maxX - objectBounds.minX : objectBounds.maxX - endBounds.minX
-            let intersectionHeight = verticalSide == .bottom ? endBounds.maxY - objectBounds.minY : objectBounds.maxY - endBounds.minY
-            if intersectionWidth > intersectionHeight && distanceY != 0 {
-                let newDistanceY = verticalSide == .bottom ? Float(objectBounds.minY - startBounds.maxY) : Float(objectBounds.maxY - startBounds.minY)
-                return CollisionResult(distanceX: newDistanceY / distanceY * distanceX, distanceY: newDistanceY, side: verticalSide)
-            } else if distanceX != 0 {
-                let newDistanceX = horizontalSide == .right ? Float(objectBounds.minX - startBounds.maxX) : Float(objectBounds.maxX - startBounds.minX)
-                return CollisionResult(distanceX: newDistanceX, distanceY: newDistanceX / distanceX * distanceY, side: horizontalSide)
-            }
+            return CollisionResult(distanceX: distanceX * entryTime, distanceY: distanceY * entryTime, side: side)
         }
         return nil
     }

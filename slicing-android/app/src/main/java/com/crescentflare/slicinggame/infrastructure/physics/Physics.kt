@@ -1,6 +1,8 @@
 package com.crescentflare.slicinggame.infrastructure.physics
 
 import android.graphics.RectF
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Physics: manages collision and send events to objects
@@ -79,19 +81,15 @@ class Physics {
         // Check collision against other objects
         var moveX = distanceX
         var moveY = distanceY
-        val startBounds = RectF(movingObject.collisionBounds)
-        var movedBounds = RectF(movingObject.collisionBounds)
+        val bounds = RectF(movingObject.collisionBounds)
         var collisionObject: PhysicsObject? = null
         var collisionSide: CollisionSide? = null
-        startBounds.offset(movingObject.x, movingObject.y)
-        movedBounds.offset(movingObject.x + moveX, movingObject.y + moveY)
+        bounds.offset(movingObject.x, movingObject.y)
         for (checkObject in objectList) {
             if (checkObject !== movingObject) {
-                checkObjectCollision(checkObject, moveX, moveY, startBounds, movedBounds)?.let {
+                checkObjectCollision(checkObject, moveX, moveY, bounds)?.let {
                     moveX = it.distanceX
                     moveY = it.distanceY
-                    movedBounds = RectF(movingObject.collisionBounds)
-                    movedBounds.offset(movingObject.x + moveX, movingObject.y + moveY)
                     collisionObject = checkObject
                     collisionSide = it.side
                 }
@@ -114,35 +112,31 @@ class Physics {
     // Collision
     // --
 
-    private fun checkObjectCollision(againstObject: PhysicsObject, distanceX: Float, distanceY: Float, startBounds: RectF, endBounds: RectF): CollisionResult? {
+    private fun checkObjectCollision(againstObject: PhysicsObject, distanceX: Float, distanceY: Float, bounds: RectF): CollisionResult? {
+        // Calculate collision distances for each axis separately
         val objectBounds = againstObject.collisionBounds
         objectBounds.offset(againstObject.x, againstObject.y)
-        if (endBounds.intersects(objectBounds.left, objectBounds.top, objectBounds.right, objectBounds.bottom)) {
-            // Handle collision with horizontal or vertical priority (depending if the start bounds were already intersecting with that axis)
-            val preferHorizontalCollision = distanceY == 0f || (distanceY > 0 && startBounds.bottom >= objectBounds.top) || (distanceY < 0 && startBounds.top <= objectBounds.bottom)
-            val preferVerticalCollision = distanceX == 0f || (distanceX > 0 && startBounds.right >= objectBounds.left) || (distanceX < 0 && startBounds.left <= objectBounds.right)
-            if (preferHorizontalCollision && distanceX != 0f) {
-                val side: CollisionSide = if (startBounds.left < endBounds.left) CollisionSide.Right else CollisionSide.Left
-                val newDistanceX = if (side == CollisionSide.Right) objectBounds.left - startBounds.right else objectBounds.right - startBounds.left
-                return CollisionResult(newDistanceX, newDistanceX / distanceX * distanceY, side)
-            } else if (preferVerticalCollision && distanceY != 0f) {
-                val side: CollisionSide = if (startBounds.top < endBounds.top) CollisionSide.Bottom else CollisionSide.Top
-                val newDistanceY = if (side == CollisionSide.Bottom) objectBounds.top - startBounds.bottom else objectBounds.bottom - startBounds.top
-                return CollisionResult(newDistanceY / distanceY * distanceX, newDistanceY, side)
-            }
+        val entryDistanceX = if (distanceX > 0) objectBounds.left - bounds.right else objectBounds.right - bounds.left
+        val entryDistanceY = if (distanceY > 0) objectBounds.top - bounds.bottom else objectBounds.bottom - bounds.top
+        val exitDistanceX = if (distanceX > 0) objectBounds.right - bounds.left else objectBounds.left - bounds.right
+        val exitDistanceY = if (distanceY > 0) objectBounds.bottom - bounds.top else objectBounds.top - bounds.bottom
 
-            // Handle remaining cases, collision side depends on the biggest overlap of the intersection
-            val horizontalSide: CollisionSide = if (startBounds.left < endBounds.left) CollisionSide.Right else CollisionSide.Left
-            val verticalSide: CollisionSide = if (startBounds.top < endBounds.top) CollisionSide.Bottom else CollisionSide.Top
-            val intersectionWidth = if (horizontalSide == CollisionSide.Right) endBounds.right - objectBounds.left else objectBounds.right - endBounds.left
-            val intersectionHeight = if (verticalSide == CollisionSide.Bottom) endBounds.bottom - objectBounds.top else objectBounds.bottom - endBounds.top
-            if (intersectionWidth > intersectionHeight && distanceY != 0f) {
-                val newDistanceY = if (verticalSide == CollisionSide.Bottom) objectBounds.top - startBounds.bottom else objectBounds.bottom - startBounds.top
-                return CollisionResult(newDistanceY / distanceY * distanceX, newDistanceY, verticalSide)
-            } else if (distanceX != 0f) {
-                val newDistanceX = if (horizontalSide == CollisionSide.Right) objectBounds.left - startBounds.right else objectBounds.right - startBounds.left
-                return CollisionResult(newDistanceX, newDistanceX / distanceX * distanceY, horizontalSide)
+        // Calculate collision time relative to the movement distance (ranging from 0 to 1)
+        val entryTimeX = if (distanceX == 0f) Float.POSITIVE_INFINITY else entryDistanceX / distanceX
+        val entryTimeY = if (distanceY == 0f) Float.POSITIVE_INFINITY else entryDistanceY / distanceY
+        val exitTimeX = if (distanceX == 0f) Float.POSITIVE_INFINITY else exitDistanceX / distanceX
+        val exitTimeY = if (distanceY == 0f) Float.POSITIVE_INFINITY else exitDistanceY / distanceY
+
+        // Check for collision and return result
+        val entryTime = max(entryTimeX, entryTimeY)
+        val exitTime = min(exitTimeX, exitTimeY)
+        if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
+            val side: CollisionSide = if (entryTimeX > entryTimeY) {
+                if (distanceX < 0) CollisionSide.Left else CollisionSide.Right
+            } else {
+                if (distanceY < 0) CollisionSide.Top else CollisionSide.Bottom
             }
+            return CollisionResult(distanceX * entryTime, distanceY * entryTime, side)
         }
         return null
     }
