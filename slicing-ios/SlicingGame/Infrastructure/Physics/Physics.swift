@@ -33,10 +33,50 @@ class Physics {
     // MARK: Members
     // --
     
-    var width: Float = 1
-    var height: Float = 1
+    var width: Float = 1 {
+        didSet {
+            topBoundary.x = -width
+            topBoundary.width = width * 3
+            bottomBoundary.x = -width
+            bottomBoundary.width = width * 3
+            leftBoundary.x = -width
+            leftBoundary.width = width
+            rightBoundary.x = width
+            rightBoundary.width = width
+        }
+    }
+    
+    var height: Float = 1 {
+        didSet {
+            leftBoundary.y = -height
+            leftBoundary.height = height * 3
+            rightBoundary.y = -height
+            rightBoundary.height = height * 3
+            topBoundary.y = -height
+            topBoundary.height = height
+            bottomBoundary.y = height
+            bottomBoundary.height = height
+        }
+    }
+    
     private var objects = [PhysicsObject]()
+    private var leftBoundary = PhysicsBoundary(x: -1, y: -1, width: 1, height: 3)
+    private var rightBoundary = PhysicsBoundary(x: 1, y: -1, width: 1, height: 3)
+    private var topBoundary = PhysicsBoundary(x: -1, y: -1, width: 3, height: 1)
+    private var bottomBoundary = PhysicsBoundary(x: -1, y: 1, width: 3, height: 1)
 
+
+    // --
+    // MARK: Initialization
+    // --
+
+    init() {
+        registerObject(leftBoundary)
+        registerObject(rightBoundary)
+        registerObject(topBoundary)
+        registerObject(bottomBoundary)
+    }
+    
 
     // --
     // MARK: Object management
@@ -49,7 +89,7 @@ class Physics {
     }
     
     func clearObjects() {
-        objects.removeAll()
+        objects.removeAll { $0 !== leftBoundary && $0 !== rightBoundary && $0 !== topBoundary && $0 !== bottomBoundary }
     }
     
 
@@ -75,26 +115,6 @@ class Physics {
                     collisionSide = collision.side
                 }
             }
-        }
-        
-        // Check collision against physics boundaries
-        if movedBounds.maxX > CGFloat(width) {
-            moveX = width - Float(startBounds.maxX)
-            collisionObject = nil
-            collisionSide = .right
-        } else if movedBounds.minX < 0 {
-            moveX = -Float(startBounds.minX)
-            collisionObject = nil
-            collisionSide = .left
-        }
-        if movedBounds.maxY > CGFloat(height) {
-            moveY = height - Float(startBounds.maxY)
-            collisionObject = nil
-            collisionSide = .bottom
-        } else if movedBounds.minY < 0 {
-            moveY = -Float(startBounds.minY)
-            collisionObject = nil
-            collisionSide = .top
         }
         
         // Move

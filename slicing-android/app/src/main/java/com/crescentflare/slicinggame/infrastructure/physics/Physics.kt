@@ -12,8 +12,48 @@ class Physics {
     // --
 
     var width: Float = 1f
+        set(width) {
+            field = width
+            topBoundary.x = -width
+            topBoundary.width = width * 3
+            bottomBoundary.x = -width
+            bottomBoundary.width = width * 3
+            leftBoundary.x = -width
+            leftBoundary.width = width
+            rightBoundary.x = width
+            rightBoundary.width = width
+        }
+
     var height: Float = 1f
+        set(height) {
+            field = height
+            leftBoundary.y = -height
+            leftBoundary.height = height * 3
+            rightBoundary.y = -height
+            rightBoundary.height = height * 3
+            topBoundary.y = -height
+            topBoundary.height = height
+            bottomBoundary.y = height
+            bottomBoundary.height = height
+        }
+
     private val objectList = mutableListOf<PhysicsObject>()
+    private var leftBoundary = PhysicsBoundary(-1f, -1f, 1f, 3f)
+    private var rightBoundary = PhysicsBoundary(1f, -1f, 1f, 3f)
+    private var topBoundary = PhysicsBoundary(-1f, -1f, 3f, 1f)
+    private var bottomBoundary = PhysicsBoundary(-1f, 1f, 3f, 1f)
+
+
+    // --
+    // Initialization
+    // --
+
+    init {
+        registerObject(leftBoundary)
+        registerObject(rightBoundary)
+        registerObject(topBoundary)
+        registerObject(bottomBoundary)
+    }
 
 
     // --
@@ -27,7 +67,7 @@ class Physics {
     }
 
     fun clearObjects() {
-        objectList.clear()
+        objectList.removeAll { it !== leftBoundary && it !== rightBoundary && it !== topBoundary && it !== bottomBoundary }
     }
 
 
@@ -56,26 +96,6 @@ class Physics {
                     collisionSide = it.side
                 }
             }
-        }
-
-        // Check collision against physics boundaries
-        if (movedBounds.right > width) {
-            moveX = width - startBounds.right
-            collisionObject = null
-            collisionSide = CollisionSide.Right
-        } else if (movedBounds.left < 0) {
-            moveX = -startBounds.left
-            collisionObject = null
-            collisionSide = CollisionSide.Left
-        }
-        if (movedBounds.bottom > height) {
-            moveY = height - startBounds.bottom
-            collisionObject = null
-            collisionSide = CollisionSide.Bottom
-        } else if (movedBounds.top < 0) {
-            moveY = -startBounds.top
-            collisionObject = null
-            collisionSide = CollisionSide.Top
         }
 
         // Move
