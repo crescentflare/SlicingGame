@@ -19,7 +19,7 @@ class PhysicsBoundary(override var x: Float, override var y: Float, var width: F
     // Physics
     // --
 
-    override fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, physics: Physics) {
+    override fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, timeRemaining: Float, physics: Physics) {
         // No implementation
     }
 

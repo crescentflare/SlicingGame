@@ -11,6 +11,6 @@ protocol PhysicsObject: class {
     var y: Float { get set }
     var collisionBounds: CGRect { get }
     
-    func didCollide(withObject: PhysicsObject?, side: CollisionSide, physics: Physics)
+    func didCollide(withObject: PhysicsObject?, side: CollisionSide, timeRemaining: TimeInterval, physics: Physics)
 
 }

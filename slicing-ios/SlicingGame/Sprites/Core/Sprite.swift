@@ -46,7 +46,7 @@ class Sprite: PhysicsObject {
     // --
     
     func update(timeInterval: TimeInterval, physics: Physics) {
-        physics.moveObject(self, distanceX: moveX * Float(timeInterval), distanceY: moveY * Float(timeInterval))
+        physics.moveObject(self, distanceX: moveX * Float(timeInterval), distanceY: moveY * Float(timeInterval), timeInterval: timeInterval)
     }
 
 
@@ -54,7 +54,7 @@ class Sprite: PhysicsObject {
     // MARK: Physics
     // --
     
-    func didCollide(withObject: PhysicsObject?, side: CollisionSide, physics: Physics) {
+    func didCollide(withObject: PhysicsObject?, side: CollisionSide, timeRemaining: TimeInterval, physics: Physics) {
         switch side {
         case .left:
             moveX = abs(moveX)
@@ -64,6 +64,9 @@ class Sprite: PhysicsObject {
             moveY = abs(moveY)
         case .bottom:
             moveY = -abs(moveY)
+        }
+        if timeRemaining > 0 {
+            update(timeInterval: timeRemaining, physics: physics)
         }
     }
     

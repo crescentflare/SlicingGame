@@ -97,7 +97,7 @@ class Physics {
     // MARK: Movement
     // --
     
-    func moveObject(_ object: PhysicsObject, distanceX: Float, distanceY: Float) {
+    func moveObject(_ object: PhysicsObject, distanceX: Float, distanceY: Float, timeInterval: TimeInterval) {
         // Check collision against other objects
         var moveX = distanceX
         var moveY = distanceY
@@ -121,8 +121,9 @@ class Physics {
         
         // Notify objects
         if let collisionSide = collisionSide {
-            collisionObject?.didCollide(withObject: object, side: collisionSide.flipped(), physics: self)
-            object.didCollide(withObject: collisionObject, side: collisionSide, physics: self)
+            let timeRemaining = TimeInterval(1 - (distanceX > distanceY ? abs(moveX) / abs(distanceX) : abs(moveY) / abs(distanceY))) * timeInterval
+            collisionObject?.didCollide(withObject: object, side: collisionSide.flipped(), timeRemaining: 0, physics: self)
+            object.didCollide(withObject: collisionObject, side: collisionSide, timeRemaining: timeRemaining, physics: self)
         }
     }
     

@@ -78,7 +78,7 @@ class Physics {
     // Movement
     // --
 
-    fun moveObject(movingObject: PhysicsObject, distanceX: Float, distanceY: Float) {
+    fun moveObject(movingObject: PhysicsObject, distanceX: Float, distanceY: Float, timeInterval: Float) {
         // Check collision against other objects
         var moveX = distanceX
         var moveY = distanceY
@@ -103,8 +103,9 @@ class Physics {
 
         // Notify objects
         collisionSide?.let { side ->
-            collisionObject?.onCollision(movingObject, side.flipped(), this)
-            movingObject.onCollision(collisionObject, side, this)
+            val timeRemaining = (1f - if (distanceX > distanceY) abs(moveX) / abs(distanceX) else abs(moveY) / abs(distanceY)) * timeInterval
+            collisionObject?.onCollision(movingObject, side.flipped(), 0f, this)
+            movingObject.onCollision(collisionObject, side, timeRemaining, this)
         }
     }
 

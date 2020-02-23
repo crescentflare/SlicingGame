@@ -11,6 +11,6 @@ interface PhysicsObject {
     var y: Float
     val collisionBounds: RectF
 
-    fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, physics: Physics)
+    fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, timeRemaining: Float, physics: Physics)
 
 }
