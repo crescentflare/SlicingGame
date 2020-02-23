@@ -130,7 +130,7 @@ class SpriteContainerView: FrameContainerView {
     
     private func update(timeInterval: TimeInterval) {
         sprites.forEach {
-            $0.update(timeInterval: timeInterval, gridWidth: gridWidth, gridHeight: gridHeight)
+            $0.update(timeInterval: timeInterval, gridWidth: gridWidth, gridHeight: gridHeight, sprites: sprites)
         }
         setNeedsDisplay()
     }

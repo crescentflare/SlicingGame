@@ -31,12 +31,26 @@ class Sprite {
 
     
     // --
+    // MARK: Properties
+    // --
+    
+    var bounds: CGRect {
+        get {
+            return CGRect(x: CGFloat(x), y: CGFloat(y), width: CGFloat(width), height: CGFloat(height))
+        }
+    }
+    
+
+    // --
     // MARK: Movement
     // --
     
-    func update(timeInterval: TimeInterval, gridWidth: Float, gridHeight: Float) {
+    func update(timeInterval: TimeInterval, gridWidth: Float, gridHeight: Float, sprites: [Sprite]) {
+        // Apply movement
         x += moveX * Float(timeInterval)
         y += moveY * Float(timeInterval)
+        
+        // Handle collision against the level boundaries
         if moveX > 0 && x + width > gridWidth {
             x = gridWidth - width
             moveX = -moveX
@@ -50,6 +64,25 @@ class Sprite {
         } else if moveY < 0 && y < 0 {
             y = 0
             moveY = -moveY
+        }
+        
+        // Handle collision against other sprites
+        let checkBounds = bounds
+        for sprite in sprites {
+            if sprite !== self {
+                let spriteBounds = sprite.bounds
+                if checkBounds.intersects(spriteBounds) {
+                    if checkBounds.minX < spriteBounds.minX && moveX > 0 {
+                        moveX = -moveX
+                    } else if checkBounds.maxX > spriteBounds.maxX && moveX < 0 {
+                        moveX = -moveX
+                    } else if checkBounds.minY < spriteBounds.minY && moveY > 0 {
+                        moveY = -moveY
+                    } else if checkBounds.maxY > spriteBounds.maxY && moveY < 0 {
+                        moveY = -moveY
+                    }
+                }
+            }
         }
     }
 

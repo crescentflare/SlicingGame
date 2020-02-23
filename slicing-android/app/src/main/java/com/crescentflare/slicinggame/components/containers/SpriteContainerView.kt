@@ -153,7 +153,7 @@ open class SpriteContainerView : FrameContainerView {
     private fun update(timeDifference: Long) {
         val timeInterval = timeDifference.toFloat() / 1000
         sprites.forEach { sprite ->
-            sprite.update(timeInterval, gridWidth, gridHeight)
+            sprite.update(timeInterval, gridWidth, gridHeight, sprites)
         }
         invalidate()
     }

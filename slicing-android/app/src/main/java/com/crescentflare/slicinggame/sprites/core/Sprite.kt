@@ -2,6 +2,7 @@ package com.crescentflare.slicinggame.sprites.core
 
 import android.graphics.Color
 import android.graphics.PointF
+import android.graphics.RectF
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import kotlin.random.Random
 
@@ -34,12 +35,23 @@ class Sprite {
 
 
     // --
+    // Properties
+    // --
+
+    val bounds: RectF
+        get() = RectF(x, y, x + width, y + height)
+
+
+    // --
     // Movement
     // --
 
-    fun update(timeInterval: Float, gridWidth: Float, gridHeight: Float) {
+    fun update(timeInterval: Float, gridWidth: Float, gridHeight: Float, sprites: List<Sprite>) {
+        // Apply movement
         x += moveX * timeInterval
         y += moveY * timeInterval
+
+        // Handle collision against the level boundaries
         if (moveX > 0 && x + width > gridWidth) {
             x = gridWidth - width
             moveX = -moveX
@@ -53,6 +65,25 @@ class Sprite {
         } else if (moveY < 0 && y < 0) {
             y = 0f
             moveY = -moveY
+        }
+
+        // Handle collision against other sprites
+        val checkBounds = bounds
+        for (sprite in sprites) {
+            if (sprite !== this) {
+                val spriteBounds = sprite.bounds
+                if (checkBounds.intersects(spriteBounds.left, spriteBounds.top, spriteBounds.right, spriteBounds.bottom)) {
+                    if (checkBounds.left < spriteBounds.left && moveX > 0) {
+                        moveX = -moveX
+                    } else if (checkBounds.right > spriteBounds.right && moveX < 0) {
+                        moveX = -moveX
+                    } else if (checkBounds.top < spriteBounds.top && moveY > 0) {
+                        moveY = -moveY
+                    } else if (checkBounds.bottom > spriteBounds.bottom && moveY < 0) {
+                        moveY = -moveY
+                    }
+                }
+            }
         }
     }
 
