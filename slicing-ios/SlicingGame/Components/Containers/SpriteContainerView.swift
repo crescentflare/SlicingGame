@@ -15,6 +15,8 @@ class SpriteContainerView: FrameContainerView {
     
     private var sprites = [Sprite]()
     private var updateScheduled = false
+    private var lastTimeInterval = Date.timeIntervalSinceReferenceDate
+    private var timeCorrection = 0.001
 
 
     // --
@@ -36,6 +38,9 @@ class SpriteContainerView: FrameContainerView {
                 // Apply canvas size
                 spriteContainer.gridWidth = convUtil.asFloat(value: attributes["gridWidth"]) ?? 1
                 spriteContainer.gridHeight = convUtil.asFloat(value: attributes["gridHeight"]) ?? 1
+
+                // Apply update frames per second
+                spriteContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
 
                 // Apply sprites
                 spriteContainer.clearSprites()
@@ -116,7 +121,9 @@ class SpriteContainerView: FrameContainerView {
         }
     }
 
+    var fps = 60
 
+    
     // --
     // MARK: Movement
     // --
@@ -144,10 +151,29 @@ class SpriteContainerView: FrameContainerView {
 
         // Schedule next update
         if !updateScheduled {
+            let checkTimeInterval = Date.timeIntervalSinceReferenceDate
+            let delayTime = 1.0 / Double(fps) - (checkTimeInterval - lastTimeInterval)
             updateScheduled = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01, execute: {
+            DispatchQueue.main.asyncAfter(deadline: .now() + max(0.001, delayTime - timeCorrection), execute: {
+                // Try to correct for time lost due to dispatch queue inaccuracy
+                let currentTimeInterval = Date.timeIntervalSinceReferenceDate
+                if (delayTime >= 0.001) {
+                    let lostTimeInterval = (currentTimeInterval - checkTimeInterval) - delayTime
+                    if lostTimeInterval < -0.0001 {
+                        self.timeCorrection -= 0.0001
+                    } else if lostTimeInterval > 0.0001 {
+                        self.timeCorrection += 0.0001
+                    }
+                }
+                
+                // Continue with the next update
+                var difference = currentTimeInterval - self.lastTimeInterval
+                self.lastTimeInterval = currentTimeInterval
                 self.updateScheduled = false
-                self.update(timeInterval: 0.01)
+                if difference > 1.0 / Double(self.fps) * 5 {
+                    difference = 1.0 / Double(self.fps) * 5
+                }
+                self.update(timeInterval: difference)
             })
         }
     }

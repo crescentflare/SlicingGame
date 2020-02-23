@@ -421,6 +421,10 @@
             "description": "The height of the coordinate system for placing sprites, they are pixel independent",
             "type": "number"
           },
+          "fps": {
+            "description": "The amount of frames per second the sprite refresh loop tries to run on",
+            "type": "integer"
+          },
           "sprites": {
             "description": "A list of sprites to place within the container",
             "type": "array",
