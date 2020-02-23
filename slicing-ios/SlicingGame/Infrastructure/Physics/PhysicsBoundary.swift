@@ -15,6 +15,7 @@ class PhysicsBoundary: PhysicsObject {
     var y: Float = 0
     var width: Float = 1
     var height: Float = 1
+    var recursiveCheck = 0
 
 
     // --

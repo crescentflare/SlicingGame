@@ -158,6 +158,7 @@ open class SpriteContainerView : FrameContainerView {
 
     private fun update(timeDifference: Long) {
         val timeInterval = timeDifference.toFloat() / 1000
+        physics.prepareObjects()
         sprites.forEach { sprite ->
             sprite.update(timeInterval, physics)
         }

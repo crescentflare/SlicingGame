@@ -8,6 +8,13 @@ import android.graphics.RectF
 class PhysicsBoundary(override var x: Float, override var y: Float, var width: Float, var height: Float): PhysicsObject {
 
     // --
+    // Members
+    // --
+
+    override var recursiveCheck = 0
+
+
+    // --
     // Properties
     // --
 

@@ -22,6 +22,7 @@ class Sprite: PhysicsObject {
     override var y = 0f
     var width = 1f
     var height = 1f
+    override var recursiveCheck = 0
     private var moveX: Float
     private var moveY: Float
 

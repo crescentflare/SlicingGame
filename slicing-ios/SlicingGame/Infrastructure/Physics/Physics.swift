@@ -92,6 +92,12 @@ class Physics {
         objects.removeAll { $0 !== leftBoundary && $0 !== rightBoundary && $0 !== topBoundary && $0 !== bottomBoundary }
     }
     
+    func prepareObjects() {
+        objects.forEach {
+            $0.recursiveCheck = 0
+        }
+    }
+    
 
     // --
     // MARK: Movement
@@ -121,7 +127,15 @@ class Physics {
         
         // Notify objects
         if let collisionSide = collisionSide {
-            let timeRemaining = TimeInterval(1 - (distanceX > distanceY ? abs(moveX) / abs(distanceX) : abs(moveY) / abs(distanceY))) * timeInterval
+            var timeRemaining = TimeInterval(1 - (distanceX > distanceY ? abs(moveX) / abs(distanceX) : abs(moveY) / abs(distanceY))) * timeInterval
+            if timeRemaining == 1 {
+                object.recursiveCheck += 1
+                if object.recursiveCheck >= 4 {
+                    timeRemaining = 0
+                }
+            } else {
+                object.recursiveCheck = 0
+            }
             collisionObject?.didCollide(withObject: object, side: collisionSide.flipped(), timeRemaining: 0, physics: self)
             object.didCollide(withObject: collisionObject, side: collisionSide, timeRemaining: timeRemaining, physics: self)
         }

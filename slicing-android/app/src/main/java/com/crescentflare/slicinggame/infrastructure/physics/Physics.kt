@@ -73,6 +73,12 @@ class Physics {
         objectList.removeAll { it !== leftBoundary && it !== rightBoundary && it !== topBoundary && it !== bottomBoundary }
     }
 
+    fun prepareObjects() {
+        objectList.forEach {
+            it.recursiveCheck = 0
+        }
+    }
+
 
     // --
     // Movement
@@ -103,7 +109,15 @@ class Physics {
 
         // Notify objects
         collisionSide?.let { side ->
-            val timeRemaining = (1f - if (distanceX > distanceY) abs(moveX) / abs(distanceX) else abs(moveY) / abs(distanceY)) * timeInterval
+            var timeRemaining = (1f - if (distanceX > distanceY) abs(moveX) / abs(distanceX) else abs(moveY) / abs(distanceY)) * timeInterval
+            if (timeRemaining == 1f) {
+                movingObject.recursiveCheck++
+                if (movingObject.recursiveCheck >= 4) {
+                    timeRemaining = 0f
+                }
+            } else {
+                movingObject.recursiveCheck = 0
+            }
             collisionObject?.onCollision(movingObject, side.flipped(), 0f, this)
             movingObject.onCollision(collisionObject, side, timeRemaining, this)
         }

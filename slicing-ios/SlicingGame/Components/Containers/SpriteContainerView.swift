@@ -134,6 +134,7 @@ class SpriteContainerView: FrameContainerView {
     // --
     
     private func update(timeInterval: TimeInterval) {
+        physics.prepareObjects()
         sprites.forEach {
             $0.update(timeInterval: timeInterval, physics: physics)
         }
