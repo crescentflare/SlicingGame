@@ -22,6 +22,7 @@ class Sprite: PhysicsObject {
     override var y = 0f
     var width = 1f
     var height = 1f
+    override var recursiveCheck = 0
     private var moveX: Float
     private var moveY: Float
 
@@ -50,7 +51,7 @@ class Sprite: PhysicsObject {
     // --
 
     fun update(timeInterval: Float, physics: Physics) {
-        physics.moveObject(this, moveX * timeInterval, moveY * timeInterval)
+        physics.moveObject(this, moveX * timeInterval, moveY * timeInterval, timeInterval)
     }
 
 
@@ -58,12 +59,15 @@ class Sprite: PhysicsObject {
     // Physics
     // --
 
-    override fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, physics: Physics) {
+    override fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, timeRemaining: Float, physics: Physics) {
         when (side) {
             Physics.CollisionSide.Left -> moveX = abs(moveX)
             Physics.CollisionSide.Right -> moveX = -abs(moveX)
             Physics.CollisionSide.Top -> moveY = abs(moveY)
             Physics.CollisionSide.Bottom -> moveY = -abs(moveY)
+        }
+        if (timeRemaining > 0) {
+            update(timeRemaining, physics)
         }
     }
 
