@@ -11,6 +11,20 @@ class Vector {
     // MARK: Members
     // --
     
+    var x: CGFloat {
+        set {
+            end.x = start.x + newValue
+        }
+        get { return end.x - start.x }
+    }
+
+    var y: CGFloat {
+        set {
+            end.y = start.y + newValue
+        }
+        get { return end.y - start.y }
+    }
+
     var start = CGPoint()
     var end = CGPoint()
 
@@ -19,11 +33,34 @@ class Vector {
     // MARK: Initialization
     // --
     
+    convenience init(x: CGFloat, y: CGFloat) {
+        self.init(start: CGPoint.zero, end: CGPoint(x: x, y: y))
+    }
+    
     init(start: CGPoint, end: CGPoint) {
         self.start = start
         self.end = end
     }
 
+    init(directionAngle: CGFloat, pivot: CGPoint? = nil) {
+        self.start = pivot ?? CGPoint.zero
+        self.end = CGPoint(x: start.x + sin(directionAngle * CGFloat.pi * 2 / 360), y: start.y - cos(directionAngle * CGFloat.pi * 2 / 360))
+    }
+
+    
+    // --
+    // MARK: Operators
+    // --
+
+    static func *(vector: Vector, multiplier: CGFloat) -> Vector {
+        return Vector(start: vector.start, end: CGPoint(x: vector.start.x + vector.x * multiplier, y: vector.start.y + vector.y * multiplier))
+    }
+    
+    static func *=(vector: Vector, multiplier: CGFloat) {
+        vector.x *= multiplier
+        vector.y *= multiplier
+    }
+    
 
     // --
     // MARK: Return modified result
@@ -84,7 +121,7 @@ class Vector {
     }
     
     func distance() -> CGFloat {
-        return sqrt((start.x - end.x) * (start.x - end.x) + (start.y - end.y) * (start.y - end.y))
+        return sqrt(x * x + y * y)
     }
 
     func directionOf(point: CGPoint) -> CGFloat {
@@ -93,7 +130,7 @@ class Vector {
     
     func intersect(withVector: Vector) -> CGPoint? {
         // Intersection direction formula
-        let d = (end.x - start.x) * (withVector.end.y - withVector.start.y) - (end.y - start.y) * (withVector.end.x - withVector.start.x)
+        let d = x * withVector.y - y * withVector.x
         if d == 0 {
             return nil
         }

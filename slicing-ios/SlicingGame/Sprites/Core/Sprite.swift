@@ -15,6 +15,8 @@ class Sprite {
     var y: Float = 0
     var width: Float = 1
     var height: Float = 1
+    private var moveX: Float
+    private var moveY: Float
 
     
     // --
@@ -22,10 +24,36 @@ class Sprite {
     // --
     
     init() {
-        // No implementation
+        let moveVector = Vector(directionAngle: CGFloat.random(in: 0..<360)) * 4
+        moveX = Float(moveVector.x)
+        moveY = Float(moveVector.y)
     }
 
     
+    // --
+    // MARK: Movement
+    // --
+    
+    func update(timeInterval: TimeInterval, gridWidth: Float, gridHeight: Float) {
+        x += moveX * Float(timeInterval)
+        y += moveY * Float(timeInterval)
+        if moveX > 0 && x + width > gridWidth {
+            x = gridWidth - width
+            moveX = -moveX
+        } else if moveX < 0 && x < 0 {
+            x = 0
+            moveX = -moveX
+        }
+        if moveY > 0 && y + height > gridHeight {
+            y = gridHeight - height
+            moveY = -moveY
+        } else if moveY < 0 && y < 0 {
+            y = 0
+            moveY = -moveY
+        }
+    }
+
+
     // --
     // MARK: Drawing
     // --

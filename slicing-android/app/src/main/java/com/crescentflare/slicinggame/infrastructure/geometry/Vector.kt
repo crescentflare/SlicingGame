@@ -1,13 +1,63 @@
 package com.crescentflare.slicinggame.infrastructure.geometry
 
 import android.graphics.PointF
-import kotlin.math.abs
-import kotlin.math.sqrt
+import kotlin.math.*
 
 /**
  * Geometry: defines a vector with a start/end position and direction
  */
-class Vector(var start: PointF, var end: PointF) {
+class Vector {
+
+    // --
+    // Members
+    // --
+
+    var x: Float
+        get() = end.x - start.x
+        set(x) {
+            end.x = start.x + x
+        }
+
+    var y: Float
+        get() = end.y - start.y
+        set(y) {
+            end.y = start.y + y
+        }
+
+    var start: PointF
+    var end: PointF
+
+
+    // --
+    // Initialization
+    // --
+
+    constructor(x: Float, y: Float): this(PointF(), PointF(x, y))
+
+    constructor(start: PointF, end: PointF) {
+        this.start = start
+        this.end = end
+    }
+
+    constructor(directionAngle: Float, pivot: PointF? = null) {
+        this.start = pivot ?: PointF()
+        this.end = PointF(sin(start.x + directionAngle * PI.toFloat() * 2 / 360), start.y - cos(directionAngle * PI.toFloat() * 2 / 360))
+    }
+
+
+    // --
+    // Operators
+    // --
+
+    operator fun times(multiplier: Float): Vector {
+        return Vector(PointF(start.x, start.y), PointF(start.x + x * multiplier, start.y + y * multiplier))
+    }
+
+    operator fun timesAssign(multiplier: Float) {
+        x *= multiplier
+        y *= multiplier
+    }
+
 
     // --
     // Return modified result
@@ -68,7 +118,7 @@ class Vector(var start: PointF, var end: PointF) {
     }
 
     fun distance(): Float {
-        return sqrt((start.x - end.x) * (start.x - end.x) + (start.y - end.y) * (start.y - end.y))
+        return sqrt(x * x + y * y)
     }
 
     fun directionOfPoint(point: PointF): Float {
@@ -77,7 +127,7 @@ class Vector(var start: PointF, var end: PointF) {
 
     fun intersect(otherVector: Vector): PointF? {
         // Intersection direction formula
-        val d = (end.x - start.x) * (otherVector.end.y - otherVector.start.y) - (end.y - start.y) * (otherVector.end.x - otherVector.start.x)
+        val d = x * otherVector.y - y * otherVector.x
         if (d == 0f) {
             return null
         }

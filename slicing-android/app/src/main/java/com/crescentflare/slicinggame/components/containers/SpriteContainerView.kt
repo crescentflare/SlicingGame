@@ -12,6 +12,11 @@ import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.slicinggame.sprites.core.SpriteCanvas
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.max
 
 
 /**
@@ -35,6 +40,9 @@ open class SpriteContainerView : FrameContainerView {
                     // Apply grid size
                     obj.gridWidth = mapUtil.optionalFloat(attributes, "gridWidth", 1f)
                     obj.gridHeight = mapUtil.optionalFloat(attributes, "gridHeight", 1f)
+
+                    // Apply update frames per second
+                    obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
 
                     // Apply sprites
                     val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
@@ -71,6 +79,9 @@ open class SpriteContainerView : FrameContainerView {
     private val sprites = mutableListOf<Sprite>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
+    private var updateScheduled = false
+    private var lastTimeMillis = System.currentTimeMillis()
+    private var timeCorrection = 1
 
 
     // --
@@ -132,17 +143,62 @@ open class SpriteContainerView : FrameContainerView {
             }
         }
 
+    var fps = 60
+
+
+    // --
+    // Movement
+    // --
+
+    private fun update(timeDifference: Long) {
+        val timeInterval = timeDifference.toFloat() / 1000
+        sprites.forEach { sprite ->
+            sprite.update(timeInterval, gridWidth, gridHeight)
+        }
+        invalidate()
+    }
+
 
     // --
     // Drawing
     // --
 
     override fun onDraw(canvas: Canvas?) {
+        // Draw sprites
         canvas?.let {
             it.clipRect(0, 0, width, height)
             spriteCanvas.prepare(it, width.toFloat(), height.toFloat(), gridWidth, gridHeight)
             sprites.forEach { sprite ->
                 sprite.draw(spriteCanvas)
+            }
+        }
+
+        // Schedule next update
+        if (!updateScheduled) {
+            val checkTimeMillis = System.currentTimeMillis()
+            val delayTime = 1000 / fps - (checkTimeMillis - lastTimeMillis)
+            updateScheduled = true
+            GlobalScope.launch(Dispatchers.Main) {
+                // Delay and try to correct for time lost due to coroutine inaccuracy
+                delay(max(1, delayTime - timeCorrection))
+                val currentTimeMillis = System.currentTimeMillis()
+                if (delayTime >= 1) {
+                    val lostTimeMillis = (currentTimeMillis - checkTimeMillis) - delayTime
+                    if (lostTimeMillis < -1) {
+                        timeCorrection -= 1
+                    } else if (lostTimeMillis > 1) {
+                        timeCorrection += 1
+                    }
+                }
+
+                // Continue with the next update
+                var difference = currentTimeMillis - lastTimeMillis
+                lastTimeMillis = currentTimeMillis
+                updateScheduled = false
+                if (difference > 1000 / fps * 5) {
+                    difference = (1000 / fps * 5).toLong()
+                }
+                update(difference)
             }
         }
     }
