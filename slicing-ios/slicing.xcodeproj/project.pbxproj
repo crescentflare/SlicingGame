@@ -11,6 +11,8 @@
 		040D1B9423AF9C4A00337A95 /* ControlComponent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040D1B9323AF9C4A00337A95 /* ControlComponent.swift */; };
 		040D1B9623AFAA0F00337A95 /* ComponentStateImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040D1B9523AFAA0F00337A95 /* ComponentStateImage.swift */; };
 		040D1B9923AFE93D00337A95 /* GameModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040D1B9823AFE93D00337A95 /* GameModule.swift */; };
+		040EE45323DCBE7A006A5B75 /* Physics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040EE45223DCBE7A006A5B75 /* Physics.swift */; };
+		040EE45523DCBF05006A5B75 /* PhysicsObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040EE45423DCBF05006A5B75 /* PhysicsObject.swift */; };
 		042C7A0423AD4AE800C8B524 /* ImageButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 042C7A0323AD4AE800C8B524 /* ImageButtonView.swift */; };
 		0433D56D23ABB98B00706CC6 /* PageModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0433D56C23ABB98B00706CC6 /* PageModule.swift */; };
 		0433D57023ABBBE800706CC6 /* AlertModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0433D56F23ABBBE800706CC6 /* AlertModule.swift */; };
@@ -40,6 +42,7 @@
 		04ECB578239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB575239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift */; };
 		04ECB579239D8AA4006CFC0D /* CustomAppConfigModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB576239D8AA4006CFC0D /* CustomAppConfigModel.swift */; };
 		04ECB57A239D8AA4006CFC0D /* CustomAppConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04ECB577239D8AA4006CFC0D /* CustomAppConfigManager.swift */; };
+		04EDBCED23E746FC00BD80D8 /* PhysicsBoundary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EDBCEC23E746FC00BD80D8 /* PhysicsBoundary.swift */; };
 		04F2AA6C239EB36E00126CD1 /* FrameContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */; };
 		04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */; };
 		04F2AA70239ED8FF00126CD1 /* String+Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04F2AA6F239ED8FF00126CD1 /* String+Localization.swift */; };
@@ -64,6 +67,8 @@
 		040D1B9323AF9C4A00337A95 /* ControlComponent.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ControlComponent.swift; sourceTree = "<group>"; };
 		040D1B9523AFAA0F00337A95 /* ComponentStateImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComponentStateImage.swift; sourceTree = "<group>"; };
 		040D1B9823AFE93D00337A95 /* GameModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameModule.swift; sourceTree = "<group>"; };
+		040EE45223DCBE7A006A5B75 /* Physics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Physics.swift; sourceTree = "<group>"; };
+		040EE45423DCBF05006A5B75 /* PhysicsObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhysicsObject.swift; sourceTree = "<group>"; };
 		042C7A0323AD4AE800C8B524 /* ImageButtonView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageButtonView.swift; sourceTree = "<group>"; };
 		0433D56C23ABB98B00706CC6 /* PageModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PageModule.swift; sourceTree = "<group>"; };
 		0433D56F23ABBBE800706CC6 /* AlertModule.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AlertModule.swift; sourceTree = "<group>"; };
@@ -95,6 +100,7 @@
 		04ECB575239D8AA4006CFC0D /* AppConfigPageLoadingMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppConfigPageLoadingMode.swift; sourceTree = "<group>"; };
 		04ECB576239D8AA4006CFC0D /* CustomAppConfigModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAppConfigModel.swift; sourceTree = "<group>"; };
 		04ECB577239D8AA4006CFC0D /* CustomAppConfigManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomAppConfigManager.swift; sourceTree = "<group>"; };
+		04EDBCEC23E746FC00BD80D8 /* PhysicsBoundary.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhysicsBoundary.swift; sourceTree = "<group>"; };
 		04F2AA6B239EB36D00126CD1 /* FrameContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FrameContainerView.swift; sourceTree = "<group>"; };
 		04F2AA6D239ECBF800126CD1 /* LinearContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinearContainerView.swift; sourceTree = "<group>"; };
 		04F2AA6F239ED8FF00126CD1 /* String+Localization.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String+Localization.swift"; sourceTree = "<group>"; };
@@ -138,6 +144,16 @@
 			path = CustomModules;
 			sourceTree = "<group>";
 		};
+		040EE45123DCBE7A006A5B75 /* Physics */ = {
+			isa = PBXGroup;
+			children = (
+				040EE45223DCBE7A006A5B75 /* Physics.swift */,
+				04EDBCEC23E746FC00BD80D8 /* PhysicsBoundary.swift */,
+				040EE45423DCBF05006A5B75 /* PhysicsObject.swift */,
+			);
+			path = Physics;
+			sourceTree = "<group>";
+		};
 		0433D56923ABB85800706CC6 /* Modules */ = {
 			isa = PBXGroup;
 			children = (
@@ -164,6 +180,7 @@
 				0475352D23A9657D00F3C216 /* Events */,
 				04AC540B23A0020400111C91 /* Geometry */,
 				043D726A239C2C0D00A79415 /* Inflator */,
+				040EE45123DCBE7A006A5B75 /* Physics */,
 			);
 			path = Infrastructure;
 			sourceTree = "<group>";
@@ -547,6 +564,7 @@
 				0433D56D23ABB98B00706CC6 /* PageModule.swift in Sources */,
 				043D726C239C2C0E00A79415 /* Inflators.swift in Sources */,
 				0473BA1323A175470020FC93 /* String+URLCoding.swift in Sources */,
+				04EDBCED23E746FC00BD80D8 /* PhysicsBoundary.swift in Sources */,
 				04F2AA6E239ECBF800126CD1 /* LinearContainerView.swift in Sources */,
 				04F2AA79239EDAE000126CD1 /* AppDimensions.swift in Sources */,
 				04F795EE23CCD88000E5414D /* SpriteContainerView.swift in Sources */,
@@ -577,11 +595,13 @@
 				040D1B9423AF9C4A00337A95 /* ControlComponent.swift in Sources */,
 				04CC779D23A3BEFD003D1BB0 /* LevelSlicePreviewView.swift in Sources */,
 				04875384239BDACB002FC386 /* AppDelegate.swift in Sources */,
+				040EE45323DCBE7A006A5B75 /* Physics.swift in Sources */,
 				0475353023A9657E00F3C216 /* AppEvent.swift in Sources */,
 				04F2AA7C239EDD1F00126CD1 /* AppFonts.swift in Sources */,
 				04F2AA89239EE43600126CD1 /* GameTitleBarView.swift in Sources */,
 				0487D2EC239C518500515520 /* Page.swift in Sources */,
 				042C7A0423AD4AE800C8B524 /* ImageButtonView.swift in Sources */,
+				040EE45523DCBF05006A5B75 /* PhysicsObject.swift in Sources */,
 				04CC779F23A3E37F003D1BB0 /* LevelView.swift in Sources */,
 				04E19155239D50CB00466143 /* PageCache.swift in Sources */,
 				04E19154239D50CB00466143 /* PageLoader.swift in Sources */,

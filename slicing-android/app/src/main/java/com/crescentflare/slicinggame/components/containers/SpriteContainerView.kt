@@ -10,6 +10,7 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.slicinggame.sprites.core.SpriteCanvas
 import kotlinx.coroutines.Dispatchers
@@ -76,6 +77,7 @@ open class SpriteContainerView : FrameContainerView {
     // Members
     // --
 
+    private val physics = Physics()
     private val sprites = mutableListOf<Sprite>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
@@ -114,10 +116,12 @@ open class SpriteContainerView : FrameContainerView {
 
     fun addSprite(sprite: Sprite) {
         sprites.add(sprite)
+        physics.registerObject(sprite)
     }
 
     fun clearSprites() {
         sprites.clear()
+        physics.clearObjects()
     }
 
 
@@ -132,6 +136,7 @@ open class SpriteContainerView : FrameContainerView {
             if (changed) {
                 requestLayout()
             }
+            physics.width = gridWidth
         }
 
     var gridHeight: Float = 1f
@@ -141,6 +146,7 @@ open class SpriteContainerView : FrameContainerView {
             if (changed) {
                 requestLayout()
             }
+            physics.height = gridHeight
         }
 
     var fps = 60
@@ -152,8 +158,9 @@ open class SpriteContainerView : FrameContainerView {
 
     private fun update(timeDifference: Long) {
         val timeInterval = timeDifference.toFloat() / 1000
+        physics.prepareObjects()
         sprites.forEach { sprite ->
-            sprite.update(timeInterval, gridWidth, gridHeight)
+            sprite.update(timeInterval, physics)
         }
         invalidate()
     }
