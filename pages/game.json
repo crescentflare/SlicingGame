@@ -2,15 +2,6 @@
   "modules": [
     {
       "module": "alert"
-    },
-    {
-      "module": "game",
-      "gameContainer": "gameContainer",
-      "randomBackgrounds": [
-        "app://background_level_starry_night",
-        "app://background_level_lightning_storm",
-        "app://background_level_morning_mist"
-      ]
     }
   ],
   "dataSets": {
@@ -38,15 +29,26 @@
       },
       "contentItems": [
         {
-          "refId": "gameContainer",
-          "viewlet": "gameContainer",
-          "width": "stretchToParent",
-          "height": "stretchToParent",
+          "viewlet": "spriteContainer",
+          "gridWidth": 12,
+          "gridHeight": 16,
+          "margin": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
+          "gravity": "center",
           "backgroundColor": "#ddd",
-          "levelWidth": 12,
-          "levelHeight": 16,
-          "requireClearRate": 75,
-          "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK"
+          "sprites": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1,
+              "height": 1
+            },
+            {
+              "x": 4,
+              "y": 2,
+              "width": 2,
+              "height": 2
+            }
+          ]
         }
       ]
     }
