@@ -12,6 +12,10 @@ import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.slicinggame.sprites.core.SpriteCanvas
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 /**
@@ -71,6 +75,7 @@ open class SpriteContainerView : FrameContainerView {
     private val sprites = mutableListOf<Sprite>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
+    private var updateScheduled = false
 
 
     // --
@@ -134,15 +139,39 @@ open class SpriteContainerView : FrameContainerView {
 
 
     // --
+    // Movement
+    // --
+
+    private fun update(timeDifference: Long) {
+        val timeInterval = timeDifference.toFloat() / 1000
+        sprites.forEach { sprite ->
+            sprite.update(timeInterval, gridWidth, gridHeight)
+        }
+        invalidate()
+    }
+
+
+    // --
     // Drawing
     // --
 
     override fun onDraw(canvas: Canvas?) {
+        // Draw sprites
         canvas?.let {
             it.clipRect(0, 0, width, height)
             spriteCanvas.prepare(it, width.toFloat(), height.toFloat(), gridWidth, gridHeight)
             sprites.forEach { sprite ->
                 sprite.draw(spriteCanvas)
+            }
+        }
+
+        // Schedule next update
+        if (!updateScheduled) {
+            updateScheduled = true
+            GlobalScope.launch(Dispatchers.Main) {
+                delay(10)
+                updateScheduled = false
+                update(10)
             }
         }
     }

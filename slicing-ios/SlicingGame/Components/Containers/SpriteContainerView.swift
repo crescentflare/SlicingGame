@@ -14,6 +14,7 @@ class SpriteContainerView: FrameContainerView {
     // --
     
     private var sprites = [Sprite]()
+    private var updateScheduled = false
 
 
     // --
@@ -117,15 +118,37 @@ class SpriteContainerView: FrameContainerView {
 
 
     // --
+    // MARK: Movement
+    // --
+    
+    private func update(timeInterval: TimeInterval) {
+        sprites.forEach {
+            $0.update(timeInterval: timeInterval, gridWidth: gridWidth, gridHeight: gridHeight)
+        }
+        setNeedsDisplay()
+    }
+
+
+    // --
     // MARK: Drawing
     // --
     
     override func draw(_ rect: CGRect) {
+        // Draw sprites
         if let context = UIGraphicsGetCurrentContext() {
             let spriteCanvas = SpriteCanvas(context: context, canvasWidth: bounds.width, canvasHeight: bounds.height, gridWidth: CGFloat(gridWidth), gridHeight: CGFloat(gridHeight))
             sprites.forEach {
                 $0.draw(canvas: spriteCanvas)
             }
+        }
+
+        // Schedule next update
+        if !updateScheduled {
+            updateScheduled = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01, execute: {
+                self.updateScheduled = false
+                self.update(timeInterval: 0.01)
+            })
         }
     }
 
