@@ -13,6 +13,7 @@ class SpriteContainerView: FrameContainerView {
     // MARK: Members
     // --
     
+    private let physics = Physics()
     private var sprites = [Sprite]()
     private var updateScheduled = false
     private var lastTimeInterval = Date.timeIntervalSinceReferenceDate
@@ -94,10 +95,12 @@ class SpriteContainerView: FrameContainerView {
     
     func addSprite(_ sprite: Sprite) {
         sprites.append(sprite)
+        physics.registerObject(sprite)
     }
     
     func clearSprites() {
         sprites.removeAll()
+        physics.clearObjects()
     }
 
 
@@ -110,6 +113,7 @@ class SpriteContainerView: FrameContainerView {
             if gridWidth != oldValue {
                 UniLayout.setNeedsLayout(view: self)
             }
+            physics.width = gridWidth
         }
     }
 
@@ -118,6 +122,7 @@ class SpriteContainerView: FrameContainerView {
             if gridHeight != oldValue {
                 UniLayout.setNeedsLayout(view: self)
             }
+            physics.height = gridHeight
         }
     }
 
@@ -130,7 +135,7 @@ class SpriteContainerView: FrameContainerView {
     
     private func update(timeInterval: TimeInterval) {
         sprites.forEach {
-            $0.update(timeInterval: timeInterval, gridWidth: gridWidth, gridHeight: gridHeight)
+            $0.update(timeInterval: timeInterval, physics: physics)
         }
         setNeedsDisplay()
     }

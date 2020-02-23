@@ -5,7 +5,7 @@
 
 import UIKit
 
-class Sprite {
+class Sprite: PhysicsObject {
 
     // --
     // MARK: Members
@@ -31,28 +31,42 @@ class Sprite {
 
     
     // --
+    // MARK: Properties
+    // --
+    
+    var collisionBounds: CGRect {
+        get {
+            return CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height))
+        }
+    }
+    
+
+    // --
     // MARK: Movement
     // --
     
-    func update(timeInterval: TimeInterval, gridWidth: Float, gridHeight: Float) {
-        x += moveX * Float(timeInterval)
-        y += moveY * Float(timeInterval)
-        if moveX > 0 && x + width > gridWidth {
-            x = gridWidth - width
-            moveX = -moveX
-        } else if moveX < 0 && x < 0 {
-            x = 0
-            moveX = -moveX
-        }
-        if moveY > 0 && y + height > gridHeight {
-            y = gridHeight - height
-            moveY = -moveY
-        } else if moveY < 0 && y < 0 {
-            y = 0
-            moveY = -moveY
-        }
+    func update(timeInterval: TimeInterval, physics: Physics) {
+        physics.moveObject(self, distanceX: moveX * Float(timeInterval), distanceY: moveY * Float(timeInterval))
     }
 
+
+    // --
+    // MARK: Physics
+    // --
+    
+    func didCollide(withObject: PhysicsObject?, side: CollisionSide, physics: Physics) {
+        switch side {
+        case .left:
+            moveX = abs(moveX)
+        case .right:
+            moveX = -abs(moveX)
+        case .top:
+            moveY = abs(moveY)
+        case .bottom:
+            moveY = -abs(moveY)
+        }
+    }
+    
 
     // --
     // MARK: Drawing
