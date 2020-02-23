@@ -146,8 +146,11 @@ class Physics {
         let exitTimeY = distanceY == 0 ? Float.infinity : exitDistanceY / distanceY
         
         // Check for collision and return result
-        let entryTime = max(entryTimeX, entryTimeY)
+        var entryTime = max(entryTimeX, entryTimeY)
         let exitTime = min(exitTimeX, exitTimeY)
+        if entryTime < 0 && abs(entryTime * distanceX) < 0.0001 && abs(entryTime * distanceY) < 0.0001 {
+            entryTime = 0
+        }
         if entryTime < exitTime && entryTime >= 0 && entryTime <= 1 {
             let side: CollisionSide
             if entryTimeX > entryTimeY {

@@ -1,6 +1,7 @@
 package com.crescentflare.slicinggame.infrastructure.physics
 
 import android.graphics.RectF
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -128,8 +129,11 @@ class Physics {
         val exitTimeY = if (distanceY == 0f) Float.POSITIVE_INFINITY else exitDistanceY / distanceY
 
         // Check for collision and return result
-        val entryTime = max(entryTimeX, entryTimeY)
+        var entryTime = max(entryTimeX, entryTimeY)
         val exitTime = min(exitTimeX, exitTimeY)
+        if (entryTime < 0 && abs(entryTime * distanceX) < 0.0001 && abs(entryTime * distanceY) < 0.0001) {
+            entryTime = 0f
+        }
         if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
             val side: CollisionSide = if (entryTimeX > entryTimeY) {
                 if (distanceX < 0) CollisionSide.Left else CollisionSide.Right
