@@ -5,7 +5,7 @@
 
 import UIKit
 
-class Sprite {
+class Sprite: PhysicsObject {
 
     // --
     // MARK: Members
@@ -34,9 +34,9 @@ class Sprite {
     // MARK: Properties
     // --
     
-    var bounds: CGRect {
+    var collisionBounds: CGRect {
         get {
-            return CGRect(x: CGFloat(x), y: CGFloat(y), width: CGFloat(width), height: CGFloat(height))
+            return CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height))
         }
     }
     
@@ -45,47 +45,28 @@ class Sprite {
     // MARK: Movement
     // --
     
-    func update(timeInterval: TimeInterval, gridWidth: Float, gridHeight: Float, sprites: [Sprite]) {
-        // Apply movement
-        x += moveX * Float(timeInterval)
-        y += moveY * Float(timeInterval)
-        
-        // Handle collision against the level boundaries
-        if moveX > 0 && x + width > gridWidth {
-            x = gridWidth - width
-            moveX = -moveX
-        } else if moveX < 0 && x < 0 {
-            x = 0
-            moveX = -moveX
-        }
-        if moveY > 0 && y + height > gridHeight {
-            y = gridHeight - height
-            moveY = -moveY
-        } else if moveY < 0 && y < 0 {
-            y = 0
-            moveY = -moveY
-        }
-        
-        // Handle collision against other sprites
-        let checkBounds = bounds
-        for sprite in sprites {
-            if sprite !== self {
-                let spriteBounds = sprite.bounds
-                if checkBounds.intersects(spriteBounds) {
-                    if checkBounds.minX < spriteBounds.minX && moveX > 0 {
-                        moveX = -moveX
-                    } else if checkBounds.maxX > spriteBounds.maxX && moveX < 0 {
-                        moveX = -moveX
-                    } else if checkBounds.minY < spriteBounds.minY && moveY > 0 {
-                        moveY = -moveY
-                    } else if checkBounds.maxY > spriteBounds.maxY && moveY < 0 {
-                        moveY = -moveY
-                    }
-                }
-            }
-        }
+    func update(timeInterval: TimeInterval, physics: Physics) {
+        physics.moveObject(self, distanceX: moveX * Float(timeInterval), distanceY: moveY * Float(timeInterval))
     }
 
+
+    // --
+    // MARK: Physics
+    // --
+    
+    func didCollide(withObject: PhysicsObject?, side: CollisionSide, physics: Physics) {
+        switch side {
+        case .left:
+            moveX = abs(moveX)
+        case .right:
+            moveX = -abs(moveX)
+        case .top:
+            moveY = abs(moveY)
+        case .bottom:
+            moveY = -abs(moveY)
+        }
+    }
+    
 
     // --
     // MARK: Drawing
