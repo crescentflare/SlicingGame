@@ -1,5 +1,6 @@
 package com.crescentflare.slicinggame.infrastructure.physics
 
+import android.graphics.PointF
 import android.graphics.RectF
 
 /**
@@ -15,11 +16,14 @@ class PhysicsBoundary(override var x: Float, override var y: Float, var width: F
 
 
     // --
-    // Properties
+    // Collision properties
     // --
 
     override val collisionBounds: RectF
         get() = RectF(0f, 0f, width, height)
+
+    override val collisionRotation = 0f
+    override val collisionPivot = PointF(0f, 0f)
 
 
     // --

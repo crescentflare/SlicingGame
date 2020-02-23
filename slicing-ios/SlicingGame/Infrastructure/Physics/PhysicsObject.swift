@@ -11,6 +11,8 @@ protocol PhysicsObject: class {
     var y: Float { get set }
     var recursiveCheck: Int { get set }
     var collisionBounds: CGRect { get }
+    var collisionRotation: Float { get }
+    var collisionPivot: CGPoint { get }
     
     func didCollide(withObject: PhysicsObject?, side: CollisionSide, timeRemaining: TimeInterval, physics: Physics)
 

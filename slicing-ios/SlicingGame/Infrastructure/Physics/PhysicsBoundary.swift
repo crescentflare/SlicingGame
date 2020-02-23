@@ -31,7 +31,7 @@ class PhysicsBoundary: PhysicsObject {
 
 
     // --
-    // MARK: Properties
+    // MARK: Collision properties
     // --
 
     var collisionBounds: CGRect {
@@ -39,6 +39,9 @@ class PhysicsBoundary: PhysicsObject {
             return CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height))
         }
     }
+    
+    var collisionRotation: Float = 0
+    var collisionPivot = CGPoint(x: 0, y: 0)
 
 
     // --

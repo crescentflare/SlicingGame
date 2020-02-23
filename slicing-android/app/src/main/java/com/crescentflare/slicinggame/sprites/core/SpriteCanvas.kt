@@ -50,4 +50,15 @@ class SpriteCanvas(private val paint: Paint) {
         canvas?.drawRect(x * scaleX, y * scaleY, (x + width) * scaleX, (y + height) * scaleY, paint)
     }
 
+    fun fillRotatedRect(centerX: Float, centerY: Float, width: Float, height: Float, color: Int, rotation: Float) {
+        paint.color = color
+        paint.style = Paint.Style.FILL
+        canvas?.save()
+        canvas?.scale(scaleX, scaleY)
+        canvas?.translate(centerX, centerY)
+        canvas?.rotate(rotation)
+        canvas?.drawRect(-width / 2, -height / 2, width / 2, height / 2, paint)
+        canvas?.restore()
+    }
+
 }
