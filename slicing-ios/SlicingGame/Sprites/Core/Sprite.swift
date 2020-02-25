@@ -69,16 +69,14 @@ class Sprite: PhysicsObject {
     // MARK: Physics
     // --
     
-    func didCollide(withObject: PhysicsObject?, side: CollisionSide, timeRemaining: TimeInterval, physics: Physics) {
-        switch side {
-        case .left:
-            moveX = abs(moveX)
-        case .right:
-            moveX = -abs(moveX)
-        case .top:
-            moveY = abs(moveY)
-        case .bottom:
-            moveY = -abs(moveY)
+    func didCollide(withObject: PhysicsObject?, normal: Vector, timeRemaining: TimeInterval, physics: Physics) {
+        let dotProduct = Float(normal.x) * moveX + Float(normal.y) * moveY
+        let newMoveX = moveX - 2 * Float(normal.x) * dotProduct
+        let newMoveY = moveY - 2 * Float(normal.y) * dotProduct
+        let surfaceVector = normal.perpendicular().reversed()
+        if surfaceVector.directionOf(point: CGPoint(x: CGFloat(newMoveX), y: CGFloat(newMoveY))) <= 0 {
+            moveX = newMoveX
+            moveY = newMoveY
         }
         if timeRemaining > 0 {
             update(timeInterval: timeRemaining, physics: physics)

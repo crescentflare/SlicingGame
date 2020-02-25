@@ -93,7 +93,7 @@ class Physics {
         var moveY = distanceY
         val bounds = RectF(movingObject.collisionBounds)
         var collisionObject: PhysicsObject? = null
-        var collisionSide: CollisionSide? = null
+        var collisionNormal: Vector? = null
         bounds.offset(movingObject.x, movingObject.y)
         for (checkObject in objectList) {
             if (checkObject !== movingObject) {
@@ -107,7 +107,7 @@ class Physics {
                     moveX = it.distanceX
                     moveY = it.distanceY
                     collisionObject = checkObject
-                    collisionSide = it.side
+                    collisionNormal = it.normal
                 }
             }
         }
@@ -117,7 +117,7 @@ class Physics {
         movingObject.y += moveY
 
         // Notify objects
-        collisionSide?.let { side ->
+        collisionNormal?.let { normal ->
             var timeRemaining = 1f - if (distanceX > distanceY) abs(moveX) / abs(distanceX) else abs(moveY) / abs(distanceY)
             if (timeRemaining == 1f || (moveX < 0.000001 && moveY < 0.000001)) {
                 movingObject.recursiveCheck++
@@ -127,8 +127,8 @@ class Physics {
             } else {
                 movingObject.recursiveCheck = 0
             }
-            collisionObject?.onCollision(movingObject, side.flipped(), 0f, this)
-            movingObject.onCollision(collisionObject, side, timeRemaining * timeInterval, this)
+            collisionObject?.onCollision(movingObject, normal.reversed().unit(), 0f, this)
+            movingObject.onCollision(collisionObject, normal, timeRemaining * timeInterval, this)
         }
     }
 
@@ -159,12 +159,12 @@ class Physics {
             entryTime = 0f
         }
         if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
-            val side: CollisionSide = if (entryTimeX > entryTimeY) {
-                if (distanceX < 0) CollisionSide.Left else CollisionSide.Right
+            val normal: Vector = if (entryTimeX > entryTimeY) {
+                Vector(if (distanceX < 0) 1f else -1f, 0f)
             } else {
-                if (distanceY < 0) CollisionSide.Top else CollisionSide.Bottom
+                Vector(0f, if (distanceY < 0) 1f else -1f)
             }
-            return CollisionResult(distanceX * entryTime, distanceY * entryTime, side)
+            return CollisionResult(distanceX * entryTime, distanceY * entryTime, normal)
         }
         return null
     }
@@ -178,10 +178,10 @@ class Physics {
 
         // Determine time of collision
         var entryTime = Float.POSITIVE_INFINITY
-        var collisionSide: CollisionSide? = null
-        for (line in collisionLines) {
-            if (line.directionOfPoint(castVector.start) <= 0 && line.directionOfPoint(castVector.end) >= 0) {
-                castVector.intersect(line)?.let { intersection ->
+        var hitLineIndex = -1
+        for (line in collisionLines.withIndex()) {
+            if (line.value.directionOfPoint(castVector.start) <= 0 && line.value.directionOfPoint(castVector.end) >= 0) {
+                castVector.intersect(line.value)?.let { intersection ->
                     val intersectDistanceX = intersection.x - castPoint.x
                     val intersectDistanceY = intersection.y - castPoint.y
                     val checkEntryTime: Float
@@ -192,11 +192,7 @@ class Physics {
                     }
                     if (checkEntryTime < entryTime) {
                         entryTime = checkEntryTime
-                        if (abs(line.start.x - line.end.x) > abs(line.start.y - line.end.y)) {
-                            collisionSide = if (line.start.x < line.end.x) CollisionSide.Bottom else CollisionSide.Top
-                        } else {
-                            collisionSide = if (line.start.y < line.end.y) CollisionSide.Left else CollisionSide.Right
-                        }
+                        hitLineIndex = line.index
                     }
                     entryTime = min(entryTime, checkEntryTime)
                 }
@@ -207,10 +203,8 @@ class Physics {
         if (entryTime < 0 && abs(entryTime * distanceX) < 0.0001 && abs(entryTime * distanceY) < 0.0001) {
             entryTime = 0f
         }
-        collisionSide?.let { side ->
-            if (entryTime >= 0 && entryTime <= 1) {
-                return CollisionResult(distanceX * entryTime, distanceY * entryTime, side)
-            }
+        if (entryTime >= 0 && entryTime <= 1 && hitLineIndex >= 0) {
+            return CollisionResult(distanceX * entryTime, distanceY * entryTime, collisionLines[hitLineIndex].perpendicular().unit())
         }
         return null
     }
@@ -250,36 +244,13 @@ class Physics {
 
 
     // --
-    // Collision side enum
-    // --
-
-    enum class CollisionSide {
-
-        Left,
-        Right,
-        Top,
-        Bottom;
-
-        fun flipped(): CollisionSide {
-            return when(this) {
-                Left -> Right
-                Right -> Left
-                Top -> Bottom
-                Bottom -> Top
-            }
-        }
-
-    }
-
-
-    // --
     // Internal collision result class
     // --
 
     private class CollisionResult(
         val distanceX: Float,
         val distanceY: Float,
-        val side: CollisionSide
+        val normal: Vector
     )
 
 }

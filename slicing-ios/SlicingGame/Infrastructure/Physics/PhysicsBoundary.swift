@@ -48,7 +48,7 @@ class PhysicsBoundary: PhysicsObject {
     // MARK: Physics
     // --
 
-    func didCollide(withObject: PhysicsObject?, side: CollisionSide, timeRemaining: TimeInterval, physics: Physics) {
+    func didCollide(withObject: PhysicsObject?, normal: Vector, timeRemaining: TimeInterval, physics: Physics) {
         // No implementation
     }
 

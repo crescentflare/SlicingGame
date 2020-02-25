@@ -6,7 +6,6 @@ import android.graphics.RectF
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.infrastructure.physics.PhysicsObject
-import kotlin.math.abs
 import kotlin.random.Random
 
 /**
@@ -67,12 +66,14 @@ class Sprite: PhysicsObject {
     // Physics
     // --
 
-    override fun onCollision(hitObject: PhysicsObject?, side: Physics.CollisionSide, timeRemaining: Float, physics: Physics) {
-        when (side) {
-            Physics.CollisionSide.Left -> moveX = abs(moveX)
-            Physics.CollisionSide.Right -> moveX = -abs(moveX)
-            Physics.CollisionSide.Top -> moveY = abs(moveY)
-            Physics.CollisionSide.Bottom -> moveY = -abs(moveY)
+    override fun onCollision(hitObject: PhysicsObject?, normal: Vector, timeRemaining: Float, physics: Physics) {
+        val dotProduct = normal.x * moveX + normal.y * moveY
+        val newMoveX = moveX - 2 * normal.x * dotProduct
+        val newMoveY = moveY - 2 * normal.y * dotProduct
+        val surfaceVector = normal.perpendicular().reversed()
+        if (surfaceVector.directionOfPoint(PointF(newMoveX, newMoveY)) <= 0) {
+            moveX = newMoveX
+            moveY = newMoveY
         }
         if (timeRemaining > 0) {
             update(timeRemaining, physics)

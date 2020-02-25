@@ -5,28 +5,6 @@
 
 import UIKit
 
-enum CollisionSide {
-    
-    case left
-    case right
-    case top
-    case bottom
-    
-    func flipped() -> CollisionSide {
-        switch self {
-        case .left:
-            return .right
-        case .right:
-            return .left
-        case .top:
-            return .bottom
-        case .bottom:
-            return .top
-        }
-    }
-    
-}
-
 class Physics {
 
     // --
@@ -109,7 +87,7 @@ class Physics {
         var moveY = distanceY
         let bounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))
         var collisionObject: PhysicsObject?
-        var collisionSide: CollisionSide?
+        var collisionNormal: Vector?
         for checkObject in objects {
             if checkObject !== object {
                 let collision: CollisionResult?
@@ -122,7 +100,7 @@ class Physics {
                     moveX = collision.distanceX
                     moveY = collision.distanceY
                     collisionObject = checkObject
-                    collisionSide = collision.side
+                    collisionNormal = collision.normal
                 }
             }
         }
@@ -132,7 +110,7 @@ class Physics {
         object.y += moveY
         
         // Notify objects
-        if let collisionSide = collisionSide {
+        if let collisionNormal = collisionNormal {
             var timeRemaining = TimeInterval(1 - (distanceX > distanceY ? abs(moveX) / abs(distanceX) : abs(moveY) / abs(distanceY)))
             if timeRemaining == 1 || (moveX < 0.000001 && moveY < 0.000001) {
                 object.recursiveCheck += 1
@@ -142,8 +120,8 @@ class Physics {
             } else {
                 object.recursiveCheck = 0
             }
-            collisionObject?.didCollide(withObject: object, side: collisionSide.flipped(), timeRemaining: 0, physics: self)
-            object.didCollide(withObject: collisionObject, side: collisionSide, timeRemaining: timeRemaining * timeInterval, physics: self)
+            collisionObject?.didCollide(withObject: object, normal: collisionNormal.reversed().unit(), timeRemaining: 0, physics: self)
+            object.didCollide(withObject: collisionObject, normal: collisionNormal, timeRemaining: timeRemaining * timeInterval, physics: self)
         }
     }
     
@@ -173,13 +151,13 @@ class Physics {
             entryTime = 0
         }
         if entryTime < exitTime && entryTime >= 0 && entryTime <= 1 {
-            let side: CollisionSide
+            let normal: Vector
             if entryTimeX > entryTimeY {
-                side = distanceX < 0 ? .left : .right
+                normal = Vector(x: distanceX < 0 ? 1 : -1, y: 0)
             } else {
-                side = distanceY < 0 ? .top : .bottom
+                normal = Vector(x: 0, y: distanceY < 0 ? 1 : -1)
             }
-            return CollisionResult(distanceX: distanceX * entryTime, distanceY: distanceY * entryTime, side: side)
+            return CollisionResult(distanceX: distanceX * entryTime, distanceY: distanceY * entryTime, normal: normal)
         }
         return nil
     }
@@ -193,8 +171,8 @@ class Physics {
         
         // Determine time of collision
         var entryTime = Float.infinity
-        var collisionSide: CollisionSide?
-        for line in collisionLines {
+        var hitLineIndex = -1
+        for (index, line) in collisionLines.enumerated() {
             if line.directionOf(point: castVector.start) <= 0 && line.directionOf(point: castVector.end) >= 0 {
                 if let intersection = castVector.intersect(withVector: line) {
                     let intersectDistanceX = intersection.x - castPoint.x
@@ -207,11 +185,7 @@ class Physics {
                     }
                     if checkEntryTime < entryTime {
                         entryTime = checkEntryTime
-                        if abs(line.start.x - line.end.x) > abs(line.start.y - line.end.y) {
-                            collisionSide = line.start.x < line.end.x ? .bottom : .top
-                        } else {
-                            collisionSide = line.start.y < line.end.y ? .left : .right
-                        }
+                        hitLineIndex = index
                     }
                     entryTime = min(entryTime, checkEntryTime)
                 }
@@ -222,8 +196,8 @@ class Physics {
         if entryTime < 0 && abs(entryTime * distanceX) < 0.0001 && abs(entryTime * distanceY) < 0.0001 {
             entryTime = 0
         }
-        if entryTime >= 0 && entryTime <= 1, let side = collisionSide {
-            return CollisionResult(distanceX: distanceX * entryTime, distanceY: distanceY * entryTime, side: side)
+        if entryTime >= 0 && entryTime <= 1 && hitLineIndex >= 0 {
+            return CollisionResult(distanceX: distanceX * entryTime, distanceY: distanceY * entryTime, normal: collisionLines[hitLineIndex].perpendicular().unit())
         }
         return nil
     }
@@ -267,12 +241,12 @@ fileprivate class CollisionResult {
     
     let distanceX: Float
     let distanceY: Float
-    let side: CollisionSide
+    let normal: Vector
     
-    init(distanceX: Float, distanceY: Float, side: CollisionSide) {
+    init(distanceX: Float, distanceY: Float, normal: Vector) {
         self.distanceX = distanceX
         self.distanceY = distanceY
-        self.side = side
+        self.normal = normal
     }
     
 }
