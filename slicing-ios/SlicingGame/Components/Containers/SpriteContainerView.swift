@@ -44,6 +44,9 @@ class SpriteContainerView: FrameContainerView {
                 // Apply update frames per second
                 spriteContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
 
+                // Apply debug settings
+                spriteContainer.drawPhysicsBoundaries = convUtil.asBool(value: attributes["drawPhysicsBoundaries"]) ?? false
+
                 // Apply sprites
                 spriteContainer.clearSprites()
                 if let spriteList = attributes["sprites"] as? [[String: Any]] {
@@ -164,6 +167,8 @@ class SpriteContainerView: FrameContainerView {
     }
 
     var fps = 60
+    
+    var drawPhysicsBoundaries = false
 
     
     // --
@@ -184,11 +189,16 @@ class SpriteContainerView: FrameContainerView {
     // --
     
     override func draw(_ rect: CGRect) {
-        // Draw sprites
+        // Draw sprites and optional physics boundaries
         if let context = UIGraphicsGetCurrentContext() {
             let spriteCanvas = SpriteCanvas(context: context, canvasWidth: bounds.width, canvasHeight: bounds.height, gridWidth: CGFloat(gridWidth), gridHeight: CGFloat(gridHeight))
             sprites.forEach {
                 $0.draw(canvas: spriteCanvas)
+            }
+            if drawPhysicsBoundaries {
+                for boundary in collisionBoundaries {
+                    spriteCanvas.fillRotatedRect(centerX: CGFloat(boundary.x) + boundary.collisionPivot.x, centerY: CGFloat(boundary.y) + boundary.collisionPivot.y, width: CGFloat(boundary.width), height: CGFloat(boundary.height), color: .red, rotation: CGFloat(boundary.collisionRotation))
+                }
             }
         }
 

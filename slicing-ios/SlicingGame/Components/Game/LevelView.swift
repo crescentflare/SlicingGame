@@ -49,6 +49,9 @@ class LevelView: FrameContainerView {
                 // Apply update frames per second
                 level.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
 
+                // Apply debug settings
+                level.drawPhysicsBoundaries = convUtil.asBool(value: attributes["drawPhysicsBoundaries"]) ?? false
+
                 // Apply sprites
                 level.clearSprites()
                 if let spriteList = attributes["sprites"] as? [[String: Any]] {
@@ -223,6 +226,13 @@ class LevelView: FrameContainerView {
             spriteContainerView.fps = newValue
         }
         get { return spriteContainerView.fps }
+    }
+
+    var drawPhysicsBoundaries: Bool {
+        set {
+            spriteContainerView.drawPhysicsBoundaries = newValue
+        }
+        get { return spriteContainerView.drawPhysicsBoundaries }
     }
 
     

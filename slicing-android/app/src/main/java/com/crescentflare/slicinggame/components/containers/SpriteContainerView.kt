@@ -3,6 +3,7 @@ package com.crescentflare.slicinggame.components.containers
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Build
 import android.util.AttributeSet
@@ -48,6 +49,9 @@ open class SpriteContainerView : FrameContainerView {
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
+
+                    // Apply debug settings
+                    obj.drawPhysicsBoundaries = mapUtil.optionalBoolean(attributes, "drawPhysicsBoundaries", false)
 
                     // Apply sprites
                     val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
@@ -192,6 +196,8 @@ open class SpriteContainerView : FrameContainerView {
 
     var fps = 60
 
+    var drawPhysicsBoundaries = false
+
 
     // --
     // Movement
@@ -212,12 +218,17 @@ open class SpriteContainerView : FrameContainerView {
     // --
 
     override fun onDraw(canvas: Canvas?) {
-        // Draw sprites
+        // Draw sprites and optional physics boundaries
         canvas?.let {
             it.clipRect(0, 0, width, height)
             spriteCanvas.prepare(it, width.toFloat(), height.toFloat(), gridWidth, gridHeight)
             sprites.forEach { sprite ->
                 sprite.draw(spriteCanvas)
+            }
+            if (drawPhysicsBoundaries) {
+                for (boundary in collisionBoundaries) {
+                    spriteCanvas.fillRotatedRect(boundary.x + boundary.collisionPivot.x, boundary.y + boundary.collisionPivot.y, boundary.width, boundary.height, Color.RED, boundary.collisionRotation)
+                }
             }
         }
 

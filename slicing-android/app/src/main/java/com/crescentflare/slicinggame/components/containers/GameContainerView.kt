@@ -58,6 +58,9 @@ open class GameContainerView : FrameContainerView {
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
 
+                    // Apply debug settings
+                    obj.drawPhysicsBoundaries = mapUtil.optionalBoolean(attributes, "drawPhysicsBoundaries", false)
+
                     // Apply sprites
                     val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
                     obj.clearSprites()
@@ -213,6 +216,12 @@ open class GameContainerView : FrameContainerView {
         get() = levelView.fps
         set(fps) {
             levelView.fps = fps
+        }
+
+    var drawPhysicsBoundaries: Boolean
+        get() = levelView.drawPhysicsBoundaries
+        set(drawPhysicsBoundaries) {
+            levelView.drawPhysicsBoundaries = drawPhysicsBoundaries
         }
 
 
