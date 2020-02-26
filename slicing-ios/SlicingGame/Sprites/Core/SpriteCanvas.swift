@@ -43,5 +43,15 @@ class SpriteCanvas {
         context.setFillColor(color.cgColor)
         context.fill(CGRect(x: x * scaleX, y: y * scaleY, width: width * scaleX, height: height * scaleY))
     }
+    
+    func fillRotatedRect(centerX: CGFloat, centerY: CGFloat, width: CGFloat, height: CGFloat, color: UIColor, rotation: CGFloat) {
+        context.setFillColor(color.cgColor)
+        context.saveGState()
+        context.scaleBy(x: scaleX, y: scaleY)
+        context.translateBy(x: centerX, y: centerY)
+        context.rotate(by: rotation * CGFloat.pi * 2 / 360)
+        context.fill(CGRect(x: -width / 2, y: -height / 2, width: width, height: height))
+        context.restoreGState()
+    }
 
 }
