@@ -331,6 +331,17 @@
             "description": "Sends event when the level is cleared",
             "$ref": "#/definitions/appEvent"
           },
+          "fps": {
+            "description": "The amount of frames per second the sprite refresh loop tries to run on",
+            "type": "integer"
+          },
+          "sprites": {
+            "description": "A list of sprites to place within the container",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/sprite"
+            }
+          },
           "slices": {
             "description": "A flattened list of slice vector coordinates",
             "type": "array",
