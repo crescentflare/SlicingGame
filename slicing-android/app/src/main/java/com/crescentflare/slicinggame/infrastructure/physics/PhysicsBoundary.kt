@@ -7,7 +7,7 @@ import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 /**
  * Physics: a solid boundary surrounding the physics engine's space
  */
-class PhysicsBoundary(override var x: Float, override var y: Float, var width: Float, var height: Float): PhysicsObject {
+class PhysicsBoundary(override var x: Float, override var y: Float, var width: Float, var height: Float, var rotation: Float = 0f): PhysicsObject {
 
     // --
     // Members
@@ -23,8 +23,11 @@ class PhysicsBoundary(override var x: Float, override var y: Float, var width: F
     override val collisionBounds: RectF
         get() = RectF(0f, 0f, width, height)
 
-    override val collisionRotation = 0f
-    override val collisionPivot = PointF(0f, 0f)
+    override val collisionRotation: Float
+        get() = rotation
+
+    override val collisionPivot: PointF
+        get() = PointF(width / 2, height / 2)
 
 
     // --

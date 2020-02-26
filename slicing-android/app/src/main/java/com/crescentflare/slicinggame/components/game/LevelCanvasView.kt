@@ -101,6 +101,9 @@ open class LevelCanvasView : UniFrameContainer {
     // Slicing
     // --
 
+    val slicedBoundary: Polygon
+        get() = clipPolygon
+
     fun slice(vector: Vector) {
         clipPolygon.sliced(vector)?.let {
             clipPolygon = it

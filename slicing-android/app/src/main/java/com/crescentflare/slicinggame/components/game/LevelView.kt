@@ -15,9 +15,11 @@ import com.crescentflare.slicinggame.R
 import com.crescentflare.slicinggame.components.basicviews.ImageView
 import com.crescentflare.slicinggame.components.basicviews.TextView
 import com.crescentflare.slicinggame.components.containers.FrameContainerView
+import com.crescentflare.slicinggame.components.containers.SpriteContainerView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 
 
@@ -49,6 +51,26 @@ open class LevelView : FrameContainerView {
                     // Apply clear goal
                     obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
 
+                    // Apply update frames per second
+                    obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
+
+                    // Apply debug settings
+                    obj.drawPhysicsBoundaries = mapUtil.optionalBoolean(attributes, "drawPhysicsBoundaries", false)
+
+                    // Apply sprites
+                    val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
+                    obj.clearSprites()
+                    for (spriteItem in spriteList) {
+                        mapUtil.asStringObjectMap(spriteItem)?.let {
+                            val sprite = Sprite()
+                            sprite.x = mapUtil.optionalFloat(it, "x", 0f)
+                            sprite.y = mapUtil.optionalFloat(it, "y", 0f)
+                            sprite.width = mapUtil.optionalFloat(it, "width", 1f)
+                            sprite.height = mapUtil.optionalFloat(it, "height", 1f)
+                            obj.addSprite(sprite)
+                        }
+                    }
+
                     // Apply slices
                     val sliceList = mapUtil.optionalFloatList(attributes, "slices")
                     obj.resetSlices()
@@ -78,6 +100,7 @@ open class LevelView : FrameContainerView {
 
     private var backgroundView = ImageView(context)
     private var canvasView = LevelCanvasView(context)
+    private var spriteContainerView = SpriteContainerView(context)
     private var progressView = TextView(context)
     private val progressViewMargin = resources.getDimensionPixelSize(R.dimen.text) + (Resources.getSystem().displayMetrics.density * 8).toInt()
 
@@ -116,6 +139,12 @@ open class LevelView : FrameContainerView {
         canvasView.setBackgroundColor(Color.WHITE)
         addView(canvasView)
 
+        // Add sprite container
+        val spriteContainerLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
+        spriteContainerLayoutParams.bottomMargin = progressViewMargin
+        spriteContainerView.layoutParams = spriteContainerLayoutParams
+        addView(spriteContainerView)
+
         // Add progress view
         val progressLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.WRAP_CONTENT)
         progressLayoutParams.verticalGravity = 1f
@@ -124,6 +153,19 @@ open class LevelView : FrameContainerView {
         progressView.gravity = Gravity.CENTER_HORIZONTAL
         progressView.text = "0 / 100%"
         addView(progressView)
+    }
+
+
+    // --
+    // Sprites
+    // --
+
+    fun addSprite(sprite: Sprite) {
+        spriteContainerView.addSprite(sprite)
+    }
+
+    fun clearSprites() {
+        spriteContainerView.clearSprites()
     }
 
 
@@ -141,12 +183,16 @@ open class LevelView : FrameContainerView {
         }
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
         canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
     }
 
     fun resetSlices() {
         canvasView.resetSlices()
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
         canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
     }
 
     fun transformedSliceVector(vector: Vector): Vector {
@@ -172,12 +218,14 @@ open class LevelView : FrameContainerView {
         set(levelWidth) {
             field = levelWidth
             canvasView.canvasWidth = levelWidth
+            spriteContainerView.gridWidth = levelWidth
         }
 
     var levelHeight: Float = 1f
         set(levelHeight) {
             field = levelHeight
             canvasView.canvasHeight = levelHeight
+            spriteContainerView.gridHeight = levelHeight
         }
 
     var backgroundImage: ImageSource?
@@ -191,6 +239,19 @@ open class LevelView : FrameContainerView {
             field = requireClearRate
             progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
             canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+            spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        }
+
+    var fps: Int
+        get() = spriteContainerView.fps
+        set(fps) {
+            spriteContainerView.fps = fps
+        }
+
+    var drawPhysicsBoundaries: Boolean
+        get() = spriteContainerView.drawPhysicsBoundaries
+        set(drawPhysicsBoundaries) {
+            spriteContainerView.drawPhysicsBoundaries = drawPhysicsBoundaries
         }
 
 

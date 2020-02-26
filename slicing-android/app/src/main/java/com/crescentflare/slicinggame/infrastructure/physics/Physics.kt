@@ -72,6 +72,10 @@ class Physics {
         }
     }
 
+    fun unregisterObject(physicsObject: PhysicsObject) {
+        objectList.remove(physicsObject)
+    }
+
     fun clearObjects() {
         objectList.removeAll { it !== leftBoundary && it !== rightBoundary && it !== topBoundary && it !== bottomBoundary }
     }

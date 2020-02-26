@@ -15,6 +15,7 @@ class LevelView: FrameContainerView {
     
     private var backgroundView = ImageView()
     private var canvasView = LevelCanvasView()
+    private var spriteContainerView = SpriteContainerView()
     private var progressView = TextView()
     private let progressViewMargin = AppDimensions.text + 8
 
@@ -45,6 +46,25 @@ class LevelView: FrameContainerView {
                 // Apply clear goal
                 level.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
                 
+                // Apply update frames per second
+                level.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
+
+                // Apply debug settings
+                level.drawPhysicsBoundaries = convUtil.asBool(value: attributes["drawPhysicsBoundaries"]) ?? false
+
+                // Apply sprites
+                level.clearSprites()
+                if let spriteList = attributes["sprites"] as? [[String: Any]] {
+                    for spriteItem in spriteList {
+                        let sprite = Sprite()
+                        sprite.x = convUtil.asFloat(value: spriteItem["x"]) ?? 0
+                        sprite.y = convUtil.asFloat(value: spriteItem["y"]) ?? 0
+                        sprite.width = convUtil.asFloat(value: spriteItem["width"]) ?? 1
+                        sprite.height = convUtil.asFloat(value: spriteItem["height"]) ?? 1
+                        level.addSprite(sprite)
+                    }
+                }
+
                 // Apply slices
                 let sliceArray = convUtil.asFloatArray(value: attributes["slices"])
                 level.resetSlices()
@@ -97,6 +117,13 @@ class LevelView: FrameContainerView {
         canvasView.backgroundColor = .white
         addSubview(canvasView)
 
+        // Add sprite container
+        spriteContainerView.layoutProperties.width = UniLayoutProperties.stretchToParent
+        spriteContainerView.layoutProperties.height = UniLayoutProperties.stretchToParent
+        spriteContainerView.layoutProperties.margin.bottom = progressViewMargin
+        spriteContainerView.backgroundColor = .clear
+        addSubview(spriteContainerView)
+
         // Add progress view
         progressView.layoutProperties.width = UniLayoutProperties.stretchToParent
         progressView.layoutProperties.verticalGravity = 1
@@ -107,6 +134,19 @@ class LevelView: FrameContainerView {
     }
     
     
+    // --
+    // MARK: Sprites
+    // --
+    
+    func addSprite(_ sprite: Sprite) {
+        spriteContainerView.addSprite(sprite)
+    }
+    
+    func clearSprites() {
+        spriteContainerView.clearSprites()
+    }
+
+
     // --
     // MARK: Slicing
     // --
@@ -121,12 +161,16 @@ class LevelView: FrameContainerView {
         }
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         canvasView.visibility = cleared() ? .invisible : .visible
+        spriteContainerView.visibility = cleared() ? .invisible : .visible
+        spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
     }
 
     func resetSlices() {
         canvasView.resetSlices()
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         canvasView.visibility = cleared() ? .invisible : .visible
+        spriteContainerView.visibility = cleared() ? .invisible : .visible
+        spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
     }
     
     func transformedSliceVector(vector: Vector) -> Vector {
@@ -151,12 +195,14 @@ class LevelView: FrameContainerView {
     var levelWidth: Float = 1 {
         didSet {
             canvasView.canvasWidth = levelWidth
+            spriteContainerView.gridWidth = levelWidth
         }
     }
 
     var levelHeight: Float = 1 {
         didSet {
             canvasView.canvasHeight = levelHeight
+            spriteContainerView.gridHeight = levelHeight
         }
     }
     
@@ -171,7 +217,22 @@ class LevelView: FrameContainerView {
         didSet {
             progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
             canvasView.visibility = cleared() ? .invisible : .visible
+            spriteContainerView.visibility = cleared() ? .invisible : .visible
         }
+    }
+    
+    var fps: Int {
+        set {
+            spriteContainerView.fps = newValue
+        }
+        get { return spriteContainerView.fps }
+    }
+
+    var drawPhysicsBoundaries: Bool {
+        set {
+            spriteContainerView.drawPhysicsBoundaries = newValue
+        }
+        get { return spriteContainerView.drawPhysicsBoundaries }
     }
 
     

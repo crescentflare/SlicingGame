@@ -22,6 +22,7 @@ import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.events.AppEvent
 import com.crescentflare.slicinggame.infrastructure.events.AppEventObserver
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 
 
@@ -53,6 +54,26 @@ open class GameContainerView : FrameContainerView {
                     // Apply clear goal
                     obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
                     obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
+
+                    // Apply update frames per second
+                    obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
+
+                    // Apply debug settings
+                    obj.drawPhysicsBoundaries = mapUtil.optionalBoolean(attributes, "drawPhysicsBoundaries", false)
+
+                    // Apply sprites
+                    val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
+                    obj.clearSprites()
+                    for (spriteItem in spriteList) {
+                        mapUtil.asStringObjectMap(spriteItem)?.let {
+                            val sprite = Sprite()
+                            sprite.x = mapUtil.optionalFloat(it, "x", 0f)
+                            sprite.y = mapUtil.optionalFloat(it, "y", 0f)
+                            sprite.width = mapUtil.optionalFloat(it, "width", 1f)
+                            sprite.height = mapUtil.optionalFloat(it, "height", 1f)
+                            obj.addSprite(sprite)
+                        }
+                    }
 
                     // Apply slices
                     val sliceList = mapUtil.optionalFloatList(attributes, "slices")
@@ -131,6 +152,19 @@ open class GameContainerView : FrameContainerView {
 
 
     // --
+    // Sprites
+    // --
+
+    fun addSprite(sprite: Sprite) {
+        levelView.addSprite(sprite)
+    }
+
+    fun clearSprites() {
+        levelView.clearSprites()
+    }
+
+
+    // --
     // Slicing
     // --
 
@@ -176,6 +210,18 @@ open class GameContainerView : FrameContainerView {
         get() = levelView.requireClearRate
         set(requireClearRate) {
             levelView.requireClearRate = requireClearRate
+        }
+
+    var fps: Int
+        get() = levelView.fps
+        set(fps) {
+            levelView.fps = fps
+        }
+
+    var drawPhysicsBoundaries: Boolean
+        get() = levelView.drawPhysicsBoundaries
+        set(drawPhysicsBoundaries) {
+            levelView.drawPhysicsBoundaries = drawPhysicsBoundaries
         }
 
 

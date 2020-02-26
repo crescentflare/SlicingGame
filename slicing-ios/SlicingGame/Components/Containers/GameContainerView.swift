@@ -53,6 +53,25 @@ class GameContainerView: FrameContainerView {
                 gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
                 gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
 
+                // Apply update frames per second
+                gameContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
+
+                // Apply debug settings
+                gameContainer.drawPhysicsBoundaries = convUtil.asBool(value: attributes["drawPhysicsBoundaries"]) ?? false
+
+                // Apply sprites
+                gameContainer.clearSprites()
+                if let spriteList = attributes["sprites"] as? [[String: Any]] {
+                    for spriteItem in spriteList {
+                        let sprite = Sprite()
+                        sprite.x = convUtil.asFloat(value: spriteItem["x"]) ?? 0
+                        sprite.y = convUtil.asFloat(value: spriteItem["y"]) ?? 0
+                        sprite.width = convUtil.asFloat(value: spriteItem["width"]) ?? 1
+                        sprite.height = convUtil.asFloat(value: spriteItem["height"]) ?? 1
+                        gameContainer.addSprite(sprite)
+                    }
+                }
+
                 // Apply slices
                 let sliceArray = convUtil.asFloatArray(value: attributes["slices"])
                 gameContainer.resetSlices()
@@ -113,6 +132,19 @@ class GameContainerView: FrameContainerView {
     
     
     // --
+    // MARK: Sprites
+    // --
+    
+    func addSprite(_ sprite: Sprite) {
+        levelView.addSprite(sprite)
+    }
+    
+    func clearSprites() {
+        levelView.clearSprites()
+    }
+
+
+    // --
     // MARK: Slicing
     // --
     
@@ -160,6 +192,20 @@ class GameContainerView: FrameContainerView {
             levelView.requireClearRate = newValue
         }
         get { return levelView.requireClearRate }
+    }
+
+    var fps: Int {
+        set {
+            levelView.fps = newValue
+        }
+        get { return levelView.fps }
+    }
+
+    var drawPhysicsBoundaries: Bool {
+        set {
+            levelView.drawPhysicsBoundaries = newValue
+        }
+        get { return levelView.drawPhysicsBoundaries }
     }
 
     
