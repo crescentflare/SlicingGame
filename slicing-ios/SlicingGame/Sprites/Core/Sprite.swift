@@ -15,7 +15,6 @@ class Sprite: PhysicsObject {
     var y: Float = 0
     var width: Float = 1
     var height: Float = 1
-    var rotation: Float = 0
     var recursiveCheck = 0
     private var moveX: Float
     private var moveY: Float
@@ -29,7 +28,6 @@ class Sprite: PhysicsObject {
         let moveVector = Vector(directionAngle: CGFloat.random(in: 0..<360)) * 4
         moveX = Float(moveVector.x)
         moveY = Float(moveVector.y)
-        rotation = Float.random(in: 0..<360)
     }
 
     
@@ -45,7 +43,7 @@ class Sprite: PhysicsObject {
     
     var collisionRotation: Float {
         get {
-            return rotation
+            return 0
         }
     }
     
@@ -89,7 +87,7 @@ class Sprite: PhysicsObject {
     // --
 
     func draw(canvas: SpriteCanvas) {
-        canvas.fillRotatedRect(centerX: CGFloat(x + width / 2), centerY: CGFloat(y + height / 2), width: CGFloat(width), height: CGFloat(height), color: .black, rotation: CGFloat(rotation))
+        canvas.fillRect(x: CGFloat(x), y: CGFloat(y), width: CGFloat(width), height: CGFloat(height), color: .black)
     }
 
 }

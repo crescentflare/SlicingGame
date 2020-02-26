@@ -21,7 +21,6 @@ class Sprite: PhysicsObject {
     override var y = 0f
     var width = 1f
     var height = 1f
-    var rotation = 0f
     override var recursiveCheck = 0
     private var moveX: Float
     private var moveY: Float
@@ -35,7 +34,6 @@ class Sprite: PhysicsObject {
         val moveVector = Vector(Random.nextFloat() * 360) * 4f
         moveX = moveVector.x
         moveY = moveVector.y
-        rotation = Random.nextFloat() * 360
     }
 
 
@@ -47,7 +45,7 @@ class Sprite: PhysicsObject {
         get() = RectF(0f, 0f, width, height)
 
     override val collisionRotation: Float
-        get() = rotation
+        get() = 0f
 
     override val collisionPivot: PointF
         get() = PointF(width / 2, height / 2)
@@ -86,7 +84,7 @@ class Sprite: PhysicsObject {
     // --
 
     fun draw(canvas: SpriteCanvas) {
-        canvas.fillRotatedRect(x + width / 2, y + height / 2, width, height, Color.BLACK, rotation)
+        canvas.fillRect(x, y, width, height, Color.BLACK)
     }
 
 }
