@@ -106,7 +106,7 @@ open class SpriteContainerView : FrameContainerView {
             : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
-        // No implementation
+        setWillNotDraw(false)
     }
 
 

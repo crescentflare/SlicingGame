@@ -25,16 +25,15 @@
         "viewlet": "view",
         "width": "stretchToParent",
         "height": "stretchToParent",
-        "backgroundColor": "#fff"
+        "backgroundColor": "#ddd"
       },
       "contentItems": [
         {
-          "viewlet": "spriteContainer",
-          "gridWidth": 12,
-          "gridHeight": 16,
+          "viewlet": "level",
+          "levelWidth": 12,
+          "levelHeight": 16,
           "margin": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
           "gravity": "center",
-          "backgroundColor": "#ddd",
           "sprites": [
             {
               "x": 1,
