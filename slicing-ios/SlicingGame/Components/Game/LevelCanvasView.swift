@@ -82,6 +82,10 @@ class LevelCanvasView: UniView {
     // MARK: Slicing
     // --
     
+    var slicedBoundary: Polygon {
+        get { return clipPolygon }
+    }
+
     func slice(vector: Vector) {
         if let sliced = clipPolygon.sliced(vector: vector) {
             clipPolygon = sliced

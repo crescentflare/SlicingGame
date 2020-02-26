@@ -10,13 +10,17 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
 import com.crescentflare.slicinggame.infrastructure.physics.Physics
+import com.crescentflare.slicinggame.infrastructure.physics.PhysicsBoundary
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.slicinggame.sprites.core.SpriteCanvas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.max
 
 
@@ -79,6 +83,7 @@ open class SpriteContainerView : FrameContainerView {
 
     private val physics = Physics()
     private val sprites = mutableListOf<Sprite>()
+    private var collisionBoundaries = mutableListOf<PhysicsBoundary>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
     private var updateScheduled = false
@@ -120,8 +125,44 @@ open class SpriteContainerView : FrameContainerView {
     }
 
     fun clearSprites() {
+        for (sprite in sprites) {
+            physics.unregisterObject(sprite)
+        }
         sprites.clear()
-        physics.clearObjects()
+    }
+
+
+    // --
+    // Collision boundaries
+    // --
+
+    fun addCollisionBoundary(boundary: PhysicsBoundary) {
+        collisionBoundaries.add(boundary)
+        physics.registerObject(boundary)
+    }
+
+    fun generateCollisionBoundaries(polygon: Polygon) {
+        clearCollisionBoundaries()
+        for (vector in polygon.asVectorList()) {
+            val halfDistanceX = vector.x / 2
+            val halfDistanceY = vector.y / 2
+            val vectorCenterX = vector.start.x + halfDistanceX
+            val vectorCenterY = vector.start.y + halfDistanceY
+            val centerX = vectorCenterX + halfDistanceY
+            val centerY = vectorCenterY - halfDistanceX
+            val vectorLength = vector.distance()
+            val x = centerX - vectorLength / 2
+            val y = centerY - vectorLength / 2
+            val rotation = atan2(vector.x, vector.y) * 360 / (PI.toFloat() * 2)
+            addCollisionBoundary(PhysicsBoundary(x, y, vectorLength, vectorLength, -rotation))
+        }
+    }
+
+    fun clearCollisionBoundaries() {
+        for (collisionBoundary in collisionBoundaries) {
+            physics.unregisterObject(collisionBoundary)
+        }
+        collisionBoundaries.clear()
     }
 
 

@@ -66,6 +66,12 @@ class Physics {
         }
     }
     
+    func unregisterObject(_ object: PhysicsObject) {
+        if let index = objects.firstIndex(where: { $0 === object }) {
+            objects.remove(at: index)
+        }
+    }
+
     func clearObjects() {
         objects.removeAll { $0 !== leftBoundary && $0 !== rightBoundary && $0 !== topBoundary && $0 !== bottomBoundary }
     }

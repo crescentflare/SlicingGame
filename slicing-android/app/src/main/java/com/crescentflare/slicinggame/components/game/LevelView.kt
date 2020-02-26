@@ -181,6 +181,7 @@ open class LevelView : FrameContainerView {
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
         canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
         spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
     }
 
     fun resetSlices() {
@@ -188,6 +189,7 @@ open class LevelView : FrameContainerView {
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
         canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
         spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
     }
 
     fun transformedSliceVector(vector: Vector): Vector {

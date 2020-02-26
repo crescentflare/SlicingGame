@@ -159,6 +159,7 @@ class LevelView: FrameContainerView {
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         canvasView.visibility = cleared() ? .invisible : .visible
         spriteContainerView.visibility = cleared() ? .invisible : .visible
+        spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
     }
 
     func resetSlices() {
@@ -166,6 +167,7 @@ class LevelView: FrameContainerView {
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         canvasView.visibility = cleared() ? .invisible : .visible
         spriteContainerView.visibility = cleared() ? .invisible : .visible
+        spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
     }
     
     func transformedSliceVector(vector: Vector) -> Vector {
