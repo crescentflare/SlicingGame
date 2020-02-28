@@ -15,6 +15,7 @@ class PhysicsBoundary: PhysicsObject {
     var y: Float = 0
     var width: Float = 1
     var height: Float = 1
+    var rotation: Float = 0
     var recursiveCheck = 0
 
 
@@ -22,21 +23,34 @@ class PhysicsBoundary: PhysicsObject {
     // MARK: Initialization
     // --
     
-    init(x: Float, y: Float, width: Float, height: Float) {
+    init(x: Float, y: Float, width: Float, height: Float, rotation: Float = 0) {
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.rotation = rotation
     }
 
 
     // --
-    // MARK: Properties
+    // MARK: Collision properties
     // --
 
     var collisionBounds: CGRect {
         get {
             return CGRect(x: 0, y: 0, width: CGFloat(width), height: CGFloat(height))
+        }
+    }
+    
+    var collisionRotation: Float {
+        get {
+            return rotation
+        }
+    }
+    
+    var collisionPivot: CGPoint {
+        get {
+            return CGPoint(x: CGFloat(width / 2), y: CGFloat(height / 2))
         }
     }
 
@@ -45,7 +59,7 @@ class PhysicsBoundary: PhysicsObject {
     // MARK: Physics
     // --
 
-    func didCollide(withObject: PhysicsObject?, side: CollisionSide, timeRemaining: TimeInterval, physics: Physics) {
+    func didCollide(withObject: PhysicsObject?, normal: Vector, timeRemaining: TimeInterval, physics: Physics) {
         // No implementation
     }
 

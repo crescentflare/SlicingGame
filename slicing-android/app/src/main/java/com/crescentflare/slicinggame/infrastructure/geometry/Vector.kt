@@ -63,6 +63,11 @@ class Vector {
     // Return modified result
     // --
 
+    fun unit(): Vector {
+        val magnitude = distance()
+        return Vector(x / magnitude, y / magnitude)
+    }
+
     fun translated(translateX: Float, translateY: Float): Vector {
         return Vector(PointF(start.x + translateX, start.y + translateY), PointF(end.x + translateX, end.y + translateY))
     }
@@ -73,6 +78,10 @@ class Vector {
 
     fun reversed(): Vector {
         return Vector(end, start)
+    }
+
+    fun perpendicular(): Vector {
+        return Vector(PointF(start.x, start.y), PointF(start.x + y, start.y - x))
     }
 
     fun stretchedToEdges(topLeft: PointF, bottomRight: PointF): Vector {

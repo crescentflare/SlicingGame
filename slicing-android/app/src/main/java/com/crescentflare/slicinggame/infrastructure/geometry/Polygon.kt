@@ -2,6 +2,10 @@ package com.crescentflare.slicinggame.infrastructure.geometry
 
 import android.graphics.Path
 import android.graphics.PointF
+import android.graphics.RectF
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
  * Geometry: contains a polygon shape
@@ -23,6 +27,28 @@ class Polygon {
 
     constructor(points: List<PointF>) {
         this.points = points.toMutableList()
+    }
+
+    constructor(rect: RectF, pivot: PointF = PointF(0f, 0f), rotation: Float = 0f) {
+        // Set rectangle points
+        points = mutableListOf(
+            PointF(rect.left, rect.top),
+            PointF(rect.right, rect.top),
+            PointF(rect.right, rect.bottom),
+            PointF(rect.left, rect.bottom)
+        )
+
+        // Apply optional rotation
+        if (rotation != 0f) {
+            val radianRotation = PI.toFloat() * 2 * rotation / 360
+            val sine = sin(radianRotation)
+            val cosine = cos(radianRotation)
+            for (index in points.indices) {
+                val distanceX = points[index].x - pivot.x
+                val distanceY = points[index].y - pivot.y
+                points[index] = PointF(pivot.x + cosine * distanceX - sine * distanceY, pivot.y + sine * distanceX + cosine * distanceY)
+            }
+        }
     }
 
 
@@ -146,6 +172,11 @@ class Polygon {
         return false
     }
 
+
+    // --
+    // Calculated values
+    // --
+
     fun calculateSurfaceArea(): Float {
         var first = 0f
         var second = 0f
@@ -156,12 +187,7 @@ class Polygon {
         return (first - second) / 2
     }
 
-
-    // --
-    // Helper
-    // --
-
-    private fun mostTopRightIndex(): Int {
+    fun mostTopRightIndex(): Int {
         var result = 0
         for (index in points.indices) {
             if (index > 0) {

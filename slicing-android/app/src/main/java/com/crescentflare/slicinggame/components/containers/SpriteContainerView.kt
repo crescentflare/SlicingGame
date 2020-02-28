@@ -3,6 +3,7 @@ package com.crescentflare.slicinggame.components.containers
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
 import android.os.Build
 import android.util.AttributeSet
@@ -10,13 +11,17 @@ import com.crescentflare.jsoninflator.JsonInflatable
 import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
 import com.crescentflare.slicinggame.infrastructure.physics.Physics
+import com.crescentflare.slicinggame.infrastructure.physics.PhysicsBoundary
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.slicinggame.sprites.core.SpriteCanvas
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.PI
+import kotlin.math.atan2
 import kotlin.math.max
 
 
@@ -44,6 +49,9 @@ open class SpriteContainerView : FrameContainerView {
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
+
+                    // Apply debug settings
+                    obj.drawPhysicsBoundaries = mapUtil.optionalBoolean(attributes, "drawPhysicsBoundaries", false)
 
                     // Apply sprites
                     val spriteList = mapUtil.optionalObjectList(attributes, "sprites")
@@ -79,6 +87,7 @@ open class SpriteContainerView : FrameContainerView {
 
     private val physics = Physics()
     private val sprites = mutableListOf<Sprite>()
+    private var collisionBoundaries = mutableListOf<PhysicsBoundary>()
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
     private var updateScheduled = false
@@ -106,7 +115,7 @@ open class SpriteContainerView : FrameContainerView {
             : super(context, attrs, defStyleAttr, defStyleRes)
 
     init {
-        // No implementation
+        setWillNotDraw(false)
     }
 
 
@@ -120,8 +129,44 @@ open class SpriteContainerView : FrameContainerView {
     }
 
     fun clearSprites() {
+        for (sprite in sprites) {
+            physics.unregisterObject(sprite)
+        }
         sprites.clear()
-        physics.clearObjects()
+    }
+
+
+    // --
+    // Collision boundaries
+    // --
+
+    fun addCollisionBoundary(boundary: PhysicsBoundary) {
+        collisionBoundaries.add(boundary)
+        physics.registerObject(boundary)
+    }
+
+    fun generateCollisionBoundaries(polygon: Polygon) {
+        clearCollisionBoundaries()
+        for (vector in polygon.asVectorList()) {
+            val halfDistanceX = vector.x / 2
+            val halfDistanceY = vector.y / 2
+            val vectorCenterX = vector.start.x + halfDistanceX
+            val vectorCenterY = vector.start.y + halfDistanceY
+            val centerX = vectorCenterX + halfDistanceY
+            val centerY = vectorCenterY - halfDistanceX
+            val vectorLength = vector.distance()
+            val x = centerX - vectorLength / 2
+            val y = centerY - vectorLength / 2
+            val rotation = atan2(vector.x, vector.y) * 360 / (PI.toFloat() * 2)
+            addCollisionBoundary(PhysicsBoundary(x, y, vectorLength, vectorLength, -rotation))
+        }
+    }
+
+    fun clearCollisionBoundaries() {
+        for (collisionBoundary in collisionBoundaries) {
+            physics.unregisterObject(collisionBoundary)
+        }
+        collisionBoundaries.clear()
     }
 
 
@@ -151,6 +196,8 @@ open class SpriteContainerView : FrameContainerView {
 
     var fps = 60
 
+    var drawPhysicsBoundaries = false
+
 
     // --
     // Movement
@@ -171,12 +218,17 @@ open class SpriteContainerView : FrameContainerView {
     // --
 
     override fun onDraw(canvas: Canvas?) {
-        // Draw sprites
+        // Draw sprites and optional physics boundaries
         canvas?.let {
             it.clipRect(0, 0, width, height)
             spriteCanvas.prepare(it, width.toFloat(), height.toFloat(), gridWidth, gridHeight)
             sprites.forEach { sprite ->
                 sprite.draw(spriteCanvas)
+            }
+            if (drawPhysicsBoundaries) {
+                for (boundary in collisionBoundaries) {
+                    spriteCanvas.fillRotatedRect(boundary.x + boundary.collisionPivot.x, boundary.y + boundary.collisionPivot.y, boundary.width, boundary.height, Color.RED, boundary.collisionRotation)
+                }
             }
         }
 

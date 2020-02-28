@@ -2,6 +2,15 @@
   "modules": [
     {
       "module": "alert"
+    },
+    {
+      "module": "game",
+      "gameContainer": "gameContainer",
+      "randomBackgrounds": [
+        "app://background_level_starry_night",
+        "app://background_level_morning_mist",
+        "app://background_level_lightning_storm"
+      ]
     }
   ],
   "dataSets": {
@@ -25,16 +34,20 @@
         "viewlet": "view",
         "width": "stretchToParent",
         "height": "stretchToParent",
-        "backgroundColor": "#fff"
+        "backgroundColor": "#ddd"
       },
       "contentItems": [
         {
-          "viewlet": "spriteContainer",
-          "gridWidth": 12,
-          "gridHeight": 16,
-          "margin": [ "$pagePadding", "$pagePadding", "$pagePadding", "$pagePadding" ],
-          "gravity": "center",
-          "backgroundColor": "#ddd",
+          "refId": "gameContainer",
+          "viewlet": "gameContainer",
+          "width": "stretchToParent",
+          "height": "stretchToParent",
+          "backgroundImage": "#ddd",
+          "levelWidth": 12,
+          "levelHeight": 16,
+          "requireClearRate": 75,
+          "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK",
+          "drawPhysicsBoundaries": true,
           "sprites": [
             {
               "x": 1,
@@ -43,46 +56,16 @@
               "height": 1
             },
             {
-              "x": 4,
-              "y": 2,
-              "width": 2,
-              "height": 2
-            },
-            {
               "x": 7,
-              "y": 9,
-              "width": 1,
-              "height": 1
+              "y": 5,
+              "width": 2,
+              "height": 2
             },
             {
-              "x": 1,
+              "x": 4,
               "y": 11,
-              "width": 2,
-              "height": 2
-            },
-            {
-              "x": 10,
-              "y": 3,
               "width": 1,
               "height": 1
-            },
-            {
-              "x": 5,
-              "y": 7,
-              "width": 2,
-              "height": 2
-            },
-            {
-              "x": 3,
-              "y": 13,
-              "width": 1,
-              "height": 1
-            },
-            {
-              "x": 8,
-              "y": 12,
-              "width": 2,
-              "height": 2
             }
           ]
         }

@@ -66,6 +66,11 @@ class Vector {
     // MARK: Return modified result
     // --
     
+    func unit() -> Vector {
+        let magnitude = distance()
+        return Vector(x: x / magnitude, y: y / magnitude)
+    }
+    
     func translated(translateX: CGFloat, translateY: CGFloat) -> Vector {
         return Vector(start: CGPoint(x: start.x + translateX, y: start.y + translateY), end: CGPoint(x: end.x + translateX, y: end.y + translateY))
     }
@@ -76,6 +81,10 @@ class Vector {
 
     func reversed() -> Vector {
         return Vector(start: end, end: start)
+    }
+    
+    func perpendicular() -> Vector {
+        return Vector(start: start, end: CGPoint(x: start.x + y, y: start.y - x))
     }
 
     func stretchedToEdges(topLeft: CGPoint, bottomRight: CGPoint) -> Vector {
