@@ -7,7 +7,7 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class GameContainerView: FrameContainerView {
+class GameContainerView: FrameContainerView, LevelViewDelegate {
     
     // --
     // MARK: Statics
@@ -50,8 +50,11 @@ class GameContainerView: FrameContainerView {
                 gameContainer.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
 
                 // Apply clear goal
-                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
                 gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
+
+                // Apply events
+                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
+                gameContainer.lethalHitEvent = AppEvent.fromValue(value: attributes["lethalHitEvent"])
 
                 // Apply update frames per second
                 gameContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
@@ -120,6 +123,7 @@ class GameContainerView: FrameContainerView {
         levelView.layoutProperties.margin = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
         levelView.layoutProperties.horizontalGravity = 0.5
         levelView.layoutProperties.verticalGravity = 0.5
+        levelView.delegate = self
         addSubview(levelView)
         
         // Add slice preview
@@ -167,7 +171,8 @@ class GameContainerView: FrameContainerView {
     // --
     
     var clearEvent: AppEvent?
-    
+    var lethalHitEvent: AppEvent?
+
     var levelWidth: Float = 1 {
         didSet {
             levelView.levelWidth = levelWidth
@@ -210,6 +215,22 @@ class GameContainerView: FrameContainerView {
 
     
     // --
+    // MARK: Level view delegate
+    // --
+    
+    func didLethalHit() {
+        dragStart = nil
+        dragEnd = nil
+        slicePreviewView.start = nil
+        slicePreviewView.end = nil
+        levelView.setSliceVector(vector: nil)
+        if let lethalHitEvent = lethalHitEvent {
+            eventObserver?.observedEvent(lethalHitEvent, sender: self)
+        }
+    }
+
+
+    // --
     // MARK: Interaction
     // --
     
@@ -236,6 +257,11 @@ class GameContainerView: FrameContainerView {
                     } else {
                         slicePreviewView.end = nil
                     }
+                    if slicePreviewView.end != nil && levelView.frame.width > 0 && levelView.frame.height > 0 {
+                        levelView.setSliceVector(vector: Vector(start: dragStart, end: dragEnd), screenSpace: true)
+                    } else {
+                        levelView.setSliceVector(vector: nil)
+                    }
                 }
             }
         }
@@ -252,7 +278,7 @@ class GameContainerView: FrameContainerView {
             let viewVector = Vector(start: dragStart, end: dragEnd)
             if viewVector.distance() >= minimumDragDistance {
                 let sliceVector = levelView.transformedSliceVector(vector: viewVector)
-                if sliceVector.isValid() {
+                if sliceVector.isValid() && levelView.setSliceVector(vector: sliceVector) {
                     slice(vector: sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))))
                 }
             }
@@ -261,6 +287,7 @@ class GameContainerView: FrameContainerView {
         dragEnd = nil
         slicePreviewView.start = nil
         slicePreviewView.end = nil
+        levelView.setSliceVector(vector: nil)
     }
 
 }

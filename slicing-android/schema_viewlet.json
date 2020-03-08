@@ -331,6 +331,10 @@
             "description": "Sends event when the level is cleared",
             "$ref": "#/definitions/appEvent"
           },
+          "lethalHitEvent": {
+            "description": "Sends event when a lethal hit occurs in the level",
+            "$ref": "#/definitions/appEvent"
+          },
           "fps": {
             "description": "The amount of frames per second the sprite refresh loop tries to run on",
             "type": "integer"

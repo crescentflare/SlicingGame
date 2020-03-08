@@ -5,6 +5,12 @@
 
 import UIKit
 
+protocol PhysicsDelegate: class {
+    
+    func didLethalCollision()
+    
+}
+
 class Physics {
 
     // --
@@ -37,6 +43,7 @@ class Physics {
         }
     }
     
+    weak var delegate: PhysicsDelegate?
     private var objects = [PhysicsObject]()
     private var leftBoundary = PhysicsBoundary(x: -1, y: -1, width: 1, height: 3)
     private var rightBoundary = PhysicsBoundary(x: 1, y: -1, width: 1, height: 3)
@@ -129,6 +136,11 @@ class Physics {
             collisionObject?.didCollide(withObject: object, normal: collisionNormal.reversed().unit(), timeRemaining: 0, physics: self)
             object.didCollide(withObject: collisionObject, normal: collisionNormal, timeRemaining: timeRemaining * timeInterval, physics: self)
         }
+        
+        // Notify delegate if needed
+        if object.lethal || collisionObject?.lethal ?? false {
+            delegate?.didLethalCollision()
+        }
     }
     
 
@@ -136,6 +148,37 @@ class Physics {
     // MARK: Collision
     // --
     
+    func intersectsSprite(vector: Vector) -> Bool {
+        for object in objects {
+            if object is Sprite {
+                let spriteBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))
+                if object.collisionRotation == 0 {
+                    if vector.intersect(withRect: spriteBounds) != nil {
+                        return true
+                    }
+                } else {
+                    let polygon = Polygon(rect: spriteBounds, pivot: CGPoint(x: object.collisionPivot.x + CGFloat(object.x), y: object.collisionPivot.y + CGFloat(object.y)), rotation: CGFloat(object.collisionRotation))
+                    if vector.intersect(withPolygon: polygon) != nil {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
+    func intersectsSprite(polygon: Polygon) -> Bool {
+        for object in objects {
+            if object is Sprite {
+                let spritePolygon = Polygon(rect: object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y)), pivot: CGPoint(x: object.collisionPivot.x + CGFloat(object.x), y: object.collisionPivot.y + CGFloat(object.y)), rotation: CGFloat(object.collisionRotation))
+                if (polygon.intersect(withPolygon: spritePolygon)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     private func checkSimpleCollision(object: PhysicsObject, distanceX: Float, distanceY: Float, bounds: CGRect) -> CollisionResult? {
         // Calculate collision distances for each axis separately
         let objectBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))

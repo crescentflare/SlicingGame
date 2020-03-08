@@ -13,6 +13,7 @@ class PhysicsBoundary(override var x: Float, override var y: Float, var width: F
     // Members
     // --
 
+    override var lethal = false
     override var recursiveCheck = 0
 
 

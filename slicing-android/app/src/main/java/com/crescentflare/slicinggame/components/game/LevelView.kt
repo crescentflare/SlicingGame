@@ -19,14 +19,16 @@ import com.crescentflare.slicinggame.components.containers.SpriteContainerView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.unilayout.helpers.UniLayoutParams
+import java.lang.ref.WeakReference
 
 
 /**
  * Game view: contains all components for the playable level area
  */
-open class LevelView : FrameContainerView {
+open class LevelView : FrameContainerView, Physics.Listener {
 
     // --
     // Static: viewlet integration
@@ -95,14 +97,36 @@ open class LevelView : FrameContainerView {
 
 
     // --
+    // Physics listener
+    // --
+
+    interface Listener {
+
+        fun onLethalHit()
+
+    }
+
+
+    // --
     // Members
     // --
+
+    var listener: Listener?
+        get() = listenerReference?.get()
+        set(listener) {
+            listenerReference = if (listener != null) {
+                WeakReference(listener)
+            } else {
+                null
+            }
+        }
 
     private var backgroundView = ImageView(context)
     private var canvasView = LevelCanvasView(context)
     private var spriteContainerView = SpriteContainerView(context)
     private var progressView = TextView(context)
     private val progressViewMargin = resources.getDimensionPixelSize(R.dimen.text) + (Resources.getSystem().displayMetrics.density * 8).toInt()
+    private var listenerReference: WeakReference<Listener>? = null
 
 
     // --
@@ -143,6 +167,7 @@ open class LevelView : FrameContainerView {
         val spriteContainerLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
         spriteContainerLayoutParams.bottomMargin = progressViewMargin
         spriteContainerView.layoutParams = spriteContainerLayoutParams
+        spriteContainerView.physicsListener = this
         addView(spriteContainerView)
 
         // Add progress view
@@ -200,6 +225,20 @@ open class LevelView : FrameContainerView {
         return translatedVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
     }
 
+    fun setSliceVector(vector: Vector?, screenSpace: Boolean = false): Boolean {
+        val sliceVector = if (vector != null) {
+            if (screenSpace) transformedSliceVector(vector) else vector
+        } else {
+            null
+        }
+        if (sliceVector?.isValid() == true) {
+            val topLeft = PointF(-spriteContainerView.gridWidth * 4, -spriteContainerView.gridHeight * 4)
+            val bottomRight = PointF(spriteContainerView.gridWidth * 4, spriteContainerView.gridHeight * 4)
+            return spriteContainerView.setSliceVector(sliceVector.stretchedToEdges(topLeft, bottomRight))
+        }
+        return spriteContainerView.setSliceVector(null)
+    }
+
 
     // --
     // Obtain state
@@ -253,6 +292,15 @@ open class LevelView : FrameContainerView {
         set(drawPhysicsBoundaries) {
             spriteContainerView.drawPhysicsBoundaries = drawPhysicsBoundaries
         }
+
+
+    // --
+    // Physics delegate
+    // --
+
+    override fun onLethalCollision() {
+        listener?.onLethalHit()
+    }
 
 
     // --

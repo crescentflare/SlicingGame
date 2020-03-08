@@ -7,12 +7,19 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class LevelView: FrameContainerView {
+protocol LevelViewDelegate: class {
+    
+    func didLethalHit()
+    
+}
+
+class LevelView: FrameContainerView, PhysicsDelegate {
     
     // --
     // MARK: Members
     // --
     
+    weak var delegate: LevelViewDelegate?
     private var backgroundView = ImageView()
     private var canvasView = LevelCanvasView()
     private var spriteContainerView = SpriteContainerView()
@@ -122,6 +129,7 @@ class LevelView: FrameContainerView {
         spriteContainerView.layoutProperties.height = UniLayoutProperties.stretchToParent
         spriteContainerView.layoutProperties.margin.bottom = progressViewMargin
         spriteContainerView.backgroundColor = .clear
+        spriteContainerView.physicsDelegate = self
         addSubview(spriteContainerView)
 
         // Add progress view
@@ -176,6 +184,21 @@ class LevelView: FrameContainerView {
     func transformedSliceVector(vector: Vector) -> Vector {
         let translatedVector = vector.translated(translateX: -frame.origin.x, translateY: -frame.origin.y)
         return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+    }
+    
+    @discardableResult func setSliceVector(vector: Vector?, screenSpace: Bool = false) -> Bool {
+        let sliceVector: Vector?
+        if let vector = vector {
+            sliceVector = screenSpace ? transformedSliceVector(vector: vector) : vector
+        } else {
+            sliceVector = nil
+        }
+        if sliceVector?.isValid() ?? false {
+            let topLeft = CGPoint(x: CGFloat(-spriteContainerView.gridWidth * 4), y: CGFloat(-spriteContainerView.gridHeight * 4))
+            let bottomRight = CGPoint(x: CGFloat(spriteContainerView.gridWidth * 4), y: CGFloat(spriteContainerView.gridHeight * 4))
+            return spriteContainerView.setSliceVector(vector: sliceVector?.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight))
+        }
+        return spriteContainerView.setSliceVector(vector: nil)
     }
     
 
@@ -236,6 +259,15 @@ class LevelView: FrameContainerView {
     }
 
     
+    // --
+    // MARK: Physics delegate
+    // --
+    
+    func didLethalCollision() {
+        delegate?.didLethalHit()
+    }
+    
+
     // --
     // MARK: Custom layout
     // --

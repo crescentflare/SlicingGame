@@ -29,7 +29,7 @@ import com.crescentflare.unilayout.helpers.UniLayoutParams
 /**
  * Container view: layout of game components and slice interaction
  */
-open class GameContainerView : FrameContainerView {
+open class GameContainerView : FrameContainerView, LevelView.Listener {
 
     // --
     // Static: viewlet integration
@@ -52,8 +52,11 @@ open class GameContainerView : FrameContainerView {
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
                     // Apply clear goal
-                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
                     obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
+
+                    // Apply events
+                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
+                    obj.lethalHitEvent = AppEvent.fromValue(attributes["lethalHitEvent"])
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
@@ -141,6 +144,7 @@ open class GameContainerView : FrameContainerView {
         levelLayoutParams.horizontalGravity = 0.5f
         levelLayoutParams.verticalGravity = 0.5f
         levelView.layoutParams = levelLayoutParams
+        levelView.listener = this
         addView(levelView)
 
         // Add slice preview
@@ -187,6 +191,7 @@ open class GameContainerView : FrameContainerView {
     // --
 
     var clearEvent: AppEvent? = null
+    var lethalHitEvent: AppEvent? = null
 
     var levelWidth: Float = 1f
         set(levelWidth) {
@@ -226,6 +231,22 @@ open class GameContainerView : FrameContainerView {
 
 
     // --
+    // Level view listener
+    // --
+
+    override fun onLethalHit() {
+        dragStart = null
+        dragEnd = null
+        slicePreviewView.start = null
+        slicePreviewView.end = null
+        levelView.setSliceVector(null)
+        lethalHitEvent?.let {
+            eventObserver?.observedEvent(it, this)
+        }
+    }
+
+
+    // --
     // Interaction
     // --
 
@@ -258,6 +279,11 @@ open class GameContainerView : FrameContainerView {
                                     } else {
                                         null
                                     }
+                                    if (slicePreviewView.end != null && levelView.width > 0 && levelView.height > 0) {
+                                        levelView.setSliceVector(Vector(vectorStart, vectorEnd), true)
+                                    } else {
+                                        levelView.setSliceVector(null)
+                                    }
                                 }
                                 break
                             }
@@ -279,7 +305,7 @@ open class GameContainerView : FrameContainerView {
                                     val viewVector = Vector(vectorStart, vectorEnd)
                                     if (viewVector.distance() >= minimumDragDistance) {
                                         val sliceVector = levelView.transformedSliceVector(viewVector)
-                                        if (sliceVector.isValid()) {
+                                        if (sliceVector.isValid() && levelView.setSliceVector(sliceVector)) {
                                             slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
                                         }
                                     }
@@ -290,6 +316,7 @@ open class GameContainerView : FrameContainerView {
                                 dragEnd = null
                                 slicePreviewView.start = null
                                 slicePreviewView.end = null
+                                levelView.setSliceVector(null)
                                 break
                             }
                         }

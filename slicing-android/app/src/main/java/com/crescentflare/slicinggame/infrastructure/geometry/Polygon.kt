@@ -172,6 +172,40 @@ class Polygon {
         return false
     }
 
+    fun contains(point: PointF): Boolean {
+        if (isValid()) {
+            points.maxBy { it.x }?.let { rightMostPoint ->
+                val endPoint = PointF(rightMostPoint.x + 100, point.y)
+                var hits = 0
+                for (vector in asVectorList()) {
+                    if (vector.intersect(Vector(point, endPoint)) != null) {
+                        hits++
+                    }
+                }
+                return (hits % 2 == 1) == isClockwise()
+            }
+        }
+        return false
+    }
+
+    fun intersect(otherPolygon: Polygon): Boolean {
+        // Return early if one point is already inside the other polygon
+        if (points.size == 0 || otherPolygon.points.size == 0) {
+            return false
+        }
+        if (contains(otherPolygon.points[0]) || otherPolygon.contains(points[0])) {
+            return true
+        }
+
+        // Check if lines intersect
+        for (vector in asVectorList()) {
+            if (vector.intersect(otherPolygon) != null) {
+                return true
+            }
+        }
+        return false
+    }
+
 
     // --
     // Calculated values
