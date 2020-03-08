@@ -52,8 +52,11 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
 
                     // Apply clear goal
-                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
                     obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
+
+                    // Apply events
+                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
+                    obj.lethalHitEvent = AppEvent.fromValue(attributes["lethalHitEvent"])
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
@@ -188,6 +191,7 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     // --
 
     var clearEvent: AppEvent? = null
+    var lethalHitEvent: AppEvent? = null
 
     var levelWidth: Float = 1f
         set(levelWidth) {
@@ -236,6 +240,9 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
         slicePreviewView.start = null
         slicePreviewView.end = null
         levelView.setSliceVector(null)
+        lethalHitEvent?.let {
+            eventObserver?.observedEvent(it, this)
+        }
     }
 
 

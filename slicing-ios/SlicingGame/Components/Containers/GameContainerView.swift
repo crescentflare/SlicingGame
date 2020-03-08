@@ -50,8 +50,11 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
                 gameContainer.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
 
                 // Apply clear goal
-                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
                 gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
+
+                // Apply events
+                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
+                gameContainer.lethalHitEvent = AppEvent.fromValue(value: attributes["lethalHitEvent"])
 
                 // Apply update frames per second
                 gameContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
@@ -168,7 +171,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     // --
     
     var clearEvent: AppEvent?
-    
+    var lethalHitEvent: AppEvent?
+
     var levelWidth: Float = 1 {
         didSet {
             levelView.levelWidth = levelWidth
@@ -220,6 +224,9 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
         slicePreviewView.start = nil
         slicePreviewView.end = nil
         levelView.setSliceVector(vector: nil)
+        if let lethalHitEvent = lethalHitEvent {
+            eventObserver?.observedEvent(lethalHitEvent, sender: self)
+        }
     }
 
 
