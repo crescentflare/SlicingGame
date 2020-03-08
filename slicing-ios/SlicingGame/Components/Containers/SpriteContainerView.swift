@@ -7,12 +7,13 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class SpriteContainerView: FrameContainerView {
+class SpriteContainerView: FrameContainerView, PhysicsDelegate {
     
     // --
     // MARK: Members
     // --
     
+    weak var physicsDelegate: PhysicsDelegate?
     private let physics = Physics()
     private var sprites = [Sprite]()
     private var collisionBoundaries = [PhysicsBoundary]()
@@ -90,7 +91,7 @@ class SpriteContainerView: FrameContainerView {
     }
     
     private func setup() {
-        // No implementation
+        physics.delegate = self
     }
     
     
@@ -163,6 +164,7 @@ class SpriteContainerView: FrameContainerView {
             let y = Float(vectorCenterY - height / 2)
             let rotation = atan2(vector.x, vector.y) * 360 / (CGFloat.pi * 2)
             let physicsBoundary = PhysicsBoundary(x: x, y: y, width: Float(width), height: Float(height), rotation: Float(-rotation))
+            physicsBoundary.lethal = true
             physics.registerObject(physicsBoundary)
             sliceVectorBoundary = physicsBoundary
         }
@@ -197,6 +199,15 @@ class SpriteContainerView: FrameContainerView {
     var drawPhysicsBoundaries = false
 
     
+    // --
+    // MARK: Physics delegate
+    // --
+    
+    func didLethalCollision() {
+        physicsDelegate?.didLethalCollision()
+    }
+
+
     // --
     // MARK: Movement
     // --

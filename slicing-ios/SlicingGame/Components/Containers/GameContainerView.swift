@@ -7,7 +7,7 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class GameContainerView: FrameContainerView {
+class GameContainerView: FrameContainerView, LevelViewDelegate {
     
     // --
     // MARK: Statics
@@ -120,6 +120,7 @@ class GameContainerView: FrameContainerView {
         levelView.layoutProperties.margin = UIEdgeInsets(top: margin, left: margin, bottom: margin, right: margin)
         levelView.layoutProperties.horizontalGravity = 0.5
         levelView.layoutProperties.verticalGravity = 0.5
+        levelView.delegate = self
         addSubview(levelView)
         
         // Add slice preview
@@ -209,6 +210,19 @@ class GameContainerView: FrameContainerView {
     }
 
     
+    // --
+    // MARK: Level view delegate
+    // --
+    
+    func didLethalHit() {
+        dragStart = nil
+        dragEnd = nil
+        slicePreviewView.start = nil
+        slicePreviewView.end = nil
+        levelView.setSliceVector(vector: nil)
+    }
+
+
     // --
     // MARK: Interaction
     // --

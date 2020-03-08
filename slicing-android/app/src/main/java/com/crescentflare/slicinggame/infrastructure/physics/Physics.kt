@@ -4,6 +4,7 @@ import android.graphics.PointF
 import android.graphics.RectF
 import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import java.lang.ref.WeakReference
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -12,6 +13,17 @@ import kotlin.math.min
  * Physics: manages collision and send events to objects
  */
 class Physics {
+
+    // --
+    // Physics listener
+    // --
+
+    interface Listener {
+
+        fun onLethalCollision()
+
+    }
+
 
     // --
     // Members
@@ -43,11 +55,22 @@ class Physics {
             bottomBoundary.height = height
         }
 
+    var listener: Listener?
+        get() = listenerReference?.get()
+        set(listener) {
+            listenerReference = if (listener != null) {
+                WeakReference(listener)
+            } else {
+                null
+            }
+        }
+
     private val objectList = mutableListOf<PhysicsObject>()
     private var leftBoundary = PhysicsBoundary(-1f, -1f, 1f, 3f)
     private var rightBoundary = PhysicsBoundary(1f, -1f, 1f, 3f)
     private var topBoundary = PhysicsBoundary(-1f, -1f, 3f, 1f)
     private var bottomBoundary = PhysicsBoundary(-1f, 1f, 3f, 1f)
+    private var listenerReference: WeakReference<Listener>? = null
 
 
     // --
@@ -133,6 +156,11 @@ class Physics {
             }
             collisionObject?.onCollision(movingObject, normal.reversed().unit(), 0f, this)
             movingObject.onCollision(collisionObject, normal, timeRemaining * timeInterval, this)
+        }
+
+        // Notify listener if needed
+        if (movingObject.lethal || collisionObject?.lethal == true) {
+            listener?.onLethalCollision()
         }
     }
 

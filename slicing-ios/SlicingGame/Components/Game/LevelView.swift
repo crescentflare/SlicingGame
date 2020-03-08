@@ -7,12 +7,19 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class LevelView: FrameContainerView {
+protocol LevelViewDelegate: class {
+    
+    func didLethalHit()
+    
+}
+
+class LevelView: FrameContainerView, PhysicsDelegate {
     
     // --
     // MARK: Members
     // --
     
+    weak var delegate: LevelViewDelegate?
     private var backgroundView = ImageView()
     private var canvasView = LevelCanvasView()
     private var spriteContainerView = SpriteContainerView()
@@ -122,6 +129,7 @@ class LevelView: FrameContainerView {
         spriteContainerView.layoutProperties.height = UniLayoutProperties.stretchToParent
         spriteContainerView.layoutProperties.margin.bottom = progressViewMargin
         spriteContainerView.backgroundColor = .clear
+        spriteContainerView.physicsDelegate = self
         addSubview(spriteContainerView)
 
         // Add progress view
@@ -251,6 +259,15 @@ class LevelView: FrameContainerView {
     }
 
     
+    // --
+    // MARK: Physics delegate
+    // --
+    
+    func didLethalCollision() {
+        delegate?.didLethalHit()
+    }
+    
+
     // --
     // MARK: Custom layout
     // --

@@ -21,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.max
@@ -29,7 +30,7 @@ import kotlin.math.max
 /**
  * Container view: provides a container for managing sprites
  */
-open class SpriteContainerView : FrameContainerView {
+open class SpriteContainerView : FrameContainerView, Physics.Listener {
 
     // --
     // Static: viewlet integration
@@ -86,6 +87,16 @@ open class SpriteContainerView : FrameContainerView {
     // Members
     // --
 
+    var physicsListener: Physics.Listener?
+        get() = physicsListenerReference?.get()
+        set(physicsListener) {
+            physicsListenerReference = if (physicsListener != null) {
+                WeakReference(physicsListener)
+            } else {
+                null
+            }
+        }
+
     private val physics = Physics()
     private val sprites = mutableListOf<Sprite>()
     private var collisionBoundaries = mutableListOf<PhysicsBoundary>()
@@ -95,6 +106,7 @@ open class SpriteContainerView : FrameContainerView {
     private var updateScheduled = false
     private var lastTimeMillis = System.currentTimeMillis()
     private var timeCorrection = 1
+    private var physicsListenerReference: WeakReference<Physics.Listener>? = null
 
 
     // --
@@ -118,6 +130,7 @@ open class SpriteContainerView : FrameContainerView {
 
     init {
         setWillNotDraw(false)
+        physics.listener = this
     }
 
 
@@ -190,6 +203,7 @@ open class SpriteContainerView : FrameContainerView {
             val y = vectorCenterY - height / 2
             val rotation = atan2(it.x, it.y) * 360 / (PI.toFloat() * 2)
             val physicsBoundary = PhysicsBoundary(x, y, width, height, -rotation)
+            physicsBoundary.lethal = true
             physics.registerObject(physicsBoundary)
             sliceVectorBoundary = physicsBoundary
         }
@@ -224,6 +238,15 @@ open class SpriteContainerView : FrameContainerView {
     var fps = 60
 
     var drawPhysicsBoundaries = false
+
+
+    // --
+    // Physics listener
+    // --
+
+    override fun onLethalCollision() {
+        physicsListener?.onLethalCollision()
+    }
 
 
     // --

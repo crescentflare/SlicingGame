@@ -29,7 +29,7 @@ import com.crescentflare.unilayout.helpers.UniLayoutParams
 /**
  * Container view: layout of game components and slice interaction
  */
-open class GameContainerView : FrameContainerView {
+open class GameContainerView : FrameContainerView, LevelView.Listener {
 
     // --
     // Static: viewlet integration
@@ -141,6 +141,7 @@ open class GameContainerView : FrameContainerView {
         levelLayoutParams.horizontalGravity = 0.5f
         levelLayoutParams.verticalGravity = 0.5f
         levelView.layoutParams = levelLayoutParams
+        levelView.listener = this
         addView(levelView)
 
         // Add slice preview
@@ -223,6 +224,19 @@ open class GameContainerView : FrameContainerView {
         set(drawPhysicsBoundaries) {
             levelView.drawPhysicsBoundaries = drawPhysicsBoundaries
         }
+
+
+    // --
+    // Level view listener
+    // --
+
+    override fun onLethalHit() {
+        dragStart = null
+        dragEnd = null
+        slicePreviewView.start = null
+        slicePreviewView.end = null
+        levelView.setSliceVector(null)
+    }
 
 
     // --

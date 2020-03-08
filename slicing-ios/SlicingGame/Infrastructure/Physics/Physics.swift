@@ -5,6 +5,12 @@
 
 import UIKit
 
+protocol PhysicsDelegate: class {
+    
+    func didLethalCollision()
+    
+}
+
 class Physics {
 
     // --
@@ -37,6 +43,7 @@ class Physics {
         }
     }
     
+    weak var delegate: PhysicsDelegate?
     private var objects = [PhysicsObject]()
     private var leftBoundary = PhysicsBoundary(x: -1, y: -1, width: 1, height: 3)
     private var rightBoundary = PhysicsBoundary(x: 1, y: -1, width: 1, height: 3)
@@ -128,6 +135,11 @@ class Physics {
             }
             collisionObject?.didCollide(withObject: object, normal: collisionNormal.reversed().unit(), timeRemaining: 0, physics: self)
             object.didCollide(withObject: collisionObject, normal: collisionNormal, timeRemaining: timeRemaining * timeInterval, physics: self)
+        }
+        
+        // Notify delegate if needed
+        if object.lethal || collisionObject?.lethal ?? false {
+            delegate?.didLethalCollision()
         }
     }
     
