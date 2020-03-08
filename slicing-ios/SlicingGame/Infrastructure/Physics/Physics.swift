@@ -167,6 +167,18 @@ class Physics {
         return false
     }
     
+    func intersectsSprite(polygon: Polygon) -> Bool {
+        for object in objects {
+            if object is Sprite {
+                let spritePolygon = Polygon(rect: object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y)), pivot: CGPoint(x: object.collisionPivot.x + CGFloat(object.x), y: object.collisionPivot.y + CGFloat(object.y)), rotation: CGFloat(object.collisionRotation))
+                if (polygon.intersect(withPolygon: spritePolygon)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     private func checkSimpleCollision(object: PhysicsObject, distanceX: Float, distanceY: Float, bounds: CGRect) -> CollisionResult? {
         // Calculate collision distances for each axis separately
         let objectBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))

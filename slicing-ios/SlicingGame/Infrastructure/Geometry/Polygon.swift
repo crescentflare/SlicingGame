@@ -178,7 +178,25 @@ class Polygon {
         return false
     }
     
+    func intersect(withPolygon: Polygon) -> Bool {
+        // Return early if one point is already inside the other polygon
+        if points.count == 0 || withPolygon.points.count == 0 {
+            return false
+        }
+        if contains(withPolygon.points[0]) || withPolygon.contains(points[0]) {
+            return true
+        }
+        
+        // Check if lines intersect
+        for vector in asVectorArray() {
+            if vector.intersect(withPolygon: withPolygon) != nil {
+                return true
+            }
+        }
+        return false
+    }
     
+
     // --
     // MARK: Calculated values
     // --

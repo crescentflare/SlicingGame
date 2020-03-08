@@ -190,6 +190,20 @@ class Physics {
         return false
     }
 
+    fun intersectsSprite(polygon: Polygon): Boolean {
+        for (checkObject in objectList) {
+            if (checkObject is Sprite) {
+                val spriteBounds = checkObject.collisionBounds
+                spriteBounds.offset(checkObject.x, checkObject.y)
+                val spritePolygon = Polygon(spriteBounds, PointF(checkObject.collisionPivot.x + checkObject.x, checkObject.collisionPivot.y + checkObject.y), checkObject.collisionRotation)
+                if (polygon.intersect(spritePolygon)) {
+                    return true
+                }
+            }
+        }
+        return false
+    }
+
     private fun checkSimpleCollision(againstObject: PhysicsObject, distanceX: Float, distanceY: Float, bounds: RectF): CollisionResult? {
         // Calculate collision distances for each axis separately
         val objectBounds = againstObject.collisionBounds

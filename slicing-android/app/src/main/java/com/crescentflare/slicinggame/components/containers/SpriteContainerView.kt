@@ -103,6 +103,7 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
     private var sliceVectorBoundary: PhysicsBoundary? = null
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
+    private var currentSliceVector: Vector? = null
     private var updateScheduled = false
     private var lastTimeMillis = System.currentTimeMillis()
     private var timeCorrection = 1
@@ -191,14 +192,32 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
 
     fun setSliceVector(vector: Vector?): Boolean {
         // First unregister the existing object
+        val previousSliceVector = currentSliceVector
         sliceVectorBoundary?.let {
             physics.unregisterObject(it)
         }
         sliceVectorBoundary = null
+        currentSliceVector = null
 
         // Check if it already collides
         vector?.let {
-            if (physics.intersectsSprite(it)) {
+            if (previousSliceVector != null) {
+                val intersection = previousSliceVector.intersect(it)
+                val polygons = mutableListOf<Polygon>()
+                if (intersection != null) {
+                    polygons.add(Polygon(listOf(previousSliceVector.start, vector.start, intersection)))
+                    polygons.add(Polygon(listOf(previousSliceVector.end, vector.end, intersection)))
+                } else {
+                    polygons.add(Polygon(listOf(previousSliceVector.start, vector.start, vector.end, previousSliceVector.end)))
+                }
+                for (polygon in polygons) {
+                    val checkPolygon = if (polygon.isClockwise()) polygon else polygon.reversed()
+                    if (physics.intersectsSprite(checkPolygon)) {
+                        onLethalCollision()
+                        return false
+                    }
+                }
+            } else if (physics.intersectsSprite(it)) {
                 onLethalCollision()
                 return false
             }
@@ -218,6 +237,7 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
             physics.registerObject(physicsBoundary)
             sliceVectorBoundary = physicsBoundary
         }
+        currentSliceVector = vector
         return true
     }
 

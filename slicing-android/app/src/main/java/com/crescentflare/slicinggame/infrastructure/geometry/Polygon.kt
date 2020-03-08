@@ -188,6 +188,24 @@ class Polygon {
         return false
     }
 
+    fun intersect(otherPolygon: Polygon): Boolean {
+        // Return early if one point is already inside the other polygon
+        if (points.size == 0 || otherPolygon.points.size == 0) {
+            return false
+        }
+        if (contains(otherPolygon.points[0]) || otherPolygon.contains(points[0])) {
+            return true
+        }
+
+        // Check if lines intersect
+        for (vector in asVectorList()) {
+            if (vector.intersect(otherPolygon) != null) {
+                return true
+            }
+        }
+        return false
+    }
+
 
     // --
     // Calculated values
