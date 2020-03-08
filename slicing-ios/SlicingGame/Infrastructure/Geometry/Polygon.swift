@@ -164,6 +164,20 @@ class Polygon {
         return false
     }
     
+    func contains(_ point: CGPoint) -> Bool {
+        if isValid(), let rightMostPoint = points.max(by: { $0.x < $1.x }) {
+            let endPoint = CGPoint(x: rightMostPoint.x + 100, y: point.y)
+            var hits = 0
+            for vector in asVectorArray() {
+                if vector.intersect(withVector: Vector(start: point, end: endPoint)) != nil {
+                    hits += 1
+                }
+            }
+            return (hits % 2 == 1) == isClockwise()
+        }
+        return false
+    }
+    
     
     // --
     // MARK: Calculated values

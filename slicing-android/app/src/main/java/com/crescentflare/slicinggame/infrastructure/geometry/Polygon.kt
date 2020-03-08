@@ -172,6 +172,22 @@ class Polygon {
         return false
     }
 
+    fun contains(point: PointF): Boolean {
+        if (isValid()) {
+            points.maxBy { it.x }?.let { rightMostPoint ->
+                val endPoint = PointF(rightMostPoint.x + 100, point.y)
+                var hits = 0
+                for (vector in asVectorList()) {
+                    if (vector.intersect(Vector(point, endPoint)) != null) {
+                        hits++
+                    }
+                }
+                return (hits % 2 == 1) == isClockwise()
+            }
+        }
+        return false
+    }
+
 
     // --
     // Calculated values

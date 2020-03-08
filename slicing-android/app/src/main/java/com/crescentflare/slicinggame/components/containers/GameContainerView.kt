@@ -305,7 +305,7 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
                                     val viewVector = Vector(vectorStart, vectorEnd)
                                     if (viewVector.distance() >= minimumDragDistance) {
                                         val sliceVector = levelView.transformedSliceVector(viewVector)
-                                        if (sliceVector.isValid()) {
+                                        if (sliceVector.isValid() && levelView.setSliceVector(sliceVector)) {
                                             slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
                                         }
                                     }

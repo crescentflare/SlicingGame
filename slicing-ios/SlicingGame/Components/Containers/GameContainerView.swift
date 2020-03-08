@@ -278,7 +278,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
             let viewVector = Vector(start: dragStart, end: dragEnd)
             if viewVector.distance() >= minimumDragDistance {
                 let sliceVector = levelView.transformedSliceVector(vector: viewVector)
-                if sliceVector.isValid() {
+                if sliceVector.isValid() && levelView.setSliceVector(vector: sliceVector) {
                     slice(vector: sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))))
                 }
             }

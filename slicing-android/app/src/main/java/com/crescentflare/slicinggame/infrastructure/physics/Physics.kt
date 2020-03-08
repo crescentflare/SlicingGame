@@ -4,6 +4,7 @@ import android.graphics.PointF
 import android.graphics.RectF
 import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import com.crescentflare.slicinggame.sprites.core.Sprite
 import java.lang.ref.WeakReference
 import kotlin.math.abs
 import kotlin.math.max
@@ -168,6 +169,26 @@ class Physics {
     // --
     // Collision
     // --
+
+    fun intersectsSprite(vector: Vector): Boolean {
+        for (checkObject in objectList) {
+            if (checkObject is Sprite) {
+                val spriteBounds = checkObject.collisionBounds
+                spriteBounds.offset(checkObject.x, checkObject.y)
+                if (checkObject.collisionRotation == 0f) {
+                    if (vector.intersect(spriteBounds) != null) {
+                        return true
+                    }
+                } else {
+                    val polygon = Polygon(spriteBounds, PointF(checkObject.collisionPivot.x + checkObject.x,checkObject.collisionPivot.y + checkObject.y), checkObject.collisionRotation)
+                    if (vector.intersect(polygon) != null) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
 
     private fun checkSimpleCollision(againstObject: PhysicsObject, distanceX: Float, distanceY: Float, bounds: RectF): CollisionResult? {
         // Calculate collision distances for each axis separately

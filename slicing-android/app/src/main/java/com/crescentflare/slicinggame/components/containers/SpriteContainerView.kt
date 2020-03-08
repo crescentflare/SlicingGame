@@ -190,10 +190,21 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
     // --
 
     fun setSliceVector(vector: Vector?): Boolean {
+        // First unregister the existing object
         sliceVectorBoundary?.let {
             physics.unregisterObject(it)
         }
         sliceVectorBoundary = null
+
+        // Check if it already collides
+        vector?.let {
+            if (physics.intersectsSprite(it)) {
+                onLethalCollision()
+                return false
+            }
+        }
+
+        // Add slice boundary
         vector?.let {
             val vectorCenterX = it.start.x + it.x / 2
             val vectorCenterY = it.start.y + it.y / 2

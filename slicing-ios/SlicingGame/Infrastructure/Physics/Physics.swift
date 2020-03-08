@@ -148,6 +148,25 @@ class Physics {
     // MARK: Collision
     // --
     
+    func intersectsSprite(vector: Vector) -> Bool {
+        for object in objects {
+            if object is Sprite {
+                let spriteBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))
+                if object.collisionRotation == 0 {
+                    if vector.intersect(withRect: spriteBounds) != nil {
+                        return true
+                    }
+                } else {
+                    let polygon = Polygon(rect: spriteBounds, pivot: CGPoint(x: object.collisionPivot.x + CGFloat(object.x), y: object.collisionPivot.y + CGFloat(object.y)), rotation: CGFloat(object.collisionRotation))
+                    if vector.intersect(withPolygon: polygon) != nil {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+    
     private func checkSimpleCollision(object: PhysicsObject, distanceX: Float, distanceY: Float, bounds: CGRect) -> CollisionResult? {
         // Calculate collision distances for each axis separately
         let objectBounds = object.collisionBounds.offsetBy(dx: CGFloat(object.x), dy: CGFloat(object.y))

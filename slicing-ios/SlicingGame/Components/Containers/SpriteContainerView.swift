@@ -151,10 +151,21 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
     // --
 
     func setSliceVector(vector: Vector?) -> Bool {
+        // First unregister the existing object
         if let sliceVectorBoundary = sliceVectorBoundary {
             physics.unregisterObject(sliceVectorBoundary)
         }
         sliceVectorBoundary = nil
+
+        // Check if it already collides
+        if let vector = vector {
+            if physics.intersectsSprite(vector: vector) {
+                didLethalCollision()
+                return false
+            }
+        }
+
+        // Add slice boundary
         if let vector = vector {
             let vectorCenterX = vector.start.x + vector.x / 2
             let vectorCenterY = vector.start.y + vector.y / 2
