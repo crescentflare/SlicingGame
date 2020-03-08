@@ -16,6 +16,7 @@ class SpriteContainerView: FrameContainerView {
     private let physics = Physics()
     private var sprites = [Sprite]()
     private var collisionBoundaries = [PhysicsBoundary]()
+    private var sliceVectorBoundary: PhysicsBoundary?
     private var updateScheduled = false
     private var lastTimeInterval = Date.timeIntervalSinceReferenceDate
     private var timeCorrection = 0.001
@@ -145,6 +146,31 @@ class SpriteContainerView: FrameContainerView {
 
 
     // --
+    // MARK: Slicing
+    // --
+
+    func setSliceVector(vector: Vector?) -> Bool {
+        if let sliceVectorBoundary = sliceVectorBoundary {
+            physics.unregisterObject(sliceVectorBoundary)
+        }
+        sliceVectorBoundary = nil
+        if let vector = vector {
+            let vectorCenterX = vector.start.x + vector.x / 2
+            let vectorCenterY = vector.start.y + vector.y / 2
+            let width: CGFloat = CGFloat(gridWidth) * 0.005
+            let height = vector.distance()
+            let x = Float(vectorCenterX - width / 2)
+            let y = Float(vectorCenterY - height / 2)
+            let rotation = atan2(vector.x, vector.y) * 360 / (CGFloat.pi * 2)
+            let physicsBoundary = PhysicsBoundary(x: x, y: y, width: Float(width), height: Float(height), rotation: Float(-rotation))
+            physics.registerObject(physicsBoundary)
+            sliceVectorBoundary = physicsBoundary
+        }
+        return true
+    }
+
+    
+    // --
     // MARK: Configurable values
     // --
     
@@ -198,6 +224,9 @@ class SpriteContainerView: FrameContainerView {
             if drawPhysicsBoundaries {
                 for boundary in collisionBoundaries {
                     spriteCanvas.fillRotatedRect(centerX: CGFloat(boundary.x) + boundary.collisionPivot.x, centerY: CGFloat(boundary.y) + boundary.collisionPivot.y, width: CGFloat(boundary.width), height: CGFloat(boundary.height), color: .red, rotation: CGFloat(boundary.collisionRotation))
+                }
+                if let boundary = sliceVectorBoundary {
+                    spriteCanvas.fillRotatedRect(centerX: CGFloat(boundary.x) + boundary.collisionPivot.x, centerY: CGFloat(boundary.y) + boundary.collisionPivot.y, width: CGFloat(boundary.width), height: CGFloat(boundary.height), color: .yellow, rotation: CGFloat(boundary.collisionRotation))
                 }
             }
         }

@@ -258,6 +258,11 @@ open class GameContainerView : FrameContainerView {
                                     } else {
                                         null
                                     }
+                                    if (slicePreviewView.end != null && levelView.width > 0 && levelView.height > 0) {
+                                        levelView.setSliceVector(Vector(vectorStart, vectorEnd), true)
+                                    } else {
+                                        levelView.setSliceVector(null)
+                                    }
                                 }
                                 break
                             }
@@ -290,6 +295,7 @@ open class GameContainerView : FrameContainerView {
                                 dragEnd = null
                                 slicePreviewView.start = null
                                 slicePreviewView.end = null
+                                levelView.setSliceVector(null)
                                 break
                             }
                         }

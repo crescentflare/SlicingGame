@@ -12,6 +12,7 @@ import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
+import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.infrastructure.physics.PhysicsBoundary
 import com.crescentflare.slicinggame.sprites.core.Sprite
@@ -88,6 +89,7 @@ open class SpriteContainerView : FrameContainerView {
     private val physics = Physics()
     private val sprites = mutableListOf<Sprite>()
     private var collisionBoundaries = mutableListOf<PhysicsBoundary>()
+    private var sliceVectorBoundary: PhysicsBoundary? = null
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
     private var updateScheduled = false
@@ -171,6 +173,31 @@ open class SpriteContainerView : FrameContainerView {
 
 
     // --
+    // Slicing
+    // --
+
+    fun setSliceVector(vector: Vector?): Boolean {
+        sliceVectorBoundary?.let {
+            physics.unregisterObject(it)
+        }
+        sliceVectorBoundary = null
+        vector?.let {
+            val vectorCenterX = it.start.x + it.x / 2
+            val vectorCenterY = it.start.y + it.y / 2
+            val width = gridWidth * 0.005f
+            val height = it.distance()
+            val x = vectorCenterX - width / 2
+            val y = vectorCenterY - height / 2
+            val rotation = atan2(it.x, it.y) * 360 / (PI.toFloat() * 2)
+            val physicsBoundary = PhysicsBoundary(x, y, width, height, -rotation)
+            physics.registerObject(physicsBoundary)
+            sliceVectorBoundary = physicsBoundary
+        }
+        return true
+    }
+
+
+    // --
     // Configurable values
     // --
 
@@ -228,6 +255,9 @@ open class SpriteContainerView : FrameContainerView {
             if (drawPhysicsBoundaries) {
                 for (boundary in collisionBoundaries) {
                     spriteCanvas.fillRotatedRect(boundary.x + boundary.collisionPivot.x, boundary.y + boundary.collisionPivot.y, boundary.width, boundary.height, Color.RED, boundary.collisionRotation)
+                }
+                sliceVectorBoundary?.let { boundary ->
+                    spriteCanvas.fillRotatedRect(boundary.x + boundary.collisionPivot.x, boundary.y + boundary.collisionPivot.y, boundary.width, boundary.height, Color.YELLOW, boundary.collisionRotation)
                 }
             }
         }

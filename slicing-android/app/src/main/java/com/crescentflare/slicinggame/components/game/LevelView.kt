@@ -200,6 +200,20 @@ open class LevelView : FrameContainerView {
         return translatedVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
     }
 
+    fun setSliceVector(vector: Vector?, screenSpace: Boolean = false): Boolean {
+        val sliceVector = if (vector != null) {
+            if (screenSpace) transformedSliceVector(vector) else vector
+        } else {
+            null
+        }
+        if (sliceVector?.isValid() == true) {
+            val topLeft = PointF(-spriteContainerView.gridWidth * 4, -spriteContainerView.gridHeight * 4)
+            val bottomRight = PointF(spriteContainerView.gridWidth * 4, spriteContainerView.gridHeight * 4)
+            return spriteContainerView.setSliceVector(sliceVector.stretchedToEdges(topLeft, bottomRight))
+        }
+        return spriteContainerView.setSliceVector(null)
+    }
+
 
     // --
     // Obtain state

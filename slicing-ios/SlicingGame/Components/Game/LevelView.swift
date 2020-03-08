@@ -178,6 +178,21 @@ class LevelView: FrameContainerView {
         return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
     }
     
+    @discardableResult func setSliceVector(vector: Vector?, screenSpace: Bool = false) -> Bool {
+        let sliceVector: Vector?
+        if let vector = vector {
+            sliceVector = screenSpace ? transformedSliceVector(vector: vector) : vector
+        } else {
+            sliceVector = nil
+        }
+        if sliceVector?.isValid() ?? false {
+            let topLeft = CGPoint(x: CGFloat(-spriteContainerView.gridWidth * 4), y: CGFloat(-spriteContainerView.gridHeight * 4))
+            let bottomRight = CGPoint(x: CGFloat(spriteContainerView.gridWidth * 4), y: CGFloat(spriteContainerView.gridHeight * 4))
+            return spriteContainerView.setSliceVector(vector: sliceVector?.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight))
+        }
+        return spriteContainerView.setSliceVector(vector: nil)
+    }
+    
 
     // --
     // MARK: Obtain state

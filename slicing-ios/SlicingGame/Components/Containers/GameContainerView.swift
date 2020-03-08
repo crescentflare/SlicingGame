@@ -236,6 +236,11 @@ class GameContainerView: FrameContainerView {
                     } else {
                         slicePreviewView.end = nil
                     }
+                    if slicePreviewView.end != nil && levelView.frame.width > 0 && levelView.frame.height > 0 {
+                        levelView.setSliceVector(vector: Vector(start: dragStart, end: dragEnd), screenSpace: true)
+                    } else {
+                        levelView.setSliceVector(vector: nil)
+                    }
                 }
             }
         }
@@ -261,6 +266,7 @@ class GameContainerView: FrameContainerView {
         dragEnd = nil
         slicePreviewView.start = nil
         slicePreviewView.end = nil
+        levelView.setSliceVector(vector: nil)
     }
 
 }
