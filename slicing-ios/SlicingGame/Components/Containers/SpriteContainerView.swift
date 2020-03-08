@@ -200,6 +200,16 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
         currentSliceVector = vector
         return true
     }
+    
+    func spritesPerSlice(vector: Vector) -> Int {
+        var spriteCount = 0
+        sprites.forEach {
+            if vector.directionOf(point: CGPoint(x: CGFloat($0.x) + $0.collisionPivot.x, y: CGFloat($0.y) + $0.collisionPivot.y)) >= 0 {
+                spriteCount += 1
+            }
+        }
+        return spriteCount
+    }
 
     
     // --

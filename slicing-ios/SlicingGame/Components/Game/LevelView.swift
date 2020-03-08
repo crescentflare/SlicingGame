@@ -160,13 +160,19 @@ class LevelView: FrameContainerView, PhysicsDelegate {
     // --
     
     func slice(vector: Vector) {
+        // Apply slice
+        let reversedVector = vector.reversed()
         let normalClearRate = canvasView.clearRateForSlice(vector: vector)
-        let reversedClearRate = canvasView.clearRateForSlice(vector: vector.reversed())
-        if reversedClearRate < normalClearRate {
-            canvasView.slice(vector: vector.reversed())
+        let reversedClearRate = canvasView.clearRateForSlice(vector: reversedVector)
+        let normalSpriteCount = spriteContainerView.spritesPerSlice(vector: vector)
+        let reversedSpriteCount = spriteContainerView.spritesPerSlice(vector: reversedVector)
+        if reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate) {
+            canvasView.slice(vector: reversedVector)
         } else {
             canvasView.slice(vector: vector)
         }
+        
+        // Update state
         progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
         canvasView.visibility = cleared() ? .invisible : .visible
         spriteContainerView.visibility = cleared() ? .invisible : .visible

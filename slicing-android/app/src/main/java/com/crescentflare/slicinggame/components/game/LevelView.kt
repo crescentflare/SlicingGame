@@ -199,13 +199,19 @@ open class LevelView : FrameContainerView, Physics.Listener {
     // --
 
     fun slice(vector: Vector) {
+        // Apply slice
+        val reversedVector = vector.reversed()
         val normalClearRate = canvasView.clearRateForSlice(vector)
-        val reversedClearRate = canvasView.clearRateForSlice(vector.reversed())
-        if (reversedClearRate < normalClearRate) {
-            canvasView.slice(vector.reversed())
+        val reversedClearRate = canvasView.clearRateForSlice(reversedVector)
+        val normalSpriteCount = spriteContainerView.spritesPerSlice(vector)
+        val reversedSpriteCount = spriteContainerView.spritesPerSlice(reversedVector)
+        if (reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate)) {
+            canvasView.slice(reversedVector)
         } else {
             canvasView.slice(vector)
         }
+
+        // Update state
         progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
         canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
         spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE

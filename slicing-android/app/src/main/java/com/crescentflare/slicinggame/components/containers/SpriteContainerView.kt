@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PointF
 import android.os.Build
 import android.util.AttributeSet
 import com.crescentflare.jsoninflator.JsonInflatable
@@ -239,6 +240,16 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
         }
         currentSliceVector = vector
         return true
+    }
+
+    fun spritesPerSlice(vector: Vector): Int {
+        var spriteCount = 0
+        sprites.forEach {
+            if (vector.directionOfPoint(PointF(it.x + it.collisionPivot.x, it.y + it.collisionPivot.y)) >= 0) {
+                spriteCount += 1
+            }
+        }
+        return spriteCount
     }
 
 
