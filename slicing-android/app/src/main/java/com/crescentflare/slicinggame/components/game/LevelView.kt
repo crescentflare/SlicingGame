@@ -18,6 +18,7 @@ import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.containers.SpriteContainerView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.sprites.core.Sprite
@@ -46,6 +47,7 @@ open class LevelView : FrameContainerView, Physics.Listener {
                     // Apply level size
                     obj.levelWidth = mapUtil.optionalFloat(attributes, "levelWidth", 1f)
                     obj.levelHeight = mapUtil.optionalFloat(attributes, "levelHeight", 1f)
+                    obj.sliceWidth = mapUtil.optionalFloat(attributes, "sliceWidth", 0f)
 
                     // Apply background
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
@@ -199,16 +201,29 @@ open class LevelView : FrameContainerView, Physics.Listener {
     // --
 
     fun slice(vector: Vector) {
+        // Prepare slice vectors
+        val topLeft = PointF(0f, 0f)
+        val bottomRight = PointF(levelWidth, levelHeight)
+        val offsetVector = vector.perpendicular().unit() * (sliceWidth / 2)
+        val sliceVector = vector.translated(-offsetVector.x, -offsetVector.y).stretchedToEdges(topLeft, bottomRight)
+        val reversedVector = vector.reversed().translated(offsetVector.x, offsetVector.y).stretchedToEdges(topLeft, bottomRight)
+
+        // Check for collision
+        val slicePolygon = Polygon(listOf(sliceVector.end, sliceVector.start, reversedVector.end, reversedVector.start))
+        if (spriteContainerView.spritesOnPolygon(slicePolygon)) {
+            onLethalCollision()
+            return
+        }
+
         // Apply slice
-        val reversedVector = vector.reversed()
-        val normalClearRate = canvasView.clearRateForSlice(vector)
+        val normalClearRate = canvasView.clearRateForSlice(sliceVector)
         val reversedClearRate = canvasView.clearRateForSlice(reversedVector)
-        val normalSpriteCount = spriteContainerView.spritesPerSlice(vector)
+        val normalSpriteCount = spriteContainerView.spritesPerSlice(sliceVector)
         val reversedSpriteCount = spriteContainerView.spritesPerSlice(reversedVector)
         if (reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate)) {
             canvasView.slice(reversedVector)
         } else {
-            canvasView.slice(vector)
+            canvasView.slice(sliceVector)
         }
 
         // Update state
@@ -271,6 +286,13 @@ open class LevelView : FrameContainerView, Physics.Listener {
             field = levelHeight
             canvasView.canvasHeight = levelHeight
             spriteContainerView.gridHeight = levelHeight
+        }
+
+    var sliceWidth: Float = 0f
+        set(sliceWidth) {
+            field = sliceWidth
+            spriteContainerView.sliceWidth = sliceWidth
+            spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
         }
 
     var backgroundImage: ImageSource?

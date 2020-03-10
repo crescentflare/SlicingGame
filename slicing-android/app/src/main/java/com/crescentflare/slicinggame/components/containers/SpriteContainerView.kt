@@ -49,6 +49,7 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
                     // Apply grid size
                     obj.gridWidth = mapUtil.optionalFloat(attributes, "gridWidth", 1f)
                     obj.gridHeight = mapUtil.optionalFloat(attributes, "gridHeight", 1f)
+                    obj.sliceWidth = mapUtil.optionalFloat(attributes, "sliceWidth", 0f)
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
@@ -163,19 +164,21 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
     }
 
     fun generateCollisionBoundaries(polygon: Polygon) {
+        val boundaryWidth = max(sliceWidth, gridWidth * 0.005f)
         clearCollisionBoundaries()
         for (vector in polygon.asVectorList()) {
+            val offsetVector = vector.perpendicular().unit() * (boundaryWidth / 2)
             val halfDistanceX = vector.x / 2
             val halfDistanceY = vector.y / 2
             val vectorCenterX = vector.start.x + halfDistanceX
             val vectorCenterY = vector.start.y + halfDistanceY
-            val centerX = vectorCenterX + halfDistanceY
-            val centerY = vectorCenterY - halfDistanceX
+            val centerX = vectorCenterX + offsetVector.x
+            val centerY = vectorCenterY + offsetVector.y
             val vectorLength = vector.distance()
-            val x = centerX - vectorLength / 2
+            val x = centerX - boundaryWidth / 2
             val y = centerY - vectorLength / 2
             val rotation = atan2(vector.x, vector.y) * 360 / (PI.toFloat() * 2)
-            addCollisionBoundary(PhysicsBoundary(x, y, vectorLength, vectorLength, -rotation))
+            addCollisionBoundary(PhysicsBoundary(x, y, boundaryWidth, vectorLength, -rotation))
         }
     }
 
@@ -242,6 +245,10 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
         return true
     }
 
+    fun spritesOnPolygon(polygon: Polygon): Boolean {
+        return physics.intersectsSprite(polygon)
+    }
+
     fun spritesPerSlice(vector: Vector): Int {
         var spriteCount = 0
         sprites.forEach {
@@ -276,6 +283,8 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
             }
             physics.height = gridHeight
         }
+
+    var sliceWidth = 0f
 
     var fps = 60
 

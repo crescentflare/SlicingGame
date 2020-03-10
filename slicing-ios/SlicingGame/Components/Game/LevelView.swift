@@ -46,7 +46,8 @@ class LevelView: FrameContainerView, PhysicsDelegate {
                 // Apply level size
                 level.levelWidth = convUtil.asFloat(value: attributes["levelWidth"]) ?? 1
                 level.levelHeight = convUtil.asFloat(value: attributes["levelHeight"]) ?? 1
-                
+                level.sliceWidth = convUtil.asFloat(value: attributes["sliceWidth"]) ?? 0
+
                 // Apply background
                 level.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
                 
@@ -160,16 +161,29 @@ class LevelView: FrameContainerView, PhysicsDelegate {
     // --
     
     func slice(vector: Vector) {
+        // Prepare slice vectors
+        let topLeft = CGPoint(x: 0, y: 0)
+        let bottomRight = CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))
+        let offsetVector = vector.perpendicular().unit() * CGFloat(sliceWidth / 2)
+        let sliceVector = vector.translated(translateX: -offsetVector.x, translateY: -offsetVector.y).stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+        let reversedVector = vector.reversed().translated(translateX: offsetVector.x, translateY: offsetVector.y).stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+        
+        // Check for collision
+        let slicePolygon = Polygon(points: [ sliceVector.end, sliceVector.start, reversedVector.end, reversedVector.start ])
+        if spriteContainerView.spritesOnPolygon(polygon: slicePolygon) {
+            didLethalCollision()
+            return
+        }
+
         // Apply slice
-        let reversedVector = vector.reversed()
-        let normalClearRate = canvasView.clearRateForSlice(vector: vector)
+        let normalClearRate = canvasView.clearRateForSlice(vector: sliceVector)
         let reversedClearRate = canvasView.clearRateForSlice(vector: reversedVector)
-        let normalSpriteCount = spriteContainerView.spritesPerSlice(vector: vector)
+        let normalSpriteCount = spriteContainerView.spritesPerSlice(vector: sliceVector)
         let reversedSpriteCount = spriteContainerView.spritesPerSlice(vector: reversedVector)
         if reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate) {
             canvasView.slice(vector: reversedVector)
         } else {
-            canvasView.slice(vector: vector)
+            canvasView.slice(vector: sliceVector)
         }
         
         // Update state
@@ -232,6 +246,13 @@ class LevelView: FrameContainerView, PhysicsDelegate {
         didSet {
             canvasView.canvasHeight = levelHeight
             spriteContainerView.gridHeight = levelHeight
+        }
+    }
+    
+    var sliceWidth: Float = 0 {
+        didSet {
+            spriteContainerView.sliceWidth = sliceWidth
+            spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
         }
     }
     

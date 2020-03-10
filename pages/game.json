@@ -48,6 +48,7 @@
           "backgroundImage": "#ddd",
           "levelWidth": 12,
           "levelHeight": 16,
+          "sliceWidth": 0.1,
           "requireClearRate": 75,
           "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK",
           "lethalHitEvent": "vibrate://heavy",
