@@ -163,9 +163,8 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
         physics.registerObject(boundary)
     }
 
-    fun generateCollisionBoundaries(polygon: Polygon) {
+    fun addCollisionBoundaries(polygon: Polygon) {
         val boundaryWidth = max(sliceWidth, gridWidth * 0.005f)
-        clearCollisionBoundaries()
         for (vector in polygon.asVectorList()) {
             val offsetVector = vector.perpendicular().unit() * (boundaryWidth / 2)
             val halfDistanceX = vector.x / 2
@@ -249,11 +248,16 @@ open class SpriteContainerView : FrameContainerView, Physics.Listener {
         return physics.intersectsSprite(polygon)
     }
 
-    fun spritesPerSlice(vector: Vector): Int {
+    fun spritesPerSlice(vector: Vector, polygon: Polygon): Int {
         var spriteCount = 0
         sprites.forEach {
-            if (vector.directionOfPoint(PointF(it.x + it.collisionPivot.x, it.y + it.collisionPivot.y)) >= 0) {
-                spriteCount += 1
+            val spriteBounds = it.collisionBounds
+            spriteBounds.offset(it.x, it.y)
+            val spritePolygon = Polygon(spriteBounds, PointF(it.collisionPivot.x + it.x, it.collisionPivot.y + it.y), it.collisionRotation)
+            if (spritePolygon.intersect(polygon)) {
+                if (vector.directionOfPoint(PointF(it.x + it.collisionPivot.x, it.y + it.collisionPivot.y)) >= 0) {
+                    spriteCount += 1
+                }
             }
         }
         return spriteCount

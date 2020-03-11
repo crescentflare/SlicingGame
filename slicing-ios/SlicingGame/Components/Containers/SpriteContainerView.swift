@@ -123,9 +123,8 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
         physics.registerObject(boundary)
     }
     
-    func generateCollisionBoundaries(fromPolygon: Polygon) {
+    func addCollisionBoundaries(fromPolygon: Polygon) {
         let boundaryWidth = max(sliceWidth, gridWidth * 0.005)
-        clearCollisionBoundaries()
         for vector in fromPolygon.asVectorArray() {
             let offsetVector = vector.perpendicular().unit() * CGFloat(boundaryWidth / 2)
             let halfDistanceX = vector.x / 2
@@ -208,11 +207,14 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
         return physics.intersectsSprite(polygon: polygon)
     }
     
-    func spritesPerSlice(vector: Vector) -> Int {
+    func spritesPerSlice(vector: Vector, inPolygon: Polygon) -> Int {
         var spriteCount = 0
         sprites.forEach {
-            if vector.directionOf(point: CGPoint(x: CGFloat($0.x) + $0.collisionPivot.x, y: CGFloat($0.y) + $0.collisionPivot.y)) >= 0 {
-                spriteCount += 1
+            let spritePolygon = Polygon(rect: $0.collisionBounds.offsetBy(dx: CGFloat($0.x), dy: CGFloat($0.y)), pivot: CGPoint(x: $0.collisionPivot.x + CGFloat($0.x), y: $0.collisionPivot.y + CGFloat($0.y)), rotation: CGFloat($0.collisionRotation))
+            if spritePolygon.intersect(withPolygon: inPolygon) {
+                if vector.directionOf(point: CGPoint(x: CGFloat($0.x) + $0.collisionPivot.x, y: CGFloat($0.y) + $0.collisionPivot.y)) >= 0 {
+                    spriteCount += 1
+                }
             }
         }
         return spriteCount
