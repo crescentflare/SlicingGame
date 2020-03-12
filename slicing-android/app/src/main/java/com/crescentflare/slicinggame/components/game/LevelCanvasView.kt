@@ -3,8 +3,10 @@ package com.crescentflare.slicinggame.components.game
 import android.annotation.TargetApi
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Path
 import android.graphics.PointF
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.util.AttributeSet
 import android.view.View
@@ -21,7 +23,7 @@ import com.crescentflare.unilayout.helpers.UniLayoutParams
 /**
  * Game view: a level canvas layer
  */
-open class LevelCanvasView : UniFrameContainer {
+open class LevelCanvasView : UniFrameContainer, Cloneable {
 
     // --
     // Static: viewlet integration
@@ -96,6 +98,22 @@ open class LevelCanvasView : UniFrameContainer {
         addView(drawView)
     }
 
+    public override fun clone(): Any {
+        // Create view and copy layout properties
+        val view = LevelCanvasView(context)
+        val layoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
+        layoutParams.width = layoutParams.width
+        layoutParams.height = layoutParams.height
+        layoutParams.bottomMargin = (layoutParams as? MarginLayoutParams)?.bottomMargin ?: 0
+        view.setBackgroundColor((drawView.background as? ColorDrawable)?.color ?: Color.TRANSPARENT)
+
+        // Copy other properties and return result
+        view.canvasWidth = canvasWidth
+        view.canvasHeight = canvasHeight
+        view.clipPolygon = Polygon(clipPolygon.points)
+        return view
+    }
+
 
     // --
     // Slicing
@@ -133,13 +151,16 @@ open class LevelCanvasView : UniFrameContainer {
     // --
 
     fun clearRate(): Float {
-        val canvasSurface = canvasWidth * canvasHeight
-        if (canvasSurface > 0) {
-            return 100 - clipPolygon.calculateSurfaceArea() * 100 / canvasSurface
-        }
-        return 0f
+        return 100f - remainingSliceArea()
     }
 
+    fun remainingSliceArea(): Float {
+        val canvasSurface = canvasWidth * canvasHeight
+        if (canvasSurface > 0) {
+            return clipPolygon.calculateSurfaceArea() * 100 / canvasSurface
+        }
+        return 100f
+    }
 
     // --
     // Configurable values

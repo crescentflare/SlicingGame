@@ -48,10 +48,11 @@
           "backgroundImage": "#ddd",
           "levelWidth": 12,
           "levelHeight": 16,
-          "requireClearRate": 75,
+          "sliceWidth": 0.1,
+          "requireClearRate": 90,
           "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK",
           "lethalHitEvent": "vibrate://heavy",
-          "drawPhysicsBoundaries": true,
+          "drawPhysicsBoundaries": false,
           "sprites": [
             {
               "x": 1,

@@ -47,6 +47,7 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
                     // Apply level size
                     obj.levelWidth = mapUtil.optionalFloat(attributes, "levelWidth", 1f)
                     obj.levelHeight = mapUtil.optionalFloat(attributes, "levelHeight", 1f)
+                    obj.sliceWidth = mapUtil.optionalFloat(attributes, "sliceWidth", 0f)
 
                     // Apply background
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
@@ -203,6 +204,12 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
         set(levelHeight) {
             field = levelHeight
             levelView.levelHeight = levelHeight
+        }
+
+    var sliceWidth: Float = 0f
+        set(sliceWidth) {
+            field = sliceWidth
+            levelView.sliceWidth = sliceWidth
         }
 
     var backgroundImage: ImageSource?

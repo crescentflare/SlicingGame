@@ -40,9 +40,10 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
         
         func update(convUtil: InflatorConvUtil, object: Any, attributes: [String: Any], parent: Any?, binder: InflatorBinder?) -> Bool {
             if let spriteContainer = object as? SpriteContainerView {
-                // Apply canvas size
+                // Apply grid size
                 spriteContainer.gridWidth = convUtil.asFloat(value: attributes["gridWidth"]) ?? 1
                 spriteContainer.gridHeight = convUtil.asFloat(value: attributes["gridHeight"]) ?? 1
+                spriteContainer.sliceWidth = convUtil.asFloat(value: attributes["sliceWidth"]) ?? 0
 
                 // Apply update frames per second
                 spriteContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
@@ -122,20 +123,21 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
         physics.registerObject(boundary)
     }
     
-    func generateCollisionBoundaries(fromPolygon: Polygon) {
-        clearCollisionBoundaries()
+    func addCollisionBoundaries(fromPolygon: Polygon) {
+        let boundaryWidth = max(sliceWidth, gridWidth * 0.005)
         for vector in fromPolygon.asVectorArray() {
+            let offsetVector = vector.perpendicular().unit() * CGFloat(boundaryWidth / 2)
             let halfDistanceX = vector.x / 2
             let halfDistanceY = vector.y / 2
-            let vectorCenterX = vector.start.x + halfDistanceX
-            let vectorCenterY = vector.start.y + halfDistanceY
-            let centerX = vectorCenterX + halfDistanceY
-            let centerY = vectorCenterY - halfDistanceX
-            let vectorLength = vector.distance()
-            let x = Float(centerX - vectorLength / 2)
-            let y = Float(centerY - vectorLength / 2)
+            let vectorCenterX = Float(vector.start.x + halfDistanceX)
+            let vectorCenterY = Float(vector.start.y + halfDistanceY)
+            let centerX = vectorCenterX + Float(offsetVector.x)
+            let centerY = vectorCenterY + Float(offsetVector.y)
+            let vectorLength = Float(vector.distance())
+            let x = centerX - boundaryWidth / 2
+            let y = centerY - vectorLength / 2
             let rotation = atan2(vector.x, vector.y) * 360 / (CGFloat.pi * 2)
-            addCollisionBoundary(PhysicsBoundary(x: x, y: y, width: Float(vectorLength), height: Float(vectorLength), rotation: Float(-rotation)))
+            addCollisionBoundary(PhysicsBoundary(x: x, y: y, width: boundaryWidth, height: vectorLength, rotation: Float(-rotation)))
         }
     }
     
@@ -200,6 +202,23 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
         currentSliceVector = vector
         return true
     }
+    
+    func spritesOnPolygon(polygon: Polygon) -> Bool {
+        return physics.intersectsSprite(polygon: polygon)
+    }
+    
+    func spritesPerSlice(vector: Vector, inPolygon: Polygon) -> Int {
+        var spriteCount = 0
+        sprites.forEach {
+            let spritePolygon = Polygon(rect: $0.collisionBounds.offsetBy(dx: CGFloat($0.x), dy: CGFloat($0.y)), pivot: CGPoint(x: $0.collisionPivot.x + CGFloat($0.x), y: $0.collisionPivot.y + CGFloat($0.y)), rotation: CGFloat($0.collisionRotation))
+            if spritePolygon.intersect(withPolygon: inPolygon) {
+                if vector.directionOf(point: CGPoint(x: CGFloat($0.x) + $0.collisionPivot.x, y: CGFloat($0.y) + $0.collisionPivot.y)) >= 0 {
+                    spriteCount += 1
+                }
+            }
+        }
+        return spriteCount
+    }
 
     
     // --
@@ -223,6 +242,8 @@ class SpriteContainerView: FrameContainerView, PhysicsDelegate {
             physics.height = gridHeight
         }
     }
+    
+    var sliceWidth: Float = 0
 
     var fps = 60
     

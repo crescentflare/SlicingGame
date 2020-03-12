@@ -77,7 +77,22 @@ class LevelCanvasView: UniView {
         // No implementation
     }
     
+    override func copy() -> Any {
+        // Create view and copy layout properties
+        let view = LevelCanvasView()
+        view.layoutProperties.width = layoutProperties.width
+        view.layoutProperties.height = layoutProperties.height
+        view.layoutProperties.margin.bottom = layoutProperties.margin.bottom
+        view.backgroundColor = backgroundColor
+        
+        // Copy other properties and return result
+        view.canvasWidth = canvasWidth
+        view.canvasHeight = canvasHeight
+        view.clipPolygon = Polygon(points: clipPolygon.points)
+        return view
+    }
     
+
     // --
     // MARK: Slicing
     // --
@@ -115,11 +130,15 @@ class LevelCanvasView: UniView {
     // --
     
     func clearRate() -> Float {
+        return 100 - remainingSliceArea()
+    }
+    
+    func remainingSliceArea() -> Float {
         let canvasSurface = canvasWidth * canvasHeight
         if canvasSurface > 0 {
-            return 100 - Float(clipPolygon.calculateSurfaceArea()) * 100 / canvasSurface
+            return Float(clipPolygon.calculateSurfaceArea()) * 100 / canvasSurface
         }
-        return 0
+        return 100
     }
     
 

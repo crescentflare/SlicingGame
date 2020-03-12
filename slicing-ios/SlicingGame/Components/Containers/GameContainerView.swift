@@ -45,6 +45,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
                 // Apply level size
                 gameContainer.levelWidth = convUtil.asFloat(value: attributes["levelWidth"]) ?? 1
                 gameContainer.levelHeight = convUtil.asFloat(value: attributes["levelHeight"]) ?? 1
+                gameContainer.sliceWidth = convUtil.asFloat(value: attributes["sliceWidth"]) ?? 0
                 
                 // Apply background
                 gameContainer.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
@@ -182,6 +183,12 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     var levelHeight: Float = 1 {
         didSet {
             levelView.levelHeight = levelHeight
+        }
+    }
+    
+    var sliceWidth: Float = 0 {
+        didSet {
+            levelView.sliceWidth = sliceWidth
         }
     }
     
