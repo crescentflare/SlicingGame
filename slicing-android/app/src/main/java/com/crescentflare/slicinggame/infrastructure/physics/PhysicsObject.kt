@@ -11,6 +11,7 @@ interface PhysicsObject {
 
     var x: Float
     var y: Float
+    var lethal: Boolean
     var recursiveCheck: Int
     val collisionBounds: RectF
     val collisionRotation: Float

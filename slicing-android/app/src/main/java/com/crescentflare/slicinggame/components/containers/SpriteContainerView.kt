@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.PointF
 import android.os.Build
 import android.util.AttributeSet
 import com.crescentflare.jsoninflator.JsonInflatable
@@ -12,6 +13,7 @@ import com.crescentflare.jsoninflator.binder.InflatorBinder
 import com.crescentflare.jsoninflator.utility.InflatorMapUtil
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
 import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
+import com.crescentflare.slicinggame.infrastructure.geometry.Vector
 import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.infrastructure.physics.PhysicsBoundary
 import com.crescentflare.slicinggame.sprites.core.Sprite
@@ -20,6 +22,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.max
@@ -28,7 +31,7 @@ import kotlin.math.max
 /**
  * Container view: provides a container for managing sprites
  */
-open class SpriteContainerView : FrameContainerView {
+open class SpriteContainerView : FrameContainerView, Physics.Listener {
 
     // --
     // Static: viewlet integration
@@ -46,6 +49,7 @@ open class SpriteContainerView : FrameContainerView {
                     // Apply grid size
                     obj.gridWidth = mapUtil.optionalFloat(attributes, "gridWidth", 1f)
                     obj.gridHeight = mapUtil.optionalFloat(attributes, "gridHeight", 1f)
+                    obj.sliceWidth = mapUtil.optionalFloat(attributes, "sliceWidth", 0f)
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
@@ -85,14 +89,27 @@ open class SpriteContainerView : FrameContainerView {
     // Members
     // --
 
+    var physicsListener: Physics.Listener?
+        get() = physicsListenerReference?.get()
+        set(physicsListener) {
+            physicsListenerReference = if (physicsListener != null) {
+                WeakReference(physicsListener)
+            } else {
+                null
+            }
+        }
+
     private val physics = Physics()
     private val sprites = mutableListOf<Sprite>()
     private var collisionBoundaries = mutableListOf<PhysicsBoundary>()
+    private var sliceVectorBoundary: PhysicsBoundary? = null
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val spriteCanvas = SpriteCanvas(paint)
+    private var currentSliceVector: Vector? = null
     private var updateScheduled = false
     private var lastTimeMillis = System.currentTimeMillis()
     private var timeCorrection = 1
+    private var physicsListenerReference: WeakReference<Physics.Listener>? = null
 
 
     // --
@@ -116,6 +133,7 @@ open class SpriteContainerView : FrameContainerView {
 
     init {
         setWillNotDraw(false)
+        physics.listener = this
     }
 
 
@@ -145,20 +163,21 @@ open class SpriteContainerView : FrameContainerView {
         physics.registerObject(boundary)
     }
 
-    fun generateCollisionBoundaries(polygon: Polygon) {
-        clearCollisionBoundaries()
+    fun addCollisionBoundaries(polygon: Polygon) {
+        val boundaryWidth = max(sliceWidth, gridWidth * 0.005f)
         for (vector in polygon.asVectorList()) {
+            val offsetVector = vector.perpendicular().unit() * (boundaryWidth / 2)
             val halfDistanceX = vector.x / 2
             val halfDistanceY = vector.y / 2
             val vectorCenterX = vector.start.x + halfDistanceX
             val vectorCenterY = vector.start.y + halfDistanceY
-            val centerX = vectorCenterX + halfDistanceY
-            val centerY = vectorCenterY - halfDistanceX
+            val centerX = vectorCenterX + offsetVector.x
+            val centerY = vectorCenterY + offsetVector.y
             val vectorLength = vector.distance()
-            val x = centerX - vectorLength / 2
+            val x = centerX - boundaryWidth / 2
             val y = centerY - vectorLength / 2
             val rotation = atan2(vector.x, vector.y) * 360 / (PI.toFloat() * 2)
-            addCollisionBoundary(PhysicsBoundary(x, y, vectorLength, vectorLength, -rotation))
+            addCollisionBoundary(PhysicsBoundary(x, y, boundaryWidth, vectorLength, -rotation))
         }
     }
 
@@ -167,6 +186,81 @@ open class SpriteContainerView : FrameContainerView {
             physics.unregisterObject(collisionBoundary)
         }
         collisionBoundaries.clear()
+    }
+
+
+    // --
+    // Slicing
+    // --
+
+    fun setSliceVector(vector: Vector?): Boolean {
+        // First unregister the existing object
+        val previousSliceVector = currentSliceVector
+        sliceVectorBoundary?.let {
+            physics.unregisterObject(it)
+        }
+        sliceVectorBoundary = null
+        currentSliceVector = null
+
+        // Check if it already collides
+        vector?.let {
+            if (previousSliceVector != null) {
+                val intersection = previousSliceVector.intersect(it)
+                val polygons = mutableListOf<Polygon>()
+                if (intersection != null) {
+                    polygons.add(Polygon(listOf(previousSliceVector.start, vector.start, intersection)))
+                    polygons.add(Polygon(listOf(previousSliceVector.end, vector.end, intersection)))
+                } else {
+                    polygons.add(Polygon(listOf(previousSliceVector.start, vector.start, vector.end, previousSliceVector.end)))
+                }
+                for (polygon in polygons) {
+                    val checkPolygon = if (polygon.isClockwise()) polygon else polygon.reversed()
+                    if (physics.intersectsSprite(checkPolygon)) {
+                        onLethalCollision()
+                        return false
+                    }
+                }
+            } else if (physics.intersectsSprite(it)) {
+                onLethalCollision()
+                return false
+            }
+        }
+
+        // Add slice boundary
+        vector?.let {
+            val vectorCenterX = it.start.x + it.x / 2
+            val vectorCenterY = it.start.y + it.y / 2
+            val width = gridWidth * 0.005f
+            val height = it.distance()
+            val x = vectorCenterX - width / 2
+            val y = vectorCenterY - height / 2
+            val rotation = atan2(it.x, it.y) * 360 / (PI.toFloat() * 2)
+            val physicsBoundary = PhysicsBoundary(x, y, width, height, -rotation)
+            physicsBoundary.lethal = true
+            physics.registerObject(physicsBoundary)
+            sliceVectorBoundary = physicsBoundary
+        }
+        currentSliceVector = vector
+        return true
+    }
+
+    fun spritesOnPolygon(polygon: Polygon): Boolean {
+        return physics.intersectsSprite(polygon)
+    }
+
+    fun spritesPerSlice(vector: Vector, polygon: Polygon): Int {
+        var spriteCount = 0
+        sprites.forEach {
+            val spriteBounds = it.collisionBounds
+            spriteBounds.offset(it.x, it.y)
+            val spritePolygon = Polygon(spriteBounds, PointF(it.collisionPivot.x + it.x, it.collisionPivot.y + it.y), it.collisionRotation)
+            if (spritePolygon.intersect(polygon)) {
+                if (vector.directionOfPoint(PointF(it.x + it.collisionPivot.x, it.y + it.collisionPivot.y)) >= 0) {
+                    spriteCount += 1
+                }
+            }
+        }
+        return spriteCount
     }
 
 
@@ -194,9 +288,20 @@ open class SpriteContainerView : FrameContainerView {
             physics.height = gridHeight
         }
 
+    var sliceWidth = 0f
+
     var fps = 60
 
     var drawPhysicsBoundaries = false
+
+
+    // --
+    // Physics listener
+    // --
+
+    override fun onLethalCollision() {
+        physicsListener?.onLethalCollision()
+    }
 
 
     // --
@@ -228,6 +333,9 @@ open class SpriteContainerView : FrameContainerView {
             if (drawPhysicsBoundaries) {
                 for (boundary in collisionBoundaries) {
                     spriteCanvas.fillRotatedRect(boundary.x + boundary.collisionPivot.x, boundary.y + boundary.collisionPivot.y, boundary.width, boundary.height, Color.RED, boundary.collisionRotation)
+                }
+                sliceVectorBoundary?.let { boundary ->
+                    spriteCanvas.fillRotatedRect(boundary.x + boundary.collisionPivot.x, boundary.y + boundary.collisionPivot.y, boundary.width, boundary.height, Color.YELLOW, boundary.collisionRotation)
                 }
             }
         }

@@ -1,6 +1,7 @@
 package com.crescentflare.slicinggame.infrastructure.geometry
 
 import android.graphics.PointF
+import android.graphics.RectF
 import kotlin.math.*
 
 /**
@@ -153,6 +154,58 @@ class Vector {
 
         // Return the intersection result
         return PointF(start.x + u * (end.x - start.x), start.y + u * (end.y - start.y))
+    }
+
+    fun intersect(rect: RectF): PointF? {
+        // Return early if the starting point is already inside the rectangle
+        if (rect.contains(start.x, start.y)) {
+            return PointF(start.x, start.y)
+        }
+
+        // Calculate intersection distances for each axis separately
+        val entryDistanceX = if (x > 0) rect.left - start.x else rect.right - start.x
+        val entryDistanceY = if (y > 0) rect.top - start.y else rect.bottom - start.y
+        val exitDistanceX = if (x > 0) rect.right - start.x else rect.left - start.x
+        val exitDistanceY = if (y > 0) rect.bottom - start.y else rect.top - start.y
+
+        // Calculate intersection time relative to the vector length (ranging from 0 to 1)
+        val entryTimeX = if (x == 0f) Float.POSITIVE_INFINITY else entryDistanceX / x
+        val entryTimeY = if (y == 0f) Float.POSITIVE_INFINITY else entryDistanceY / y
+        val exitTimeX = if (x == 0f) Float.POSITIVE_INFINITY else exitDistanceX / x
+        val exitTimeY = if (y == 0f) Float.POSITIVE_INFINITY else exitDistanceY / y
+
+        // Check for intersection and return result
+        val entryTime = max(entryTimeX, entryTimeY)
+        val exitTime = min(exitTimeX, exitTimeY)
+        if (entryTime < exitTime && entryTime >= 0 && entryTime <= 1) {
+            return PointF(start.x + x * entryTime, start.y + y * entryTime)
+        }
+        return null
+    }
+
+    fun intersect(polygon: Polygon): PointF? {
+        // Return early if the starting point is already inside the polygon
+        if (polygon.contains(start)) {
+            return PointF(start.x, start.y)
+        }
+
+        // Check if intersecting with the polygon lines
+        var closestIntersection: PointF? = null
+        for (vector in polygon.asVectorList()) {
+            if (vector.directionOfPoint(start) < 0 && vector.directionOfPoint(end) > 0) {
+                vector.intersect(this)?.let {
+                    val previousIntersection = closestIntersection
+                    if (previousIntersection != null) {
+                        if (abs(it.x - vector.start.x) < abs(previousIntersection.x - vector.start.x) && abs(it.y - vector.start.y) < abs(previousIntersection.y - vector.start.y)) {
+                            closestIntersection = it
+                        }
+                    } else {
+                        closestIntersection = it
+                    }
+                }
+            }
+        }
+        return closestIntersection
     }
 
 }

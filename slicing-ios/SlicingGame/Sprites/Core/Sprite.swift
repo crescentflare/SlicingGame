@@ -15,6 +15,7 @@ class Sprite: PhysicsObject {
     var y: Float = 0
     var width: Float = 1
     var height: Float = 1
+    var lethal = false
     var recursiveCheck = 0
     private var moveX: Float
     private var moveY: Float
@@ -68,6 +69,9 @@ class Sprite: PhysicsObject {
     // --
     
     func didCollide(withObject: PhysicsObject?, normal: Vector, timeRemaining: TimeInterval, physics: Physics) {
+        if withObject?.lethal ?? false {
+            return
+        }
         let dotProduct = Float(normal.x) * moveX + Float(normal.y) * moveY
         let newMoveX = moveX - 2 * Float(normal.x) * dotProduct
         let newMoveY = moveY - 2 * Float(normal.y) * dotProduct

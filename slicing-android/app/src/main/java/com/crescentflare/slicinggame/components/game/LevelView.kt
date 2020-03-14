@@ -18,15 +18,19 @@ import com.crescentflare.slicinggame.components.containers.FrameContainerView
 import com.crescentflare.slicinggame.components.containers.SpriteContainerView
 import com.crescentflare.slicinggame.components.utility.ImageSource
 import com.crescentflare.slicinggame.components.utility.ViewletUtil
+import com.crescentflare.slicinggame.infrastructure.geometry.Polygon
 import com.crescentflare.slicinggame.infrastructure.geometry.Vector
+import com.crescentflare.slicinggame.infrastructure.physics.Physics
 import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.unilayout.helpers.UniLayoutParams
+import java.lang.ref.WeakReference
+import kotlin.math.max
 
 
 /**
  * Game view: contains all components for the playable level area
  */
-open class LevelView : FrameContainerView {
+open class LevelView : FrameContainerView, Physics.Listener {
 
     // --
     // Static: viewlet integration
@@ -44,6 +48,7 @@ open class LevelView : FrameContainerView {
                     // Apply level size
                     obj.levelWidth = mapUtil.optionalFloat(attributes, "levelWidth", 1f)
                     obj.levelHeight = mapUtil.optionalFloat(attributes, "levelHeight", 1f)
+                    obj.sliceWidth = mapUtil.optionalFloat(attributes, "sliceWidth", 0f)
 
                     // Apply background
                     obj.backgroundImage = ImageSource.fromValue(attributes["backgroundImage"])
@@ -95,14 +100,36 @@ open class LevelView : FrameContainerView {
 
 
     // --
+    // Physics listener
+    // --
+
+    interface Listener {
+
+        fun onLethalHit()
+
+    }
+
+
+    // --
     // Members
     // --
 
+    var listener: Listener?
+        get() = listenerReference?.get()
+        set(listener) {
+            listenerReference = if (listener != null) {
+                WeakReference(listener)
+            } else {
+                null
+            }
+        }
+
     private var backgroundView = ImageView(context)
-    private var canvasView = LevelCanvasView(context)
+    private var canvasViews = mutableListOf(LevelCanvasView(context))
     private var spriteContainerView = SpriteContainerView(context)
     private var progressView = TextView(context)
     private val progressViewMargin = resources.getDimensionPixelSize(R.dimen.text) + (Resources.getSystem().displayMetrics.density * 8).toInt()
+    private var listenerReference: WeakReference<Listener>? = null
 
 
     // --
@@ -135,14 +162,15 @@ open class LevelView : FrameContainerView {
         // Add level canvas
         val canvasLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
         canvasLayoutParams.bottomMargin = progressViewMargin
-        canvasView.layoutParams = canvasLayoutParams
-        canvasView.setBackgroundColor(Color.WHITE)
-        addView(canvasView)
+        canvasViews[0].layoutParams = canvasLayoutParams
+        canvasViews[0].setBackgroundColor(Color.WHITE)
+        addView(canvasViews[0])
 
         // Add sprite container
         val spriteContainerLayoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
         spriteContainerLayoutParams.bottomMargin = progressViewMargin
         spriteContainerView.layoutParams = spriteContainerLayoutParams
+        spriteContainerView.physicsListener = this
         addView(spriteContainerView)
 
         // Add progress view
@@ -174,30 +202,91 @@ open class LevelView : FrameContainerView {
     // --
 
     fun slice(vector: Vector) {
-        val normalClearRate = canvasView.clearRateForSlice(vector)
-        val reversedClearRate = canvasView.clearRateForSlice(vector.reversed())
-        if (reversedClearRate < normalClearRate) {
-            canvasView.slice(vector.reversed())
-        } else {
-            canvasView.slice(vector)
+        // Prepare slice vectors
+        val topLeft = PointF(0f, 0f)
+        val bottomRight = PointF(levelWidth, levelHeight)
+        val offsetVector = vector.perpendicular().unit() * (sliceWidth / 2)
+        val sliceVector = vector.translated(-offsetVector.x, -offsetVector.y).stretchedToEdges(topLeft, bottomRight)
+        val reversedVector = vector.reversed().translated(offsetVector.x, offsetVector.y).stretchedToEdges(topLeft, bottomRight)
+
+        // Check for collision
+        val slicePolygon = Polygon(listOf(sliceVector.end, sliceVector.start, reversedVector.end, reversedVector.start))
+        if (spriteContainerView.spritesOnPolygon(slicePolygon)) {
+            onLethalCollision()
+            return
         }
-        progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
-        canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+
+        // Apply slice
+        val originalCanvasViews = mutableListOf<LevelCanvasView>().apply { addAll(canvasViews) }
+        val insertDuplicateIndex = max(indexOfChild(canvasViews[0]), 0)
+        for (canvasView in originalCanvasViews) {
+            val normalClearRate = canvasView.clearRateForSlice(sliceVector)
+            val reversedClearRate = canvasView.clearRateForSlice(reversedVector)
+            val normalSpriteCount = spriteContainerView.spritesPerSlice(sliceVector, canvasView.slicedBoundary)
+            val reversedSpriteCount = spriteContainerView.spritesPerSlice(reversedVector, canvasView.slicedBoundary)
+            if (normalSpriteCount > 0 && reversedSpriteCount > 0) {
+                (canvasView.clone() as? LevelCanvasView)?.let { duplicateCanvasView ->
+                    canvasViews.add(duplicateCanvasView)
+                    addView(duplicateCanvasView, insertDuplicateIndex)
+                    duplicateCanvasView.slice(reversedVector)
+                }
+                canvasView.slice(sliceVector)
+            } else if (reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate)) {
+                canvasView.slice(reversedVector)
+            } else {
+                canvasView.slice(sliceVector)
+            }
+        }
+
+        // Update state
+        val remainingProgress = canvasViews.map { it.remainingSliceArea() }.reduce { acc, area -> acc + area }
         spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
-        spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
+        spriteContainerView.clearCollisionBoundaries()
+        for (canvasView in canvasViews) {
+            canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+            spriteContainerView.addCollisionBoundaries(canvasView.slicedBoundary)
+        }
+        progressView.text = "${100 - remainingProgress.toInt()} / $requireClearRate%"
     }
 
     fun resetSlices() {
-        canvasView.resetSlices()
-        progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
-        canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+        // Remove duplicated canvas views and reset slices on the original one
+        for (canvasView in canvasViews) {
+            if (canvasView !== canvasViews.firstOrNull()) {
+                removeView(canvasView)
+            }
+        }
+        canvasViews = mutableListOf(canvasViews[0])
+        canvasViews[0].resetSlices()
+
+        // Update state
+        val remainingProgress = canvasViews.map { it.remainingSliceArea() }.reduce { acc, area -> acc + area }
         spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
-        spriteContainerView.generateCollisionBoundaries(canvasView.slicedBoundary)
+        spriteContainerView.clearCollisionBoundaries()
+        for (canvasView in canvasViews) {
+            canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+            spriteContainerView.addCollisionBoundaries(canvasView.slicedBoundary)
+        }
+        progressView.text = "${100 - remainingProgress.toInt()} / $requireClearRate%"
     }
 
     fun transformedSliceVector(vector: Vector): Vector {
         val translatedVector = vector.translated(-left.toFloat(), -top.toFloat())
-        return translatedVector.scaled(levelWidth / canvasView.width.toFloat(), levelHeight / canvasView.height.toFloat())
+        return translatedVector.scaled(levelWidth / canvasViews[0].width.toFloat(), levelHeight / canvasViews[0].height.toFloat())
+    }
+
+    fun setSliceVector(vector: Vector?, screenSpace: Boolean = false): Boolean {
+        val sliceVector = if (vector != null) {
+            if (screenSpace) transformedSliceVector(vector) else vector
+        } else {
+            null
+        }
+        if (sliceVector?.isValid() == true) {
+            val topLeft = PointF(-spriteContainerView.gridWidth * 4, -spriteContainerView.gridHeight * 4)
+            val bottomRight = PointF(spriteContainerView.gridWidth * 4, spriteContainerView.gridHeight * 4)
+            return spriteContainerView.setSliceVector(sliceVector.stretchedToEdges(topLeft, bottomRight))
+        }
+        return spriteContainerView.setSliceVector(null)
     }
 
 
@@ -206,7 +295,8 @@ open class LevelView : FrameContainerView {
     // --
 
     fun cleared(): Boolean {
-        return canvasView.clearRate() >= requireClearRate
+        val remainingProgress = canvasViews.map { it.remainingSliceArea() }.reduce { acc, area -> acc + area }
+        return 100 - remainingProgress.toInt() >= requireClearRate
     }
 
 
@@ -217,15 +307,29 @@ open class LevelView : FrameContainerView {
     var levelWidth: Float = 1f
         set(levelWidth) {
             field = levelWidth
-            canvasView.canvasWidth = levelWidth
+            for (canvasView in canvasViews) {
+                canvasView.canvasWidth = levelWidth
+            }
             spriteContainerView.gridWidth = levelWidth
         }
 
     var levelHeight: Float = 1f
         set(levelHeight) {
             field = levelHeight
-            canvasView.canvasHeight = levelHeight
+            for (canvasView in canvasViews) {
+                canvasView.canvasHeight = levelHeight
+            }
             spriteContainerView.gridHeight = levelHeight
+        }
+
+    var sliceWidth: Float = 0f
+        set(sliceWidth) {
+            field = sliceWidth
+            spriteContainerView.sliceWidth = sliceWidth
+            spriteContainerView.clearCollisionBoundaries()
+            for (canvasView in canvasViews) {
+                spriteContainerView.addCollisionBoundaries(canvasView.slicedBoundary)
+            }
         }
 
     var backgroundImage: ImageSource?
@@ -237,8 +341,11 @@ open class LevelView : FrameContainerView {
     var requireClearRate: Int = 100
         set(requireClearRate) {
             field = requireClearRate
-            progressView.text = "${canvasView.clearRate().toInt()} / $requireClearRate%"
-            canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+            val remainingProgress = canvasViews.map { it.remainingSliceArea() }.reduce { acc, area -> acc + area }
+            for (canvasView in canvasViews) {
+                canvasView.visibility = if (cleared()) INVISIBLE else VISIBLE
+            }
+            progressView.text = "${100 - remainingProgress.toInt()} / $requireClearRate%"
             spriteContainerView.visibility = if (cleared()) INVISIBLE else VISIBLE
         }
 
@@ -256,12 +363,21 @@ open class LevelView : FrameContainerView {
 
 
     // --
+    // Physics delegate
+    // --
+
+    override fun onLethalCollision() {
+        listener?.onLethalHit()
+    }
+
+
+    // --
     // Custom layout
     // --
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
-        setMeasuredDimension(canvasView.measuredWidth, canvasView.measuredHeight + progressViewMargin)
+        setMeasuredDimension(canvasViews[0].measuredWidth, canvasViews[0].measuredHeight + progressViewMargin)
     }
 
 }

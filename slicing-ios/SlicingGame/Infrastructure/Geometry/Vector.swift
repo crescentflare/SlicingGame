@@ -157,5 +157,56 @@ class Vector {
         // Return the intersection result
         return CGPoint(x: start.x + u * (end.x - start.x), y: start.y + u * (end.y - start.y))
     }
+    
+    func intersect(withRect: CGRect) -> CGPoint? {
+        // Return early if the starting point is already inside the rectangle
+        if withRect.contains(start) {
+            return CGPoint(x: start.x, y: start.y)
+        }
+        
+        // Calculate intersection distances for each axis separately
+        let entryDistanceX = x > 0 ? withRect.minX - start.x : withRect.maxX - start.x
+        let entryDistanceY = y > 0 ? withRect.minY - start.y : withRect.maxY - start.y
+        let exitDistanceX = x > 0 ? withRect.maxX - start.x : withRect.minX - start.x
+        let exitDistanceY = y > 0 ? withRect.maxY - start.y : withRect.minY - start.y
+        
+        // Calculate intersection time relative to the vector length (ranging from 0 to 1)
+        let entryTimeX = x == 0 ? CGFloat.infinity : entryDistanceX / x
+        let entryTimeY = y == 0 ? CGFloat.infinity : entryDistanceY / y
+        let exitTimeX = x == 0 ? CGFloat.infinity : exitDistanceX / x
+        let exitTimeY = y == 0 ? CGFloat.infinity : exitDistanceY / y
+        
+        // Check for intersection and return result
+        let entryTime = max(entryTimeX, entryTimeY)
+        let exitTime = min(exitTimeX, exitTimeY)
+        if entryTime < exitTime && entryTime >= 0 && entryTime <= 1 {
+            return CGPoint(x: start.x + x * entryTime, y: start.y + y * entryTime)
+        }
+        return nil
+    }
+    
+    func intersect(withPolygon: Polygon) -> CGPoint? {
+        // Return early if the starting point is already inside the polygon
+        if withPolygon.contains(start) {
+            return CGPoint(x: start.x, y: start.y)
+        }
+        
+        // Check if intersecting with the polygon lines
+        var closestIntersection: CGPoint?
+        for vector in withPolygon.asVectorArray() {
+            if vector.directionOf(point: start) < 0 && vector.directionOf(point: end) > 0 {
+                if let intersection = vector.intersect(withVector: self) {
+                    if let previousIntersection = closestIntersection {
+                        if abs(intersection.x - vector.start.x) < abs(previousIntersection.x - vector.start.x) && abs(intersection.y - vector.start.y) < abs(previousIntersection.y - vector.start.y) {
+                            closestIntersection = intersection
+                        }
+                    } else {
+                        closestIntersection = intersection
+                    }
+                }
+            }
+        }
+        return closestIntersection
+    }
 
 }

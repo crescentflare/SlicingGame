@@ -61,7 +61,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         // Basic modules
         Inflators.module.register(name: "alert", inflatable: AlertModule.inflatable())
-        
+        Inflators.module.register(name: "vibrate", inflatable: VibrateModule.inflatable())
+
         // Custom modules
         Inflators.module.register(name: "game", inflatable: GameModule.inflatable())
     }

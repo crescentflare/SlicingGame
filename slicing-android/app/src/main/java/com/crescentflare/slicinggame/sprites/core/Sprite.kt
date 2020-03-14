@@ -21,6 +21,7 @@ class Sprite: PhysicsObject {
     override var y = 0f
     var width = 1f
     var height = 1f
+    override var lethal = false
     override var recursiveCheck = 0
     private var moveX: Float
     private var moveY: Float
@@ -65,6 +66,9 @@ class Sprite: PhysicsObject {
     // --
 
     override fun onCollision(hitObject: PhysicsObject?, normal: Vector, timeRemaining: Float, physics: Physics) {
+        if (hitObject?.lethal == true) {
+            return
+        }
         val dotProduct = normal.x * moveX + normal.y * moveY
         val newMoveX = moveX - 2 * normal.x * dotProduct
         val newMoveY = moveY - 2 * normal.y * dotProduct

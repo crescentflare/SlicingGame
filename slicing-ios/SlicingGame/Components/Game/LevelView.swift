@@ -7,14 +7,21 @@ import UIKit
 import UniLayout
 import JsonInflator
 
-class LevelView: FrameContainerView {
+protocol LevelViewDelegate: class {
+    
+    func didLethalHit()
+    
+}
+
+class LevelView: FrameContainerView, PhysicsDelegate {
     
     // --
     // MARK: Members
     // --
     
+    weak var delegate: LevelViewDelegate?
     private var backgroundView = ImageView()
-    private var canvasView = LevelCanvasView()
+    private var canvasViews = [LevelCanvasView()]
     private var spriteContainerView = SpriteContainerView()
     private var progressView = TextView()
     private let progressViewMargin = AppDimensions.text + 8
@@ -39,7 +46,8 @@ class LevelView: FrameContainerView {
                 // Apply level size
                 level.levelWidth = convUtil.asFloat(value: attributes["levelWidth"]) ?? 1
                 level.levelHeight = convUtil.asFloat(value: attributes["levelHeight"]) ?? 1
-                
+                level.sliceWidth = convUtil.asFloat(value: attributes["sliceWidth"]) ?? 0
+
                 // Apply background
                 level.backgroundImage = ImageSource.fromValue(value: attributes["backgroundImage"])
                 
@@ -111,17 +119,18 @@ class LevelView: FrameContainerView {
         addSubview(backgroundView)
 
         // Add level canvas
-        canvasView.layoutProperties.width = UniLayoutProperties.stretchToParent
-        canvasView.layoutProperties.height = UniLayoutProperties.stretchToParent
-        canvasView.layoutProperties.margin.bottom = progressViewMargin
-        canvasView.backgroundColor = .white
-        addSubview(canvasView)
+        canvasViews[0].layoutProperties.width = UniLayoutProperties.stretchToParent
+        canvasViews[0].layoutProperties.height = UniLayoutProperties.stretchToParent
+        canvasViews[0].layoutProperties.margin.bottom = progressViewMargin
+        canvasViews[0].backgroundColor = .white
+        addSubview(canvasViews[0])
 
         // Add sprite container
         spriteContainerView.layoutProperties.width = UniLayoutProperties.stretchToParent
         spriteContainerView.layoutProperties.height = UniLayoutProperties.stretchToParent
         spriteContainerView.layoutProperties.margin.bottom = progressViewMargin
         spriteContainerView.backgroundColor = .clear
+        spriteContainerView.physicsDelegate = self
         addSubview(spriteContainerView)
 
         // Add progress view
@@ -129,7 +138,7 @@ class LevelView: FrameContainerView {
         progressView.layoutProperties.verticalGravity = 1
         progressView.numberOfLines = 1
         progressView.textAlignment = .center
-        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
+        progressView.text = "\(Int(canvasViews[0].clearRate())) / \(requireClearRate)%"
         addSubview(progressView)
     }
     
@@ -152,30 +161,91 @@ class LevelView: FrameContainerView {
     // --
     
     func slice(vector: Vector) {
-        let normalClearRate = canvasView.clearRateForSlice(vector: vector)
-        let reversedClearRate = canvasView.clearRateForSlice(vector: vector.reversed())
-        if reversedClearRate < normalClearRate {
-            canvasView.slice(vector: vector.reversed())
-        } else {
-            canvasView.slice(vector: vector)
+        // Prepare slice vectors
+        let topLeft = CGPoint(x: 0, y: 0)
+        let bottomRight = CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))
+        let offsetVector = vector.perpendicular().unit() * CGFloat(sliceWidth / 2)
+        let sliceVector = vector.translated(translateX: -offsetVector.x, translateY: -offsetVector.y).stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+        let reversedVector = vector.reversed().translated(translateX: offsetVector.x, translateY: offsetVector.y).stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+        
+        // Check for collision
+        let slicePolygon = Polygon(points: [ sliceVector.end, sliceVector.start, reversedVector.end, reversedVector.start ])
+        if spriteContainerView.spritesOnPolygon(polygon: slicePolygon) {
+            didLethalCollision()
+            return
         }
-        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
-        canvasView.visibility = cleared() ? .invisible : .visible
+
+        // Apply slice
+        let originalCanvasViews = canvasViews
+        for canvasView in originalCanvasViews {
+            let normalClearRate = canvasView.clearRateForSlice(vector: sliceVector)
+            let reversedClearRate = canvasView.clearRateForSlice(vector: reversedVector)
+            let normalSpriteCount = spriteContainerView.spritesPerSlice(vector: sliceVector, inPolygon: canvasView.slicedBoundary)
+            let reversedSpriteCount = spriteContainerView.spritesPerSlice(vector: reversedVector, inPolygon: canvasView.slicedBoundary)
+            if normalSpriteCount > 0 && reversedSpriteCount > 0 {
+                if let duplicateCanvasView = canvasView.copy() as? LevelCanvasView {
+                    canvasViews.append(duplicateCanvasView)
+                    insertSubview(duplicateCanvasView, belowSubview: canvasView)
+                    duplicateCanvasView.slice(vector: reversedVector)
+                }
+                canvasView.slice(vector: sliceVector)
+            } else if reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate) {
+                canvasView.slice(vector: reversedVector)
+            } else {
+                canvasView.slice(vector: sliceVector)
+            }
+        }
+        
+        // Update state
+        let remainingProgress = canvasViews.map { $0.remainingSliceArea() }.reduce(0, +)
         spriteContainerView.visibility = cleared() ? .invisible : .visible
-        spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
+        spriteContainerView.clearCollisionBoundaries()
+        for canvasView in canvasViews {
+            canvasView.visibility = cleared() ? .invisible : .visible
+            spriteContainerView.addCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
+        }
+        progressView.text = "\(Int(100 - remainingProgress)) / \(requireClearRate)%"
     }
 
     func resetSlices() {
-        canvasView.resetSlices()
-        progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
-        canvasView.visibility = cleared() ? .invisible : .visible
+        // Remove duplicated canvas views and reset slices on the original one
+        for canvasView in canvasViews {
+            if canvasView !== canvasViews.first {
+                canvasView.removeFromSuperview()
+            }
+        }
+        canvasViews = [canvasViews[0]]
+        canvasViews[0].resetSlices()
+        
+        // Update state
+        let remainingProgress = canvasViews.map { $0.remainingSliceArea() }.reduce(0, +)
         spriteContainerView.visibility = cleared() ? .invisible : .visible
-        spriteContainerView.generateCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
+        spriteContainerView.clearCollisionBoundaries()
+        for canvasView in canvasViews {
+            canvasView.visibility = cleared() ? .invisible : .visible
+            spriteContainerView.addCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
+        }
+        progressView.text = "\(Int(100 - remainingProgress)) / \(requireClearRate)%"
     }
     
     func transformedSliceVector(vector: Vector) -> Vector {
         let translatedVector = vector.translated(translateX: -frame.origin.x, translateY: -frame.origin.y)
-        return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasView.frame.width, scaleY: CGFloat(levelHeight) / canvasView.frame.height)
+        return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasViews[0].frame.width, scaleY: CGFloat(levelHeight) / canvasViews[0].frame.height)
+    }
+    
+    @discardableResult func setSliceVector(vector: Vector?, screenSpace: Bool = false) -> Bool {
+        let sliceVector: Vector?
+        if let vector = vector {
+            sliceVector = screenSpace ? transformedSliceVector(vector: vector) : vector
+        } else {
+            sliceVector = nil
+        }
+        if sliceVector?.isValid() ?? false {
+            let topLeft = CGPoint(x: CGFloat(-spriteContainerView.gridWidth * 4), y: CGFloat(-spriteContainerView.gridHeight * 4))
+            let bottomRight = CGPoint(x: CGFloat(spriteContainerView.gridWidth * 4), y: CGFloat(spriteContainerView.gridHeight * 4))
+            return spriteContainerView.setSliceVector(vector: sliceVector?.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight))
+        }
+        return spriteContainerView.setSliceVector(vector: nil)
     }
     
 
@@ -184,7 +254,8 @@ class LevelView: FrameContainerView {
     // --
     
     func cleared() -> Bool {
-        return Int(canvasView.clearRate()) >= requireClearRate
+        let remainingProgress = canvasViews.map { $0.remainingSliceArea() }.reduce(0, +)
+        return Int(100 - remainingProgress) >= requireClearRate
     }
     
 
@@ -194,15 +265,29 @@ class LevelView: FrameContainerView {
     
     var levelWidth: Float = 1 {
         didSet {
-            canvasView.canvasWidth = levelWidth
+            for canvasView in canvasViews {
+                canvasView.canvasWidth = levelWidth
+            }
             spriteContainerView.gridWidth = levelWidth
         }
     }
 
     var levelHeight: Float = 1 {
         didSet {
-            canvasView.canvasHeight = levelHeight
+            for canvasView in canvasViews {
+                canvasView.canvasHeight = levelHeight
+            }
             spriteContainerView.gridHeight = levelHeight
+        }
+    }
+    
+    var sliceWidth: Float = 0 {
+        didSet {
+            spriteContainerView.sliceWidth = sliceWidth
+            spriteContainerView.clearCollisionBoundaries()
+            for canvasView in canvasViews {
+                spriteContainerView.addCollisionBoundaries(fromPolygon: canvasView.slicedBoundary)
+            }
         }
     }
     
@@ -215,8 +300,11 @@ class LevelView: FrameContainerView {
     
     var requireClearRate: Int = 100 {
         didSet {
-            progressView.text = "\(Int(canvasView.clearRate())) / \(requireClearRate)%"
-            canvasView.visibility = cleared() ? .invisible : .visible
+            let remainingProgress = canvasViews.map { $0.remainingSliceArea() }.reduce(0, +)
+            for canvasView in canvasViews {
+                canvasView.visibility = cleared() ? .invisible : .visible
+            }
+            progressView.text = "\(Int(100 - remainingProgress)) / \(requireClearRate)%"
             spriteContainerView.visibility = cleared() ? .invisible : .visible
         }
     }
@@ -237,11 +325,20 @@ class LevelView: FrameContainerView {
 
     
     // --
+    // MARK: Physics delegate
+    // --
+    
+    func didLethalCollision() {
+        delegate?.didLethalHit()
+    }
+    
+
+    // --
     // MARK: Custom layout
     // --
     
     override func measuredSize(sizeSpec: CGSize, widthSpec: UniMeasureSpec, heightSpec: UniMeasureSpec) -> CGSize {
-        var result = canvasView.measuredSize(sizeSpec: sizeSpec, widthSpec: widthSpec, heightSpec: heightSpec)
+        var result = canvasViews[0].measuredSize(sizeSpec: sizeSpec, widthSpec: widthSpec, heightSpec: heightSpec)
         result.height += progressViewMargin
         return result
     }

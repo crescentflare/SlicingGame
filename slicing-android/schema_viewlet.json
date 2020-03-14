@@ -319,6 +319,10 @@
             "description": "The height of the level in pixel independent units",
             "type": "number"
           },
+          "sliceWidth": {
+            "description": "The thickness of a slice in pixel independent units",
+            "type": "number"
+          },
           "backgroundImage": {
             "description": "The image to reveal behind the level canvas",
             "$ref": "./schema_image_source.json"
@@ -329,6 +333,10 @@
           },
           "clearEvent": {
             "description": "Sends event when the level is cleared",
+            "$ref": "#/definitions/appEvent"
+          },
+          "lethalHitEvent": {
+            "description": "Sends event when a lethal hit occurs in the level",
             "$ref": "#/definitions/appEvent"
           },
           "fps": {
@@ -436,6 +444,10 @@
             "description": "The height of the coordinate system for placing sprites, they are pixel independent",
             "type": "number"
           },
+          "sliceWidth": {
+            "description": "The thickness of a slice in pixel independent units",
+            "type": "number"
+          },
           "fps": {
             "description": "The amount of frames per second the sprite refresh loop tries to run on",
             "type": "integer"
@@ -470,6 +482,10 @@
           },
           "levelHeight": {
             "description": "The height of the level in pixel independent units",
+            "type": "number"
+          },
+          "sliceWidth": {
+            "description": "The thickness of a slice in pixel independent units",
             "type": "number"
           },
           "backgroundImage": {
