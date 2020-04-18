@@ -151,7 +151,6 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
         // Add slice preview
         slicePreviewView.layoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
         slicePreviewView.color = ContextCompat.getColor(context, R.color.slicePreviewLine)
-        slicePreviewView.stretchedColor = ContextCompat.getColor(context, R.color.stretchedSlicePreviewLine)
         addView(slicePreviewView)
     }
 

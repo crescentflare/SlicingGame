@@ -282,9 +282,7 @@ open class LevelView : FrameContainerView, Physics.Listener {
             null
         }
         if (sliceVector?.isValid() == true) {
-            val topLeft = PointF(-spriteContainerView.gridWidth * 4, -spriteContainerView.gridHeight * 4)
-            val bottomRight = PointF(spriteContainerView.gridWidth * 4, spriteContainerView.gridHeight * 4)
-            return spriteContainerView.setSliceVector(sliceVector.stretchedToEdges(topLeft, bottomRight))
+            return spriteContainerView.setSliceVector(sliceVector)
         }
         return spriteContainerView.setSliceVector(null)
     }

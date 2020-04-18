@@ -241,9 +241,7 @@ class LevelView: FrameContainerView, PhysicsDelegate {
             sliceVector = nil
         }
         if sliceVector?.isValid() ?? false {
-            let topLeft = CGPoint(x: CGFloat(-spriteContainerView.gridWidth * 4), y: CGFloat(-spriteContainerView.gridHeight * 4))
-            let bottomRight = CGPoint(x: CGFloat(spriteContainerView.gridWidth * 4), y: CGFloat(spriteContainerView.gridHeight * 4))
-            return spriteContainerView.setSliceVector(vector: sliceVector?.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight))
+            return spriteContainerView.setSliceVector(vector: sliceVector)
         }
         return spriteContainerView.setSliceVector(vector: nil)
     }

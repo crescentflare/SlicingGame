@@ -131,7 +131,6 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
         slicePreviewView.layoutProperties.width = UniLayoutProperties.stretchToParent
         slicePreviewView.layoutProperties.height = UniLayoutProperties.stretchToParent
         slicePreviewView.color = .slicePreviewLine
-        slicePreviewView.stretchedColor = .stretchedSlicePreviewLine
         addSubview(slicePreviewView)
     }
     

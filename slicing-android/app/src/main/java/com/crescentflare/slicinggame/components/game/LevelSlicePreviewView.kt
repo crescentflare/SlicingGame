@@ -50,7 +50,6 @@ open class LevelSlicePreviewView : UniFrameContainer {
 
                     // Apply colors
                     obj.color = mapUtil.optionalColor(attributes, "color", Color.TRANSPARENT)
-                    obj.stretchedColor = mapUtil.optionalColor(attributes, "stretchedColor", Color.TRANSPARENT)
 
                     // Generic view properties
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
@@ -73,11 +72,9 @@ open class LevelSlicePreviewView : UniFrameContainer {
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val dotSize = resources.getDimensionPixelSize(R.dimen.slicePreviewDot).toFloat()
     private val lineWidth = resources.getDimensionPixelSize(R.dimen.slicePreviewWidth).toFloat()
-    private val stretchedLineWidth = resources.getDimensionPixelSize(R.dimen.slicePreviewStretchedWidth).toFloat()
     private val lineDash = resources.getDimensionPixelSize(R.dimen.slicePreviewDash).toFloat()
     private val dashEffect = DashPathEffect(floatArrayOf(lineDash, lineDash), 0f)
     private var linePath: Path? = null
-    private var stretchedLinePath: Path? = null
     private var startDotOval: RectF? = null
     private var endDotOval: RectF? = null
 
@@ -139,15 +136,6 @@ open class LevelSlicePreviewView : UniFrameContainer {
             }
         }
 
-    var stretchedColor: Int = Color.TRANSPARENT
-        set(stretchedColor) {
-            val changed = field != stretchedColor
-            field = stretchedColor
-            if (changed) {
-                invalidate()
-            }
-        }
-
 
     // --
     // Update shapes
@@ -162,23 +150,12 @@ open class LevelSlicePreviewView : UniFrameContainer {
         } else {
             null
         }
-        val stretchedSliceVector = sliceVector?.stretchedToEdges(PointF(0f, 0f), PointF(width.toFloat(), height.toFloat()))
 
         // Set up line
         linePath = if (sliceVector != null && sliceVector.isValid()) {
             Path().apply {
                 moveTo(sliceVector.start.x, sliceVector.start.y)
                 lineTo(sliceVector.end.x, sliceVector.end.y)
-            }
-        } else {
-            null
-        }
-
-        // Set up stretched line
-        stretchedLinePath = if (stretchedSliceVector != null && stretchedSliceVector.isValid()) {
-            Path().apply {
-                moveTo(stretchedSliceVector.start.x, stretchedSliceVector.start.y)
-                lineTo(stretchedSliceVector.end.x, stretchedSliceVector.end.y)
             }
         } else {
             null
@@ -196,7 +173,7 @@ open class LevelSlicePreviewView : UniFrameContainer {
         }
 
         // Update draw state
-        setWillNotDraw(linePath == null && stretchedLinePath == null && startDotOval == null && endDotOval == null)
+        setWillNotDraw(linePath == null && startDotOval == null && endDotOval == null)
     }
 
 
@@ -205,17 +182,8 @@ open class LevelSlicePreviewView : UniFrameContainer {
     // --
 
     override fun onDraw(canvas: Canvas?) {
-        // Draw stretched line
-        super.onDraw(canvas)
-        stretchedLinePath?.let {
-            paint.color = stretchedColor
-            paint.strokeWidth = stretchedLineWidth
-            paint.style = Paint.Style.STROKE
-            paint.pathEffect = null
-            canvas?.drawPath(it, paint)
-        }
-
         // Draw start/end dots
+        super.onDraw(canvas)
         startDotOval?.let {
             paint.color = color
             paint.style = Paint.Style.FILL
