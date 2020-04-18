@@ -19,7 +19,6 @@ extension UIColor {
                 "text": .text,
                 
                 "slicePreviewLine": slicePreviewLine,
-                "stretchedSlicePreviewLine": stretchedSlicePreviewLine,
                 
                 "red": .red,
                 "yellow": .yellow,
@@ -49,7 +48,6 @@ extension UIColor {
     // --
 
     class var slicePreviewLine: UIColor { get { return UIColor(hexValue: 0xffff0000) } }
-    class var stretchedSlicePreviewLine: UIColor { get { return UIColor(hexValue: 0x40ff0000) } }
 
 
     // --

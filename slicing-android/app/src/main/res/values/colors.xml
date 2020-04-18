@@ -6,7 +6,6 @@
 
     <!-- Game -->
     <color name="slicePreviewLine">#ff0000</color>
-    <color name="stretchedSlicePreviewLine">#40ff0000</color>
 
     <!-- System -->
     <color name="red">#ff0000</color>

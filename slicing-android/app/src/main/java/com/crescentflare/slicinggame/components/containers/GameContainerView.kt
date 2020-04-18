@@ -115,6 +115,7 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     private var slicePreviewView = LevelSlicePreviewView(context)
     private var dragStart: PointF? = null
     private var dragEnd: PointF? = null
+    private var currentSlice: LevelView.SliceResult? = null
     private var dragPointerId = 0
     private val minimumDragDistance = Resources.getSystem().displayMetrics.density * 32
 
@@ -151,7 +152,6 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
         // Add slice preview
         slicePreviewView.layoutParams = UniLayoutParams(UniLayoutParams.MATCH_PARENT, UniLayoutParams.MATCH_PARENT)
         slicePreviewView.color = ContextCompat.getColor(context, R.color.slicePreviewLine)
-        slicePreviewView.stretchedColor = ContextCompat.getColor(context, R.color.stretchedSlicePreviewLine)
         addView(slicePreviewView)
     }
 
@@ -173,8 +173,8 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     // Slicing
     // --
 
-    fun slice(vector: Vector) {
-        levelView.slice(vector)
+    fun slice(vector: Vector, restrictCanvasIndices: List<Int>? = null) {
+        levelView.slice(vector, restrictCanvasIndices)
         if (levelView.cleared()) {
             clearEvent?.let {
                 eventObserver?.observedEvent(it, this)
@@ -242,6 +242,7 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     // --
 
     override fun onLethalHit() {
+        currentSlice = null
         dragStart = null
         dragEnd = null
         slicePreviewView.start = null
@@ -261,64 +262,85 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     override fun onTouchEvent(event: MotionEvent?): Boolean {
         if (event != null) {
             when (event.action) {
+                // Touch start
                 MotionEvent.ACTION_DOWN, MotionEvent.ACTION_POINTER_DOWN -> {
                     if (!levelView.cleared() && dragStart == null && event.pointerCount > 0) {
                         dragStart = PointF(event.getX(0), event.getY(0))
                         dragEnd = dragStart
                         dragPointerId = event.getPointerId(0)
-                        dragStart?.let {
-                            slicePreviewView.start = Point(it.x.toInt(), it.y.toInt())
-                        }
                     }
                     return true
                 }
+
+                // Touch move
                 MotionEvent.ACTION_MOVE -> {
                     if (dragStart != null && dragEnd != null) {
                         for (i in 0 until event.pointerCount) {
                             if (event.getPointerId(i) == dragPointerId) {
+                                // Check if a slice can be made
                                 dragEnd = PointF(event.getX(i), event.getY(i))
                                 val vectorStart = dragStart
                                 val vectorEnd = dragEnd
                                 if (vectorStart != null && vectorEnd != null) {
-                                    val viewVector = Vector(vectorStart, vectorEnd)
-                                    slicePreviewView.end = if (viewVector.distance() >= minimumDragDistance) {
-                                        Point(vectorEnd.x.toInt(), vectorEnd.y.toInt())
-                                    } else {
-                                        null
+                                    val dragVector = Vector(vectorStart, vectorEnd)
+                                    if (currentSlice != null || dragVector.distance() >= minimumDragDistance) {
+                                        currentSlice = levelView.validateSlice(dragVector, true)
                                     }
-                                    if (slicePreviewView.end != null && levelView.width > 0 && levelView.height > 0) {
-                                        levelView.setSliceVector(Vector(vectorStart, vectorEnd), true)
-                                    } else {
-                                        levelView.setSliceVector(null)
-                                    }
+                                } else {
+                                    currentSlice = null
                                 }
+
+                                // Update view
+                                val checkCurrentSlice = currentSlice
+                                currentSlice?.let {
+                                    dragStart = it.vector.start
+                                }
+                                slicePreviewView.start = if (checkCurrentSlice != null) {
+                                    Point(checkCurrentSlice.vector.start.x.toInt(), checkCurrentSlice.vector.start.y.toInt())
+                                } else {
+                                    null
+                                }
+                                slicePreviewView.end = if (checkCurrentSlice != null) {
+                                    Point(checkCurrentSlice.vector.end.x.toInt(), checkCurrentSlice.vector.end.y.toInt())
+                                } else {
+                                    null
+                                }
+                                levelView.setSliceVector(currentSlice?.vector, true)
                                 break
                             }
                         }
                         return true
                     }
                 }
+
+                // Touch end
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
                     if (dragStart != null && dragEnd != null) {
                         for (i in 0 until event.pointerCount) {
                             if (event.getPointerId(i) == dragPointerId) {
-                                // Update final end position
+                                // Update the slice
                                 dragEnd = PointF(event.getX(i), event.getY(i))
-
-                                // Make vector and slice
                                 val vectorStart = dragStart
                                 val vectorEnd = dragEnd
-                                if (vectorStart != null && vectorEnd != null && levelView.width > 0 && levelView.height > 0) {
-                                    val viewVector = Vector(vectorStart, vectorEnd)
-                                    if (viewVector.distance() >= minimumDragDistance) {
-                                        val sliceVector = levelView.transformedSliceVector(viewVector)
-                                        if (sliceVector.isValid() && levelView.setSliceVector(sliceVector)) {
-                                            slice(sliceVector.stretchedToEdges(PointF(0f, 0f), PointF(levelWidth, levelHeight)))
-                                        }
+                                if (vectorStart != null && vectorEnd != null) {
+                                    val dragVector = Vector(vectorStart, vectorEnd)
+                                    if (currentSlice != null || dragVector.distance() >= minimumDragDistance) {
+                                        currentSlice = levelView.validateSlice(dragVector, true)
+                                    }
+                                } else {
+                                    currentSlice = null
+                                }
+
+                                // Apply slice if possible
+                                currentSlice?.let {
+                                    val transformedVector = levelView.transformedSliceVector(it.vector)
+                                    if (transformedVector.isValid() && levelView.setSliceVector(transformedVector)) {
+                                        slice(transformedVector, it.canvasIndices)
                                     }
                                 }
 
                                 // Reset dragging state
+                                currentSlice = null
                                 dragStart = null
                                 dragEnd = null
                                 slicePreviewView.start = null

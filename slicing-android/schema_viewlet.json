@@ -576,10 +576,6 @@
           "color": {
             "description": "The color of the slice preview",
             "$ref": "#/definitions/color"
-          },
-          "stretchedColor": {
-            "description": "The color of the stretched slice extending to the component edges",
-            "$ref": "#/definitions/color"
           }
         }
       }

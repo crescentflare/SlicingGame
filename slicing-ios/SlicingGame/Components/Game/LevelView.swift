@@ -13,6 +13,18 @@ protocol LevelViewDelegate: class {
     
 }
 
+class LevelViewSliceResult {
+    
+    let vector: Vector
+    let canvasIndices: [Int]
+    
+    init(vector: Vector, canvasIndices: [Int]) {
+        self.vector = vector
+        self.canvasIndices = canvasIndices
+    }
+    
+}
+
 class LevelView: FrameContainerView, PhysicsDelegate {
     
     // --
@@ -160,16 +172,18 @@ class LevelView: FrameContainerView, PhysicsDelegate {
     // MARK: Slicing
     // --
     
-    func slice(vector: Vector) {
+    func slice(vector: Vector, restrictCanvasIndices: [Int]? = nil) {
         // Prepare slice vectors
         let topLeft = CGPoint(x: 0, y: 0)
         let bottomRight = CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))
         let offsetVector = vector.perpendicular().unit() * CGFloat(sliceWidth / 2)
-        let sliceVector = vector.translated(translateX: -offsetVector.x, translateY: -offsetVector.y).stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
-        let reversedVector = vector.reversed().translated(translateX: offsetVector.x, translateY: offsetVector.y).stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+        let originalSliceVector = vector.translated(translateX: -offsetVector.x, translateY: -offsetVector.y)
+        let originalReversedVector = vector.reversed().translated(translateX: offsetVector.x, translateY: offsetVector.y)
+        let sliceVector = originalSliceVector.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+        let reversedVector = originalReversedVector.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
         
         // Check for collision
-        let slicePolygon = Polygon(points: [ sliceVector.end, sliceVector.start, reversedVector.end, reversedVector.start ])
+        let slicePolygon = Polygon(points: [ originalSliceVector.end, originalSliceVector.start, originalReversedVector.end, originalReversedVector.start ])
         if spriteContainerView.spritesOnPolygon(polygon: slicePolygon) {
             didLethalCollision()
             return
@@ -177,22 +191,25 @@ class LevelView: FrameContainerView, PhysicsDelegate {
 
         // Apply slice
         let originalCanvasViews = canvasViews
-        for canvasView in originalCanvasViews {
-            let normalClearRate = canvasView.clearRateForSlice(vector: sliceVector)
-            let reversedClearRate = canvasView.clearRateForSlice(vector: reversedVector)
-            let normalSpriteCount = spriteContainerView.spritesPerSlice(vector: sliceVector, inPolygon: canvasView.slicedBoundary)
-            let reversedSpriteCount = spriteContainerView.spritesPerSlice(vector: reversedVector, inPolygon: canvasView.slicedBoundary)
-            if normalSpriteCount > 0 && reversedSpriteCount > 0 {
-                if let duplicateCanvasView = canvasView.copy() as? LevelCanvasView {
-                    canvasViews.append(duplicateCanvasView)
-                    insertSubview(duplicateCanvasView, belowSubview: canvasView)
-                    duplicateCanvasView.slice(vector: reversedVector)
+        for index in originalCanvasViews.indices {
+            let canvasView = originalCanvasViews[index]
+            if restrictCanvasIndices?.contains(index) ?? true {
+                let normalClearRate = canvasView.clearRateForSlice(vector: sliceVector)
+                let reversedClearRate = canvasView.clearRateForSlice(vector: reversedVector)
+                let normalSpriteCount = spriteContainerView.spritesPerSlice(vector: sliceVector, inPolygon: canvasView.slicedBoundary)
+                let reversedSpriteCount = spriteContainerView.spritesPerSlice(vector: reversedVector, inPolygon: canvasView.slicedBoundary)
+                if normalSpriteCount > 0 && reversedSpriteCount > 0 {
+                    if let duplicateCanvasView = canvasView.copy() as? LevelCanvasView {
+                        canvasViews.append(duplicateCanvasView)
+                        insertSubview(duplicateCanvasView, belowSubview: canvasView)
+                        duplicateCanvasView.slice(vector: reversedVector)
+                    }
+                    canvasView.slice(vector: sliceVector)
+                } else if reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate) {
+                    canvasView.slice(vector: reversedVector)
+                } else {
+                    canvasView.slice(vector: sliceVector)
                 }
-                canvasView.slice(vector: sliceVector)
-            } else if reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate) {
-                canvasView.slice(vector: reversedVector)
-            } else {
-                canvasView.slice(vector: sliceVector)
             }
         }
         
@@ -228,7 +245,11 @@ class LevelView: FrameContainerView, PhysicsDelegate {
         progressView.text = "\(Int(100 - remainingProgress)) / \(requireClearRate)%"
     }
     
-    func transformedSliceVector(vector: Vector) -> Vector {
+    func transformedSliceVector(vector: Vector, reversed: Bool = false) -> Vector {
+        if reversed {
+            let scaledVector = vector.scaled(scaleX: canvasViews[0].frame.width / CGFloat(levelWidth), scaleY: canvasViews[0].frame.height / CGFloat(levelHeight))
+            return scaledVector.translated(translateX: frame.origin.x, translateY: frame.origin.y)
+        }
         let translatedVector = vector.translated(translateX: -frame.origin.x, translateY: -frame.origin.y)
         return translatedVector.scaled(scaleX: CGFloat(levelWidth) / canvasViews[0].frame.width, scaleY: CGFloat(levelHeight) / canvasViews[0].frame.height)
     }
@@ -241,14 +262,73 @@ class LevelView: FrameContainerView, PhysicsDelegate {
             sliceVector = nil
         }
         if sliceVector?.isValid() ?? false {
-            let topLeft = CGPoint(x: CGFloat(-spriteContainerView.gridWidth * 4), y: CGFloat(-spriteContainerView.gridHeight * 4))
-            let bottomRight = CGPoint(x: CGFloat(spriteContainerView.gridWidth * 4), y: CGFloat(spriteContainerView.gridHeight * 4))
-            return spriteContainerView.setSliceVector(vector: sliceVector?.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight))
+            return spriteContainerView.setSliceVector(vector: sliceVector)
         }
         return spriteContainerView.setSliceVector(vector: nil)
     }
     
+    func validateSlice(vector: Vector, screenSpace: Bool = false) -> LevelViewSliceResult? {
+        // Validation fails when the view size has not been calculated yet
+        if frame.width <= 0 || frame.height <= 0 {
+            return nil
+        }
+    
+        // Prepare slice vector for finding points
+        let topLeft = CGPoint(x: 0, y: 0)
+        let bottomRight = CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))
+        let sliceVector = screenSpace ? transformedSliceVector(vector: vector) : vector
+        let stretchedSliceVector = sliceVector.stretchedToEdges(topLeft: topLeft, bottomRight: bottomRight)
+    
+        // Collect intersection points for all canvases
+        var intersectionPoints = [SliceIntersectionPoint]()
+        for index in canvasViews.indices {
+            let edgeIntersections = stretchedSliceVector.edgeIntersections(withPolygon: canvasViews[index].slicedBoundary)
+            for point in edgeIntersections {
+                var intersectionPoint = SliceIntersectionPoint()
+                intersectionPoint.canvasIndex = index
+                intersectionPoint.point = point
+                intersectionPoint.startDistance = pointDistance(from: sliceVector.start, to: point, directionVector: sliceVector)
+                intersectionPoint.endDistance = pointDistance(from: point, to: sliceVector.end, directionVector: sliceVector)
+                intersectionPoints.append(intersectionPoint)
+            }
+        }
+    
+        // Find start and end positions as well as canvases that can be sliced (with snapping)
+        let sortedIntersectionPoints = intersectionPoints.sorted { $0.startDistance < $1.startDistance }
+        let maxSnapDistance: CGFloat = CGFloat(levelWidth) / 16
+        var resultVector: Vector?
+        var sliceCanvasIndices = [Int]()
+        for index in sortedIntersectionPoints.indices {
+            if index + 1 < sortedIntersectionPoints.count {
+                let intersectionPoint = sortedIntersectionPoints[index]
+                let nextIntersectionPoint = sortedIntersectionPoints[index + 1]
+                if intersectionPoint.startDistance >= -maxSnapDistance && intersectionPoint.endDistance >= 0 && nextIntersectionPoint.canvasIndex == intersectionPoint.canvasIndex {
+                    if let resultVector = resultVector {
+                        if nextIntersectionPoint.endDistance >= -maxSnapDistance {
+                            resultVector.end = nextIntersectionPoint.point
+                            sliceCanvasIndices.append(intersectionPoint.canvasIndex)
+                        } else {
+                            resultVector.end = sliceVector.end
+                        }
+                    } else {
+                        resultVector = Vector(start: intersectionPoint.point, end: sliceVector.end)
+                        if nextIntersectionPoint.endDistance >= -maxSnapDistance {
+                            resultVector?.end = nextIntersectionPoint.point
+                            sliceCanvasIndices.append(intersectionPoint.canvasIndex)
+                        }
+                    }
+                }
+            }
+        }
+    
+        // Return result
+        if let resultVector = resultVector {
+            return LevelViewSliceResult(vector: screenSpace ? transformedSliceVector(vector: resultVector, reversed: true) : resultVector, canvasIndices: sliceCanvasIndices)
+        }
+        return nil
+    }
 
+    
     // --
     // MARK: Obtain state
     // --
@@ -334,6 +414,21 @@ class LevelView: FrameContainerView, PhysicsDelegate {
     
 
     // --
+    // MARK: Helper
+    // --
+    
+    private func pointDistance(from: CGPoint, to: CGPoint, directionVector: Vector) -> CGFloat {
+        let x = to.x - from.x
+        let y = to.y - from.y
+        let result = sqrt(x * x + y * y)
+        if (x < 0) == (directionVector.x < 0) && (y < 0) == (directionVector.y < 0) {
+            return result
+        }
+        return -result
+    }
+    
+
+    // --
     // MARK: Custom layout
     // --
     
@@ -343,4 +438,18 @@ class LevelView: FrameContainerView, PhysicsDelegate {
         return result
     }
 
+
+    // --
+    // MARK: Slice intersection point structure
+    // --
+    
+    private struct SliceIntersectionPoint {
+        
+        var point = CGPoint.zero
+        var startDistance: CGFloat = 0
+        var endDistance: CGFloat = 0
+        var canvasIndex = 0
+        
+    }
+    
 }
