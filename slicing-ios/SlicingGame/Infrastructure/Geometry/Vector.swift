@@ -208,5 +208,15 @@ class Vector {
         }
         return closestIntersection
     }
+    
+    func edgeIntersections(withPolygon: Polygon) -> [CGPoint] {
+        var points = [CGPoint]()
+        for vector in withPolygon.asVectorArray() {
+            if let point = intersect(withVector: vector) {
+                points.append(point)
+            }
+        }
+        return points
+    }
 
 }

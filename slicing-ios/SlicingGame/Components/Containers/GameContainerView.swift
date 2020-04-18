@@ -22,6 +22,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     
     private var levelView = LevelView()
     private var slicePreviewView = LevelSlicePreviewView()
+    private var currentSlice: LevelViewSliceResult?
     private var dragStart: CGPoint?
     private var dragEnd: CGPoint?
 
@@ -152,8 +153,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     // MARK: Slicing
     // --
     
-    func slice(vector: Vector) {
-        levelView.slice(vector: vector)
+    func slice(vector: Vector, restrictCanvasIndices: [Int]? = nil) {
+        levelView.slice(vector: vector, restrictCanvasIndices: restrictCanvasIndices)
         if levelView.cleared() {
             if let clearEvent = clearEvent {
                 eventObserver?.observedEvent(clearEvent, sender: self)
@@ -225,6 +226,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     // --
     
     func didLethalHit() {
+        currentSlice = nil
         dragStart = nil
         dragEnd = nil
         slicePreviewView.start = nil
@@ -246,7 +248,6 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
             if let touch = touches.first {
                 dragStart = touch.location(in: self)
                 dragEnd = dragStart
-                slicePreviewView.start = dragStart
             }
         }
     }
@@ -255,40 +256,53 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
         super.touchesMoved(touches, with: event)
         for touch in touches {
             if touch.previousLocation(in: self) == dragEnd {
+                // Check if a slice can be made
                 dragEnd = touch.location(in: self)
                 if let dragStart = dragStart, let dragEnd = dragEnd {
-                    let viewVector = Vector(start: dragStart, end: dragEnd)
-                    if viewVector.distance() >= minimumDragDistance {
-                        slicePreviewView.end = dragEnd
-                    } else {
-                        slicePreviewView.end = nil
+                    let dragVector = Vector(start: dragStart, end: dragEnd)
+                    if currentSlice != nil || dragVector.distance() >= minimumDragDistance {
+                        currentSlice = levelView.validateSlice(vector: dragVector, screenSpace: true)
                     }
-                    if slicePreviewView.end != nil && levelView.frame.width > 0 && levelView.frame.height > 0 {
-                        levelView.setSliceVector(vector: Vector(start: dragStart, end: dragEnd), screenSpace: true)
-                    } else {
-                        levelView.setSliceVector(vector: nil)
-                    }
+                } else {
+                    currentSlice = nil
                 }
+                
+                // Update view
+                if let currentSlice = currentSlice {
+                    dragStart = currentSlice.vector.start
+                }
+                slicePreviewView.start = currentSlice?.vector.start
+                slicePreviewView.end = currentSlice?.vector.end
+                levelView.setSliceVector(vector: currentSlice?.vector, screenSpace: true)
             }
         }
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesEnded(touches, with: event)
-        for touch in touches {
-            if touch.previousLocation(in: self) == dragEnd {
-                dragEnd = touch.location(in: self)
-            }
-        }
-        if let dragStart = dragStart, let dragEnd = dragEnd, levelView.frame.width > 0 && levelView.frame.height > 0 {
-            let viewVector = Vector(start: dragStart, end: dragEnd)
-            if viewVector.distance() >= minimumDragDistance {
-                let sliceVector = levelView.transformedSliceVector(vector: viewVector)
-                if sliceVector.isValid() && levelView.setSliceVector(vector: sliceVector) {
-                    slice(vector: sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: CGFloat(levelWidth), y: CGFloat(levelHeight))))
+        // Update the slice
+        if let touch = touches.first {
+            dragEnd = touch.location(in: self)
+            if let dragStart = dragStart, let dragEnd = dragEnd {
+                let dragVector = Vector(start: dragStart, end: dragEnd)
+                if currentSlice != nil || dragVector.distance() >= minimumDragDistance {
+                    currentSlice = levelView.validateSlice(vector: dragVector, screenSpace: true)
                 }
+            } else {
+                currentSlice = nil
             }
         }
+        
+        // Apply slice if possible
+        if let currentSlice = currentSlice {
+            let transformedVector = levelView.transformedSliceVector(vector: currentSlice.vector)
+            if transformedVector.isValid() && levelView.setSliceVector(vector: transformedVector) {
+                slice(vector: transformedVector, restrictCanvasIndices: currentSlice.canvasIndices)
+            }
+        }
+        
+        // Reset state
+        currentSlice = nil
         dragStart = nil
         dragEnd = nil
         slicePreviewView.start = nil

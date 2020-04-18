@@ -208,4 +208,14 @@ class Vector {
         return closestIntersection
     }
 
+    fun edgeIntersections(polygon: Polygon): List<PointF> {
+        val points = mutableListOf<PointF>()
+        for (vector in polygon.asVectorList()) {
+            intersect(vector)?.let {
+                points.add(it)
+            }
+        }
+        return points
+    }
+
 }

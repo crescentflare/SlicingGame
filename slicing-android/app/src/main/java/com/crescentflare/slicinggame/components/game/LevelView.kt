@@ -25,6 +25,7 @@ import com.crescentflare.slicinggame.sprites.core.Sprite
 import com.crescentflare.unilayout.helpers.UniLayoutParams
 import java.lang.ref.WeakReference
 import kotlin.math.max
+import kotlin.math.sqrt
 
 
 /**
@@ -108,6 +109,13 @@ open class LevelView : FrameContainerView, Physics.Listener {
         fun onLethalHit()
 
     }
+
+
+    // --
+    // Slice result
+    // --
+
+    data class SliceResult(val vector: Vector, val canvasIndices: List<Int>)
 
 
     // --
@@ -201,16 +209,18 @@ open class LevelView : FrameContainerView, Physics.Listener {
     // Slicing
     // --
 
-    fun slice(vector: Vector) {
+    fun slice(vector: Vector, restrictCanvasIndices: List<Int>? = null) {
         // Prepare slice vectors
         val topLeft = PointF(0f, 0f)
         val bottomRight = PointF(levelWidth, levelHeight)
         val offsetVector = vector.perpendicular().unit() * (sliceWidth / 2)
-        val sliceVector = vector.translated(-offsetVector.x, -offsetVector.y).stretchedToEdges(topLeft, bottomRight)
-        val reversedVector = vector.reversed().translated(offsetVector.x, offsetVector.y).stretchedToEdges(topLeft, bottomRight)
+        val originalSliceVector = vector.translated(-offsetVector.x, -offsetVector.y)
+        val originalReversedVector = vector.reversed().translated(offsetVector.x, offsetVector.y)
+        val sliceVector = originalSliceVector.stretchedToEdges(topLeft, bottomRight)
+        val reversedVector = originalReversedVector.stretchedToEdges(topLeft, bottomRight)
 
         // Check for collision
-        val slicePolygon = Polygon(listOf(sliceVector.end, sliceVector.start, reversedVector.end, reversedVector.start))
+        val slicePolygon = Polygon(listOf(originalSliceVector.end, originalSliceVector.start, originalReversedVector.end, originalReversedVector.start))
         if (spriteContainerView.spritesOnPolygon(slicePolygon)) {
             onLethalCollision()
             return
@@ -219,22 +229,25 @@ open class LevelView : FrameContainerView, Physics.Listener {
         // Apply slice
         val originalCanvasViews = mutableListOf<LevelCanvasView>().apply { addAll(canvasViews) }
         val insertDuplicateIndex = max(indexOfChild(canvasViews[0]), 0)
-        for (canvasView in originalCanvasViews) {
-            val normalClearRate = canvasView.clearRateForSlice(sliceVector)
-            val reversedClearRate = canvasView.clearRateForSlice(reversedVector)
-            val normalSpriteCount = spriteContainerView.spritesPerSlice(sliceVector, canvasView.slicedBoundary)
-            val reversedSpriteCount = spriteContainerView.spritesPerSlice(reversedVector, canvasView.slicedBoundary)
-            if (normalSpriteCount > 0 && reversedSpriteCount > 0) {
-                (canvasView.clone() as? LevelCanvasView)?.let { duplicateCanvasView ->
-                    canvasViews.add(duplicateCanvasView)
-                    addView(duplicateCanvasView, insertDuplicateIndex)
-                    duplicateCanvasView.slice(reversedVector)
+        for (index in originalCanvasViews.indices) {
+            val canvasView = originalCanvasViews[index]
+            if (restrictCanvasIndices?.contains(index) == true) {
+                val normalClearRate = canvasView.clearRateForSlice(sliceVector)
+                val reversedClearRate = canvasView.clearRateForSlice(reversedVector)
+                val normalSpriteCount = spriteContainerView.spritesPerSlice(sliceVector, canvasView.slicedBoundary)
+                val reversedSpriteCount = spriteContainerView.spritesPerSlice(reversedVector, canvasView.slicedBoundary)
+                if (normalSpriteCount > 0 && reversedSpriteCount > 0) {
+                    (canvasView.clone() as? LevelCanvasView)?.let { duplicateCanvasView ->
+                        canvasViews.add(duplicateCanvasView)
+                        addView(duplicateCanvasView, insertDuplicateIndex)
+                        duplicateCanvasView.slice(reversedVector)
+                    }
+                    canvasView.slice(sliceVector)
+                } else if (reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate)) {
+                    canvasView.slice(reversedVector)
+                } else {
+                    canvasView.slice(sliceVector)
                 }
-                canvasView.slice(sliceVector)
-            } else if (reversedSpriteCount > normalSpriteCount || (reversedSpriteCount == normalSpriteCount && reversedClearRate < normalClearRate)) {
-                canvasView.slice(reversedVector)
-            } else {
-                canvasView.slice(sliceVector)
             }
         }
 
@@ -270,7 +283,11 @@ open class LevelView : FrameContainerView, Physics.Listener {
         progressView.text = "${100 - remainingProgress.toInt()} / $requireClearRate%"
     }
 
-    fun transformedSliceVector(vector: Vector): Vector {
+    fun transformedSliceVector(vector: Vector, reversed: Boolean = false): Vector {
+        if (reversed) {
+            val scaledVector = vector.scaled(canvasViews[0].width / levelWidth, canvasViews[0].height / levelHeight)
+            return scaledVector.translated(left.toFloat(), top.toFloat())
+        }
         val translatedVector = vector.translated(-left.toFloat(), -top.toFloat())
         return translatedVector.scaled(levelWidth / canvasViews[0].width.toFloat(), levelHeight / canvasViews[0].height.toFloat())
     }
@@ -285,6 +302,67 @@ open class LevelView : FrameContainerView, Physics.Listener {
             return spriteContainerView.setSliceVector(sliceVector)
         }
         return spriteContainerView.setSliceVector(null)
+    }
+
+    fun validateSlice(vector: Vector, screenSpace: Boolean = false): SliceResult? {
+        // Validation fails when the view size has not been calculated yet
+        if (width <= 0 || height <= 0) {
+            return null
+        }
+
+        // Prepare slice vector for finding points
+        val topLeft = PointF(0f, 0f)
+        val bottomRight = PointF(levelWidth, levelHeight)
+        val sliceVector = if (screenSpace) transformedSliceVector(vector) else vector
+        val stretchedSliceVector = sliceVector.stretchedToEdges(topLeft, bottomRight)
+
+        // Collect intersection points for all canvases
+        val intersectionPoints = mutableListOf<SliceIntersectionPoint>()
+        for (index in canvasViews.indices) {
+            val edgeIntersections = stretchedSliceVector.edgeIntersections(canvasViews[index].slicedBoundary)
+            for (point in edgeIntersections) {
+                val intersectionPoint = SliceIntersectionPoint()
+                intersectionPoint.canvasIndex = index
+                intersectionPoint.point = point
+                intersectionPoint.startDistance = pointDistance(sliceVector.start, point, sliceVector)
+                intersectionPoint.endDistance = pointDistance(point, sliceVector.end, sliceVector)
+                intersectionPoints.add(intersectionPoint)
+            }
+        }
+
+        // Find start and end positions as well as canvases that can be sliced (with snapping)
+        val sortedIntersectionPoints = intersectionPoints.sortedBy { it.startDistance }
+        val maxSnapDistance = levelWidth / 16
+        var resultVector: Vector? = null
+        val sliceCanvasIndices = mutableListOf<Int>()
+        for (index in sortedIntersectionPoints.indices) {
+            if (index + 1 < sortedIntersectionPoints.size) {
+                val intersectionPoint = sortedIntersectionPoints[index]
+                val nextIntersectionPoint = sortedIntersectionPoints[index + 1]
+                if (intersectionPoint.startDistance >= -maxSnapDistance && intersectionPoint.endDistance >= 0 && nextIntersectionPoint.canvasIndex == intersectionPoint.canvasIndex) {
+                    if (resultVector != null) {
+                        if (nextIntersectionPoint.endDistance >= -maxSnapDistance) {
+                            resultVector.end = nextIntersectionPoint.point
+                            sliceCanvasIndices.add(intersectionPoint.canvasIndex)
+                        } else {
+                            resultVector.end = sliceVector.end
+                        }
+                    } else {
+                        resultVector = Vector(intersectionPoint.point, sliceVector.end)
+                        if (nextIntersectionPoint.endDistance >= -maxSnapDistance) {
+                            resultVector.end = nextIntersectionPoint.point
+                            sliceCanvasIndices.add(intersectionPoint.canvasIndex)
+                        }
+                    }
+                }
+            }
+        }
+
+        // Return result
+        resultVector?.let {
+            return SliceResult(if (screenSpace) transformedSliceVector(it, true) else resultVector, sliceCanvasIndices)
+        }
+        return null
     }
 
 
@@ -370,6 +448,21 @@ open class LevelView : FrameContainerView, Physics.Listener {
 
 
     // --
+    // Helper
+    // --
+
+    private fun pointDistance(from: PointF, to: PointF, directionVector: Vector): Float {
+        val x = to.x - from.x
+        val y = to.y - from.y
+        val result = sqrt(x * x + y * y)
+        if ((x < 0) == (directionVector.x < 0) && (y < 0) == (directionVector.y < 0)) {
+            return result
+        }
+        return -result
+    }
+
+
+    // --
     // Custom layout
     // --
 
@@ -377,5 +470,17 @@ open class LevelView : FrameContainerView, Physics.Listener {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(canvasViews[0].measuredWidth, canvasViews[0].measuredHeight + progressViewMargin)
     }
+
+
+    // --
+    // Slice intersection point structure
+    // --
+
+    private data class SliceIntersectionPoint(
+        var point: PointF = PointF(),
+        var startDistance: Float = 0f,
+        var endDistance: Float = 0f,
+        var canvasIndex: Int = 0
+    )
 
 }
