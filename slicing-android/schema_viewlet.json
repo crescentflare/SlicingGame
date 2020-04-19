@@ -339,6 +339,13 @@
             "description": "Sends event when a lethal hit occurs in the level",
             "$ref": "#/definitions/appEvent"
           },
+          "lethalHitEvents": {
+            "description": "Sends multiple events when a lethal hit occurs in the level",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/appEvent"
+            }
+          },
           "fps": {
             "description": "The amount of frames per second the sprite refresh loop tries to run on",
             "type": "integer"

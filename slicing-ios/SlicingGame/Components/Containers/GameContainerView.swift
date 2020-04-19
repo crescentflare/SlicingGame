@@ -56,7 +56,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
 
                 // Apply events
                 gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
-                gameContainer.lethalHitEvent = AppEvent.fromValue(value: attributes["lethalHitEvent"])
+                gameContainer.lethalHitEvents = AppEvent.fromValues(values: attributes["lethalHitEvents"] ?? attributes["lethalHitEvent"])
 
                 // Apply update frames per second
                 gameContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
@@ -172,7 +172,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     // --
     
     var clearEvent: AppEvent?
-    var lethalHitEvent: AppEvent?
+    var lethalHitEvents = [AppEvent]()
 
     var levelWidth: Float = 1 {
         didSet {
@@ -232,8 +232,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
         slicePreviewView.start = nil
         slicePreviewView.end = nil
         levelView.setSliceVector(vector: nil)
-        if let lethalHitEvent = lethalHitEvent {
-            eventObserver?.observedEvent(lethalHitEvent, sender: self)
+        for event in lethalHitEvents {
+            eventObserver?.observedEvent(event, sender: self)
         }
     }
 
