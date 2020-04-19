@@ -55,8 +55,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
                 gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
 
                 // Apply events
-                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
-                gameContainer.lethalHitEvent = AppEvent.fromValue(value: attributes["lethalHitEvent"])
+                gameContainer.clearEvents = AppEvent.fromValues(values: attributes["clearEvents"] ?? attributes["clearEvent"])
+                gameContainer.lethalHitEvents = AppEvent.fromValues(values: attributes["lethalHitEvents"] ?? attributes["lethalHitEvent"])
 
                 // Apply update frames per second
                 gameContainer.fps = convUtil.asInt(value: attributes["fps"]) ?? 60
@@ -156,8 +156,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     func slice(vector: Vector, restrictCanvasIndices: [Int]? = nil) {
         levelView.slice(vector: vector, restrictCanvasIndices: restrictCanvasIndices)
         if levelView.cleared() {
-            if let clearEvent = clearEvent {
-                eventObserver?.observedEvent(clearEvent, sender: self)
+            for event in clearEvents {
+                eventObserver?.observedEvent(event, sender: self)
             }
         }
     }
@@ -171,8 +171,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     // MARK: Configurable values
     // --
     
-    var clearEvent: AppEvent?
-    var lethalHitEvent: AppEvent?
+    var clearEvents = [AppEvent]()
+    var lethalHitEvents = [AppEvent]()
 
     var levelWidth: Float = 1 {
         didSet {
@@ -232,8 +232,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
         slicePreviewView.start = nil
         slicePreviewView.end = nil
         levelView.setSliceVector(vector: nil)
-        if let lethalHitEvent = lethalHitEvent {
-            eventObserver?.observedEvent(lethalHitEvent, sender: self)
+        for event in lethalHitEvents {
+            eventObserver?.observedEvent(event, sender: self)
         }
     }
 

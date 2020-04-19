@@ -62,7 +62,7 @@ class ImageButtonView: UniImageView, ControlComponent {
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: imageButton, attributes: attributes)
 
                 // Apply event
-                imageButton.tapEvent = AppEvent.fromValue(value: attributes["tapEvent"])
+                imageButton.tapEvents = AppEvent.fromValues(values: attributes["tapEvents"] ?? attributes["tapEvent"])
 
                 // Chain event observer
                 if let eventObserver = parent as? AppEventObserver {
@@ -108,9 +108,9 @@ class ImageButtonView: UniImageView, ControlComponent {
     
     weak var eventObserver: AppEventObserver?
     
-    var tapEvent: AppEvent? {
+    var tapEvents = [AppEvent]() {
         didSet {
-            isEnabled = tapEvent != nil
+            isEnabled = !tapEvents.isEmpty
         }
     }
 
@@ -227,8 +227,8 @@ class ImageButtonView: UniImageView, ControlComponent {
     }
     
     private func buttonTapped() {
-        if let tapEvent = tapEvent {
-            eventObserver?.observedEvent(tapEvent, sender: self)
+        for event in tapEvents {
+            eventObserver?.observedEvent(event, sender: self)
         }
     }
 

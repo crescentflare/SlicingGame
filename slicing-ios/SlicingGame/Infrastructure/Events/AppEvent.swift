@@ -15,7 +15,7 @@ class AppEvent {
 
 
     // --
-    // MARK: Factory method
+    // MARK: Factory methods
     // --
     
     class func fromValue(value: Any?) -> AppEvent? {
@@ -27,7 +27,22 @@ class AppEvent {
         return nil
     }
 
+    class func fromValues(values: Any?) -> [AppEvent] {
+        if let valueArray = values as? [Any] {
+            var result = [AppEvent]()
+            for valueItem in valueArray {
+                if let value = fromValue(value: valueItem) {
+                    result.append(value)
+                }
+            }
+            return result
+        } else if let singleValue = fromValue(value: values) {
+            return [singleValue]
+        }
+        return []
+    }
 
+    
     // --
     // MARK: Initialization
     // --

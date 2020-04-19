@@ -11,5 +11,7 @@
     <!-- Game -->
     <string name="game_complete_level_title">Congratulations!</string>
     <string name="game_complete_level_text">You\'ve reached the clear target to reveal the background</string>
+    <string name="game_failed_title">Too bad...</string>
+    <string name="game_failed_text">Something was hit while making your slice, you\'ll have to start over</string>
 
 </resources>

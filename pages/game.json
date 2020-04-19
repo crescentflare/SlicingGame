@@ -51,7 +51,11 @@
           "sliceWidth": 0.1,
           "requireClearRate": 90,
           "clearEvent": "alert://simple?localizedTitle=GAME_COMPLETE_LEVEL_TITLE&localizedText=GAME_COMPLETE_LEVEL_TEXT&localizedActionText=ALERT_OK",
-          "lethalHitEvent": "vibrate://heavy",
+          "lethalHitEvents": [
+            "vibrate://heavy",
+            "alert://simple?localizedTitle=GAME_FAILED_TITLE&localizedText=GAME_FAILED_TEXT",
+            "game://reset"
+          ],
           "drawPhysicsBoundaries": false,
           "sprites": [
             {

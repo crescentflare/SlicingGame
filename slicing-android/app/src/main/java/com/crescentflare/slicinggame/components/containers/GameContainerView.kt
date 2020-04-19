@@ -56,8 +56,8 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
                     obj.requireClearRate = mapUtil.optionalInteger(attributes, "requireClearRate", 100)
 
                     // Apply events
-                    obj.clearEvent = AppEvent.fromValue(attributes["clearEvent"])
-                    obj.lethalHitEvent = AppEvent.fromValue(attributes["lethalHitEvent"])
+                    obj.clearEvents = AppEvent.fromValues(attributes["clearEvents"] ?: attributes["clearEvent"])
+                    obj.lethalHitEvents = AppEvent.fromValues(attributes["lethalHitEvents"] ?: attributes["lethalHitEvent"])
 
                     // Apply update frames per second
                     obj.fps = mapUtil.optionalInteger(attributes, "fps", 60)
@@ -176,8 +176,8 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     fun slice(vector: Vector, restrictCanvasIndices: List<Int>? = null) {
         levelView.slice(vector, restrictCanvasIndices)
         if (levelView.cleared()) {
-            clearEvent?.let {
-                eventObserver?.observedEvent(it, this)
+            for (clearEvent in clearEvents) {
+                eventObserver?.observedEvent(clearEvent, this)
             }
         }
     }
@@ -191,8 +191,8 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
     // Configurable values
     // --
 
-    var clearEvent: AppEvent? = null
-    var lethalHitEvent: AppEvent? = null
+    var clearEvents = listOf<AppEvent>()
+    var lethalHitEvents = listOf<AppEvent>()
 
     var levelWidth: Float = 1f
         set(levelWidth) {
@@ -248,8 +248,8 @@ open class GameContainerView : FrameContainerView, LevelView.Listener {
         slicePreviewView.start = null
         slicePreviewView.end = null
         levelView.setSliceVector(null)
-        lethalHitEvent?.let {
-            eventObserver?.observedEvent(it, this)
+        for (event in lethalHitEvents) {
+            eventObserver?.observedEvent(event, this)
         }
     }
 

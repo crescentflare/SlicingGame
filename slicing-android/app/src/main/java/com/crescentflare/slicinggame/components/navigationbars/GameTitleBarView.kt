@@ -62,9 +62,9 @@ open class GameTitleBarView : LinearContainerView, View.OnClickListener, Navigat
 
                     // Apply icons and events
                     obj.menuIcon = ImageSource.fromValue(attributes["menuIcon"])
-                    obj.menuEvent = AppEvent.fromValue(attributes["menuEvent"])
+                    obj.menuEvents = AppEvent.fromValues(attributes["menuEvents"] ?: attributes["menuEvent"])
                     obj.actionIcon = ImageSource.fromValue(attributes["actionIcon"])
-                    obj.actionEvent = AppEvent.fromValue(attributes["actionEvent"])
+                    obj.actionEvents = AppEvent.fromValues(attributes["actionEvents"] ?: attributes["actionEvent"])
 
                     // Apply bar styling
                     obj.showDivider = mapUtil.optionalBoolean(attributes, "showDivider", false)
@@ -179,12 +179,12 @@ open class GameTitleBarView : LinearContainerView, View.OnClickListener, Navigat
             menuIconContainer?.visibility = if (menuIcon != null) VISIBLE else GONE
         }
 
-    var menuEvent: AppEvent? = null
-        set(menuEvent) {
-            field = menuEvent
-            menuIconView?.isEnabled = menuEvent != null
-            menuIconContainer?.isEnabled = menuEvent != null
-            menuIconContainer?.setOnClickListener(if (menuEvent != null) this else null)
+    var menuEvents = listOf<AppEvent>()
+        set(menuEvents) {
+            field = menuEvents
+            menuIconView?.isEnabled = menuEvents.isNotEmpty()
+            menuIconContainer?.isEnabled = menuEvents.isNotEmpty()
+            menuIconContainer?.setOnClickListener(if (menuEvents.isNotEmpty()) this else null)
         }
 
     var actionIcon: ImageSource?
@@ -196,12 +196,12 @@ open class GameTitleBarView : LinearContainerView, View.OnClickListener, Navigat
             actionIconContainer?.visibility = if (actionIcon != null) VISIBLE else GONE
         }
 
-    var actionEvent: AppEvent? = null
-        set(actionEvent) {
-            field = actionEvent
-            actionIconView?.isEnabled = actionEvent != null
-            actionIconContainer?.isEnabled = actionEvent != null
-            actionIconContainer?.setOnClickListener(if (actionEvent != null) this else null)
+    var actionEvents = listOf<AppEvent>()
+        set(actionEvents) {
+            field = actionEvents
+            actionIconView?.isEnabled = actionEvents.isNotEmpty()
+            actionIconContainer?.isEnabled = actionEvents.isNotEmpty()
+            actionIconContainer?.setOnClickListener(if (actionEvents.isNotEmpty()) this else null)
         }
 
     var showDivider: Boolean = false
@@ -217,12 +217,12 @@ open class GameTitleBarView : LinearContainerView, View.OnClickListener, Navigat
 
     override fun onClick(view: View?) {
         if (view == menuIconContainer) {
-            menuEvent?.let {
-                eventObserver?.observedEvent(it, menuIconView)
+            for (menuEvent in menuEvents) {
+                eventObserver?.observedEvent(menuEvent, menuIconView)
             }
         } else if (view == actionIconContainer) {
-            actionEvent?.let {
-                eventObserver?.observedEvent(it, actionIconView)
+            for (actionEvent in actionEvents) {
+                eventObserver?.observedEvent(actionEvent, actionIconView)
             }
         }
     }
