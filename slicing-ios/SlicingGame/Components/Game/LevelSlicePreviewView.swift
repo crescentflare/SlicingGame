@@ -50,7 +50,6 @@ class LevelSlicePreviewView: UniView {
                 
                 // Apply colors
                 slicePreview.color = convUtil.asColor(value: attributes["color"])
-                slicePreview.stretchedColor = convUtil.asColor(value: attributes["stretchedColor"])
 
                 // Generic view properties
                 ViewletUtil.applyGenericViewAttributes(convUtil: convUtil, view: slicePreview, attributes: attributes)
@@ -121,12 +120,6 @@ class LevelSlicePreviewView: UniView {
         }
     }
 
-    var stretchedColor: UIColor? {
-        didSet {
-            updateLayers()
-        }
-    }
-
     
     // --
     // MARK: Update layers
@@ -138,21 +131,6 @@ class LevelSlicePreviewView: UniView {
             layer.removeFromSuperlayer()
         }
 
-        // Add stretched line to component edges
-        if let sliceVector = sliceVector, sliceVector.isValid() {
-            let stretchedVector = sliceVector.stretchedToEdges(topLeft: CGPoint(x: 0, y: 0), bottomRight: CGPoint(x: bounds.width, y: bounds.height))
-            if stretchedVector.isValid() {
-                let stretchedLine = CAShapeLayer()
-                let stretchedLinePath = UIBezierPath()
-                stretchedLinePath.move(to: stretchedVector.start)
-                stretchedLinePath.addLine(to: stretchedVector.end)
-                stretchedLine.path = stretchedLinePath.cgPath
-                stretchedLine.strokeColor = stretchedColor?.cgColor
-                stretchedLine.lineWidth = AppDimensions.slicePreviewStretchedWidth
-                layer.addSublayer(stretchedLine)
-            }
-        }
-        
         // Add start/end dots
         let dotOffset = AppDimensions.slicePreviewDot / 2
         if let start = start {

@@ -11,7 +11,7 @@ import com.crescentflare.slicinggame.infrastructure.inflator.Inflators
 class AppEvent {
 
     // --
-    // Static: factory method
+    // Static: factory methods
     // --
 
     companion object {
@@ -29,6 +29,22 @@ class AppEvent {
                 }
             }
             return null
+        }
+
+        fun fromValues(values: Any?): List<AppEvent> {
+            if (values is List<*>) {
+                val result = mutableListOf<AppEvent>()
+                for (valueItem in values) {
+                    fromValue(valueItem)?.let {
+                        result.add(it)
+                    }
+                }
+                return result
+            }
+            fromValue(values)?.let {
+                return listOf(it)
+            }
+            return listOf()
         }
 
     }

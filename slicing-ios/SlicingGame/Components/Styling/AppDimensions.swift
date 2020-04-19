@@ -23,7 +23,6 @@ class AppDimensions {
                 
                 "slicePreviewDot": slicePreviewDot,
                 "slicePreviewWidth": slicePreviewWidth,
-                "slicePreviewStretchedWidth": slicePreviewStretchedWidth,
                 "slicePreviewDash": slicePreviewDash,
                 
                 "portraitTitleBarHeight": portraitTitleBarHeight,
@@ -56,7 +55,6 @@ class AppDimensions {
     
     class var slicePreviewDot: CGFloat { get { return 10 } }
     class var slicePreviewWidth: CGFloat { get { return 2 } }
-    class var slicePreviewStretchedWidth: CGFloat { get { return 1 } }
     class var slicePreviewDash: CGFloat { get { return 8 } }
 
 
