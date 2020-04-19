@@ -52,7 +52,7 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
                     ViewletUtil.applyGenericViewAttributes(mapUtil, obj, attributes)
 
                     // Apply event
-                    obj.tapEvent = AppEvent.fromValue(attributes["tapEvent"])
+                    obj.tapEvents = AppEvent.fromValues(attributes["tapEvents"] ?: attributes["tapEvent"])
 
                     // Chain event observer
                     if (parent is AppEventObserver) {
@@ -117,11 +117,11 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
             }
         }
 
-    var tapEvent: AppEvent? = null
-        set(tapEvent) {
-            field = tapEvent
-            isEnabled = tapEvent != null
-            setOnClickListener(if (tapEvent != null) this else null)
+    var tapEvents = listOf<AppEvent>()
+        set(tapEvents) {
+            field = tapEvents
+            isEnabled = tapEvents.isNotEmpty()
+            setOnClickListener(if (tapEvents.isNotEmpty()) this else null)
         }
 
     var source: ImageSource? = null
@@ -196,8 +196,8 @@ open class ImageButtonView : UniImageView, View.OnClickListener {
     // --
 
     override fun onClick(view: View?) {
-        tapEvent?.let {
-            eventObserver?.observedEvent(it, this)
+        for (tapEvent in tapEvents) {
+            eventObserver?.observedEvent(tapEvent, this)
         }
     }
 

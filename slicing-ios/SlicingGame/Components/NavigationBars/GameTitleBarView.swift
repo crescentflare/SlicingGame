@@ -49,9 +49,9 @@ class GameTitleBarView: LinearContainerView, NavigationBarComponent {
                 
                 // Apply icons and events
                 titleBar.menuIcon = ImageSource.fromValue(value: attributes["menuIcon"])
-                titleBar.menuEvent = AppEvent.fromValue(value: attributes["menuEvent"])
+                titleBar.menuEvents = AppEvent.fromValues(values: attributes["menuEvents"] ?? attributes["menuEvent"])
                 titleBar.actionIcon = ImageSource.fromValue(value: attributes["actionIcon"])
-                titleBar.actionEvent = AppEvent.fromValue(value: attributes["actionEvent"])
+                titleBar.actionEvents = AppEvent.fromValues(values: attributes["actionEvents"] ?? attributes["actionEvent"])
 
                 // Apply bar styling
                 titleBar.showDivider = convUtil.asBool(value: attributes["showDivider"]) ?? false
@@ -145,11 +145,11 @@ class GameTitleBarView: LinearContainerView, NavigationBarComponent {
         get { return menuButtonView?.source }
     }
     
-    var menuEvent: AppEvent? {
+    var menuEvents: [AppEvent] {
         set {
-            menuButtonView?.tapEvent = newValue
+            menuButtonView?.tapEvents = newValue
         }
-        get { return menuButtonView?.tapEvent }
+        get { return menuButtonView?.tapEvents ?? [] }
     }
 
     var actionIcon: ImageSource? {
@@ -163,11 +163,11 @@ class GameTitleBarView: LinearContainerView, NavigationBarComponent {
         get { return actionButtonView?.source }
     }
     
-    var actionEvent: AppEvent? {
+    var actionEvents: [AppEvent] {
         set {
-            actionButtonView?.tapEvent = newValue
+            actionButtonView?.tapEvents = newValue
         }
-        get { return actionButtonView?.tapEvent }
+        get { return actionButtonView?.tapEvents ?? [] }
     }
 
     var showDivider: Bool = false {

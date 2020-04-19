@@ -55,7 +55,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
                 gameContainer.requireClearRate = convUtil.asInt(value: attributes["requireClearRate"]) ?? 100
 
                 // Apply events
-                gameContainer.clearEvent = AppEvent.fromValue(value: attributes["clearEvent"])
+                gameContainer.clearEvents = AppEvent.fromValues(values: attributes["clearEvents"] ?? attributes["clearEvent"])
                 gameContainer.lethalHitEvents = AppEvent.fromValues(values: attributes["lethalHitEvents"] ?? attributes["lethalHitEvent"])
 
                 // Apply update frames per second
@@ -156,8 +156,8 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     func slice(vector: Vector, restrictCanvasIndices: [Int]? = nil) {
         levelView.slice(vector: vector, restrictCanvasIndices: restrictCanvasIndices)
         if levelView.cleared() {
-            if let clearEvent = clearEvent {
-                eventObserver?.observedEvent(clearEvent, sender: self)
+            for event in clearEvents {
+                eventObserver?.observedEvent(event, sender: self)
             }
         }
     }
@@ -171,7 +171,7 @@ class GameContainerView: FrameContainerView, LevelViewDelegate {
     // MARK: Configurable values
     // --
     
-    var clearEvent: AppEvent?
+    var clearEvents = [AppEvent]()
     var lethalHitEvents = [AppEvent]()
 
     var levelWidth: Float = 1 {

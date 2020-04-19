@@ -221,6 +221,13 @@
           "tapEvent": {
             "description": "Sends event when the button is tapped",
             "$ref": "#/definitions/appEvent"
+          },
+          "tapEvents": {
+            "description": "Sends multiple events when the button is tapped",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/appEvent"
+            }
           }
         }
       }
@@ -334,6 +341,13 @@
           "clearEvent": {
             "description": "Sends event when the level is cleared",
             "$ref": "#/definitions/appEvent"
+          },
+          "clearEvents": {
+            "description": "Sends multiple events when the level is cleared",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/appEvent"
+            }
           },
           "lethalHitEvent": {
             "description": "Sends event when a lethal hit occurs in the level",
@@ -613,6 +627,13 @@
             "description": "Sends event when the menu icon is tapped",
             "$ref": "#/definitions/appEvent"
           },
+          "menuEvents": {
+            "description": "Sends multiple events when the menu icon is tapped",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/appEvent"
+            }
+          },
           "actionIcon": {
             "description": "Defines the icon for an action button",
             "$ref": "./schema_image_source.json"
@@ -620,6 +641,13 @@
           "actionEvent": {
             "description": "Sends event when the action icon is tapped",
             "$ref": "#/definitions/appEvent"
+          },
+          "actionEvents": {
+            "description": "Sends multiple events when the action icon is tapped",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/appEvent"
+            }
           },
           "showDivider": {
             "description": "Set visibility of the divider between the bar and the rest of the content",
